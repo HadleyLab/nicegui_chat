@@ -8,7 +8,7 @@ import sys
 project_root = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, project_root)
 
-from main import main
+from main import main  # noqa: E402
 
 if __name__ == "__main__":
     print("🚀 Starting NiceGUI Chat...")

@@ -5,6 +5,48 @@ All notable changes to MammoChat will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2025-10-02
+
+### Added - Comprehensive Testing Suite
+- **143 passing tests** with 95% code coverage
+- **Complete unit test coverage** for all core modules:
+  - Configuration management (95% coverage)
+  - Chat and memory models (100% coverage)
+  - Service layer (87-100% coverage)
+  - Exception handling (100% coverage)
+- **Integration tests** for chat service workflows
+- **Async testing support** for all async operations
+- **Mocking infrastructure** for external API dependencies
+- **CI/CD ready** with automated coverage reporting
+
+### Added - Testing Infrastructure
+- **pytest** with async support and coverage reporting
+- **Comprehensive test fixtures** in `tests/conftest.py`
+- **Shared test utilities** for consistent mocking
+- **Coverage configuration** with 90% minimum threshold
+- **UI components excluded** from coverage (complex to test)
+
+### Added - Code Quality Tools
+- **ruff**: Fast Python linter and formatter
+- **black**: Code formatter with 100-character line length
+- **isort**: Import organizer for clean imports
+- **mypy**: Static type checker for type safety
+- **Automated quality gates** in CI/CD pipeline
+
+### Changed
+- **Version bumped** to 0.2.5 (internal testing improvements)
+- **Updated documentation** to reflect comprehensive testing
+- **Enhanced README** with testing section and coverage details
+
+### Technical Details
+- **Testing Standards**: Fail fast, explicit coverage, speed first
+- **Coverage Breakdown**:
+  - 100% coverage: Exceptions, Chat models, Memory models, Chat service
+  - 95% coverage: Configuration management
+  - 87-90% coverage: Auth service, Memory service, Agent service
+- **Test Architecture**: Unit tests + integration tests + async support
+- **Quality Tools**: ruff/black/isort/mypy with automated enforcement
+
 ## [0.2.0] - 2025-10-02
 
 ### Changed

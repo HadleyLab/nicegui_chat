@@ -2,22 +2,23 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class MemoryEpisode(BaseModel):
+class MemoryEpisode(BaseModel):  # type: ignore[misc]
     """Memory episode model."""
+
     episode_id: str
     body: str
-    space_id: Optional[str] = None
-    session_id: Optional[str] = None
-    created_at: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    space_id: str | None = None
+    session_id: str | None = None
+    created_at: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
     @classmethod
-    def from_api(cls, payload: Dict[str, Any]) -> "MemoryEpisode":
+    def from_api(cls, payload: dict[str, Any]) -> MemoryEpisode:
         """Create a MemoryEpisode from API response."""
         return cls(
             episode_id=str(payload.get("episode_id") or payload.get("id", "")),
@@ -29,13 +30,14 @@ class MemoryEpisode(BaseModel):
         )
 
 
-class MemorySearchResult(BaseModel):
+class MemorySearchResult(BaseModel):  # type: ignore[misc]
     """Memory search result model."""
-    episodes: List[MemoryEpisode] = Field(default_factory=list)
+
+    episodes: list[MemoryEpisode] = Field(default_factory=list)
     total: int = 0
 
     @classmethod
-    def from_api(cls, payload: Dict[str, Any]) -> "MemorySearchResult":
+    def from_api(cls, payload: dict[str, Any]) -> MemorySearchResult:
         """Create a MemorySearchResult from API response."""
         episodes_data = payload.get("episodes", [])
         episodes = [MemoryEpisode.from_api(ep) for ep in episodes_data]
@@ -45,15 +47,16 @@ class MemorySearchResult(BaseModel):
         )
 
 
-class MemorySpace(BaseModel):
+class MemorySpace(BaseModel):  # type: ignore[misc]
     """Memory space model."""
+
     space_id: str
     name: str
-    description: Optional[str] = None
-    created_at: Optional[str] = None
+    description: str | None = None
+    created_at: str | None = None
 
     @classmethod
-    def from_dict(cls, payload: Dict[str, Any]) -> "MemorySpace":
+    def from_dict(cls, payload: dict[str, Any]) -> MemorySpace:
         """Create a MemorySpace from dictionary."""
         return cls(
             space_id=str(payload.get("space_id") or payload.get("id", "")),

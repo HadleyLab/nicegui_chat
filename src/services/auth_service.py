@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 import sys
-from typing import Optional
 
 try:
     from heysol import HeySolClient
@@ -12,7 +11,7 @@ except ModuleNotFoundError as exc:
     client_path = os.getenv("HEYSOL_CLIENT_PATH")
     if client_path and client_path not in sys.path:
         sys.path.append(client_path)
-        from heysol import HeySolClient  # type: ignore
+        from heysol import HeySolClient
     else:
         raise exc
 
@@ -25,8 +24,8 @@ class AuthService:
 
     def __init__(self, config: HeysolConfig) -> None:
         self._config = config
-        self._client: Optional[HeySolClient] = None
-        self._api_key: Optional[str] = config.api_key
+        self._client: HeySolClient | None = None
+        self._api_key: str | None = config.api_key
 
         if self._api_key:
             try:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, RunContext
@@ -10,34 +10,36 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.deepseek import DeepSeekProvider
 
 from ..config import DeepSeekConfig
-from ..models.chat import ChatMessage, ConversationState, MessageRole
-from ..models.memory import MemorySearchResult
+from ..models.chat import ConversationState
 from ..services.memory_service import MemoryService
 from ..utils.exceptions import ChatServiceError
 
 
-class AgentDependencies(BaseModel):
+class AgentDependencies(BaseModel):  # type: ignore[misc]
     """Dependencies provided to tool callbacks during agent execution."""
-    selected_space_ids: List[str] = Field(default_factory=list)
+
+    selected_space_ids: list[str] = Field(default_factory=list)
 
 
-class AgentOutput(BaseModel):
+class AgentOutput(BaseModel):  # type: ignore[misc]
     """Structured response returned by the agent."""
+
     reply: str = Field(description="Assistant reply to present to the user")
-    referenced_memories: List[str] = Field(
+    referenced_memories: list[str] = Field(
         default_factory=list,
         description="List of memory entries used in the response",
     )
-    follow_up_actions: List[str] = Field(
+    follow_up_actions: list[str] = Field(
         default_factory=list,
         description="Optional follow up actions to suggest to the user",
     )
 
 
-class AgentResult(BaseModel):
+class AgentResult(BaseModel):  # type: ignore[misc]
     """Aggregated result returned to the chat service."""
+
     reply: str
-    referenced_memories: List[str] = Field(default_factory=list)
+    referenced_memories: list[str] = Field(default_factory=list)
 
 
 class ChatAgent:
@@ -48,7 +50,7 @@ class ChatAgent:
         memory_service: MemoryService,
         *,
         config: DeepSeekConfig,
-        model_name: Optional[str] = None,
+        model_name: str | None = None,
     ) -> None:
         self._memory_service = memory_service
         self._config = config
@@ -68,12 +70,12 @@ class ChatAgent:
         )
 
         # Register memory search tool
-        @self._agent.tool
+        @self._agent.tool  # type: ignore[misc]
         async def memory_search(
             ctx: RunContext[AgentDependencies],
             query: str,
             limit: int = 5,
-        ) -> List[str]:
+        ) -> list[str]:
             """Search the user's HeySol memory store for episodes related to the query."""
             deps = ctx.deps
             result = await self._memory_service.search(
@@ -84,11 +86,11 @@ class ChatAgent:
             return [episode.body for episode in result.episodes]
 
         # Register memory ingest tool
-        @self._agent.tool
+        @self._agent.tool  # type: ignore[misc]
         async def memory_ingest(
             ctx: RunContext[AgentDependencies],
             note: str,
-            space_id: Optional[str] = None,
+            space_id: str | None = None,
         ) -> str:
             """Store a new note in the user's HeySol memory."""
             await self._memory_service.add(
@@ -111,16 +113,14 @@ class ChatAgent:
         conversation: ConversationState,
         user_message: str,
         *,
-        selected_space_ids: Optional[List[str]] = None,
-        metadata: Optional[dict] = None,
+        selected_space_ids: list[str] | None = None,
+        metadata: dict[str, Any] | None = None,
         prefetch_memory: bool = True,
     ) -> AgentResult:
         """Generate a response using the LLM agent."""
         try:
             # Create dependencies
-            deps = AgentDependencies(
-                selected_space_ids=selected_space_ids or []
-            )
+            deps = AgentDependencies(selected_space_ids=selected_space_ids or [])
 
             # Run the agent - let it handle the conversation internally
             # Don't pass message_history as it causes the error
@@ -131,7 +131,7 @@ class ChatAgent:
 
             # Extract output
             output = result.output
-            
+
             return AgentResult(
                 reply=output.reply,
                 referenced_memories=output.referenced_memories,

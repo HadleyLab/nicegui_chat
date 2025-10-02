@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Any
 
 from dotenv import load_dotenv
-import json
 
 from .utils.exceptions import ConfigurationError
 
@@ -24,7 +24,7 @@ class PromptStore:
     """Lazy loader for prompt files stored on disk."""
 
     root: Path
-    _cache: Dict[str, str] = field(default_factory=dict, init=False)
+    _cache: dict[str, str] = field(default_factory=dict, init=False)
 
     def read(self, name: str) -> str:
         path = self.root / f"{name}.md"
@@ -33,7 +33,7 @@ class PromptStore:
         cache = object.__getattribute__(self, "_cache")
         if name not in cache:
             cache[name] = path.read_text(encoding="utf-8").strip()
-        return cache[name]
+        return str(cache[name])
 
     def optional(self, name: str, default: str = "") -> str:
         try:
@@ -52,13 +52,15 @@ class ChatConfig:
     max_history_display: int
 
     @classmethod
-    def from_payload(cls, payload: Dict[str, object]) -> "ChatConfig":
+    def from_payload(cls, payload: dict[str, Any]) -> ChatConfig:
         try:
             return cls(
-                enable_memory_enrichment=bool(payload.get("enable_memory_enrichment", True)),
+                enable_memory_enrichment=bool(
+                    payload.get("enable_memory_enrichment", True)
+                ),
                 store_user_messages=bool(payload.get("store_user_messages", True)),
-                stream_chunk_size=int(payload.get("stream_chunk_size", 50)),  # type: ignore
-                max_history_display=int(payload.get("max_history_display", 50)),  # type: ignore
+                stream_chunk_size=int(payload.get("stream_chunk_size", 50)),
+                max_history_display=int(payload.get("max_history_display", 50)),
             )
         except (KeyError, ValueError) as exc:
             raise ConfigurationError(f"Chat configuration error: {exc}") from exc
@@ -77,12 +79,14 @@ class DeepSeekConfig:
                 "DEEPSEEK_API_KEY environment variable is required to run the chat agent"
             )
         if not self.system_prompt:
-            raise ConfigurationError("System prompt could not be loaded from configuration")
+            raise ConfigurationError(
+                "System prompt could not be loaded from configuration"
+            )
 
 
 @dataclass(frozen=True)
 class HeysolConfig:
-    api_key: Optional[str]
+    api_key: str | None
     base_url: str
 
 
@@ -114,7 +118,7 @@ class UIConfig:
     response_complete_notification: str
 
     @classmethod
-    def from_payload(cls, payload: Dict[str, object]) -> "UIConfig":
+    def from_payload(cls, payload: dict[str, Any]) -> UIConfig:
         return cls(
             theme=str(payload.get("theme", "dark")),
             primary_color=str(payload.get("primary_color", "#6366f1")),
@@ -125,19 +129,33 @@ class UIConfig:
             border_radius=str(payload.get("border_radius", "12px")),
             animation_duration=str(payload.get("animation_duration", "0.3s")),
             tagline=str(payload.get("tagline", "Your journey, together")),
-            logo_full_path=str(payload.get("logo_full_path", "/branding/logo-full-color.svg")),
-            logo_icon_path=str(payload.get("logo_icon_path", "/branding/logo-icon.svg")),
+            logo_full_path=str(
+                payload.get("logo_full_path", "/branding/logo-full-color.svg")
+            ),
+            logo_icon_path=str(
+                payload.get("logo_icon_path", "/branding/logo-icon.svg")
+            ),
             welcome_title=str(payload.get("welcome_title", "Welcome to MammoChat")),
             welcome_message=str(payload.get("welcome_message", "")),
-            input_placeholder=str(payload.get("input_placeholder", "Type your message...")),
+            input_placeholder=str(
+                payload.get("input_placeholder", "Type your message...")
+            ),
             thinking_text=str(payload.get("thinking_text", "Thinking...")),
             send_tooltip=str(payload.get("send_tooltip", "Send Message")),
             dark_mode_tooltip=str(payload.get("dark_mode_tooltip", "Toggle Dark Mode")),
-            new_conversation_tooltip=str(payload.get("new_conversation_tooltip", "New Conversation")),
+            new_conversation_tooltip=str(
+                payload.get("new_conversation_tooltip", "New Conversation")
+            ),
             logout_tooltip=str(payload.get("logout_tooltip", "Logout")),
-            new_conversation_notification=str(payload.get("new_conversation_notification", "Started new conversation")),
-            logout_notification=str(payload.get("logout_notification", "Logged out successfully")),
-            response_complete_notification=str(payload.get("response_complete_notification", "Response complete")),
+            new_conversation_notification=str(
+                payload.get("new_conversation_notification", "Started new conversation")
+            ),
+            logout_notification=str(
+                payload.get("logout_notification", "Logged out successfully")
+            ),
+            response_complete_notification=str(
+                payload.get("response_complete_notification", "Response complete")
+            ),
         )
 
 
@@ -151,11 +169,11 @@ class AppMetadata:
     reload: bool
 
     @classmethod
-    def from_payload(cls, payload: Dict[str, object]) -> "AppMetadata":
+    def from_payload(cls, payload: dict[str, Any]) -> AppMetadata:
         return cls(
             name=str(payload.get("name", "NiceGUI Chat")),
             host=str(payload.get("host", "0.0.0.0")),
-            port=int(payload.get("port", 8080)),  # type: ignore
+            port=int(payload.get("port", 8080)),
             reload=bool(payload.get("reload", False)),
         )
 
@@ -204,10 +222,10 @@ def load_app_config() -> AppConfig:
         llm_section = payload["llm"]
     except KeyError as exc:
         raise ConfigurationError("Config missing 'llm' section") from exc
-    
+
     # API key from environment variable only (secrets should not be in JSON)
     llm_api_key = os.getenv("DEEPSEEK_API_KEY", "").strip()
-    
+
     llm_model = llm_section.get("model", "deepseek-chat")
     llm_base = llm_section.get("base_url", "https://api.deepseek.com")
     llm = DeepSeekConfig(
@@ -222,10 +240,10 @@ def load_app_config() -> AppConfig:
         heysol_section = payload["heysol"]
     except KeyError as exc:
         raise ConfigurationError("Config missing 'heysol' section") from exc
-    
+
     # API key from environment variable only (secrets should not be in JSON)
     heysol_api_key = os.getenv("HEYSOL_API_KEY", "").strip() or None
-    
+
     heysol_base = heysol_section.get("base_url", "https://core.heysol.ai/api/v1")
     heysol = HeysolConfig(api_key=heysol_api_key, base_url=heysol_base)
 

@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import json
-from typing import AsyncIterator, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 from uuid import uuid4
 
 from ..config import AppConfig, ChatConfig
@@ -30,22 +31,24 @@ class ChatService:
         auth_service: AuthService,
         memory_service: MemoryService,
         app_config: AppConfig,
-        agent: Optional[ChatAgent] = None,
+        agent: ChatAgent | None = None,
     ) -> None:
         self._auth_service = auth_service
         self._memory_service = memory_service
         self._app_config = app_config
         self._chat_config: ChatConfig = app_config.chat
         self._app_config.llm.ensure_valid()
-        self._agent = agent or ChatAgent(memory_service, config=app_config.llm)
+        self._agent: ChatAgent = agent or ChatAgent(
+            memory_service, config=app_config.llm
+        )
 
     async def stream_chat(
         self,
         conversation: ConversationState,
         user_message: str,
         *,
-        selected_space_ids: Optional[list[str]] = None,
-        metadata: Optional[dict] = None,
+        selected_space_ids: list[str] | None = None,
+        metadata: dict[str, Any] | None = None,
         store_user_message: bool = True,
     ) -> AsyncIterator[ChatStreamEvent]:
         """Stream chat responses from the agent."""
@@ -55,7 +58,7 @@ class ChatService:
             raise ChatServiceError("Cannot send an empty message")
 
         conversation.status = ConversationStatus.RUNNING
-        
+
         if store_user_message and self._chat_config.store_user_messages:
             user_chat_message = ChatMessage(
                 message_id=str(uuid4()),
@@ -82,20 +85,19 @@ class ChatService:
 
         yield ChatStreamEvent(
             event_type=ChatEventType.MESSAGE_START,
-            payload={"role": MessageRole.ASSISTANT.value}
+            payload={"role": MessageRole.ASSISTANT.value},
         )
 
         # Stream the response in chunks
         for chunk in self._chunk_reply(agent_result.reply):
             assistant_message.content += chunk
             yield ChatStreamEvent(
-                event_type=ChatEventType.MESSAGE_CHUNK,
-                payload={"content": chunk}
+                event_type=ChatEventType.MESSAGE_CHUNK, payload={"content": chunk}
             )
 
         yield ChatStreamEvent(
             event_type=ChatEventType.MESSAGE_END,
-            payload={"content": assistant_message.content}
+            payload={"content": assistant_message.content},
         )
 
         # Add execution steps for memory references
@@ -117,15 +119,12 @@ class ChatService:
                 data=step_payload,
             )
             conversation.execution_history.append(execution_step)
-            yield ChatStreamEvent(
-                event_type=ChatEventType.STEP,
-                payload=step_payload
-            )
+            yield ChatStreamEvent(event_type=ChatEventType.STEP, payload=step_payload)
 
         conversation.status = ConversationStatus.SUCCESS
         yield ChatStreamEvent(
             event_type=ChatEventType.STREAM_END,
-            payload={"type": ChatEventType.STREAM_END.value}
+            payload={"type": ChatEventType.STREAM_END.value},
         )
 
     def _chunk_reply(self, reply: str) -> list[str]:

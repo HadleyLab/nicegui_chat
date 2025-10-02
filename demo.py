@@ -72,20 +72,21 @@ def check_config():
     print("⚙️  Configuration Status:")
     try:
         from src.config import load_app_config
+
         config = load_app_config()
-        
+
         # Check DeepSeek
         if config.llm.api_key:
             print("  ✓ DeepSeek API key configured")
         else:
             print("  ✗ DeepSeek API key NOT configured (required)")
-        
+
         # Check HeySol
         if config.heysol.api_key:
             print("  ✓ HeySol API key configured (memory enabled)")
         else:
             print("  ⚠ HeySol API key NOT configured (memory disabled)")
-        
+
         print(f"  • App will run on {config.app.host}:{config.app.port}")
         print()
         return True
@@ -127,26 +128,27 @@ def main():
     print_features()
     print_architecture()
     print_tech_stack()
-    
+
     config_ok = check_config()
-    
+
     print_usage()
     print_customization()
     print_footer()
-    
+
     if not config_ok:
         print("⚠️  Please fix configuration issues before running the application.")
         print()
         return 1
-    
+
     # Ask if user wants to start the application
     try:
         response = input("Would you like to start the application now? (y/n): ").strip().lower()
-        if response in ['y', 'yes']:
+        if response in ["y", "yes"]:
             print("\n🚀 Starting NiceGUI Chat...")
             print("📍 Open your browser at: http://localhost:8080")
             print("Press Ctrl+C to stop the server\n")
             from main import main as run_app
+
             run_app()
         else:
             print("\n👋 You can start the application anytime with: python main.py")
@@ -154,7 +156,7 @@ def main():
     except KeyboardInterrupt:
         print("\n\n👋 Goodbye!")
         print()
-    
+
     return 0
 
 
