@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "MammoChat",
+    "host": "0.0.0.0",
+    "port": 8080,
+    "reload": false
+  },
+  "prompts": {
+    "root": "prompts",
+    "system": "system"
+  },
+  "heysol": {
+    "base_url": "https://core.heysol.ai/api/v1"
+  },
+  "llm": {
+    "model": "deepseek-chat",
+    "base_url": "https://api.deepseek.com"
+  },
+  "chat": {
+    "enable_memory_enrichment": true,
+    "store_user_messages": true,
+    "stream_chunk_size": 50,
+    "max_history_display": 50
+  },
+  "ui": {
+    "theme": "light",
+    "primary_color": "#F4B8C5",
+    "background_color": "#FAFBFC",
+    "surface_color": "#FFFFFF",
+    "text_color": "#334155",
+    "accent_color": "#E8A0B8",
+    "border_radius": "12px",
+    "animation_duration": "0.3s",
+    "tagline": "Your journey, together",
+    "logo_full_path": "/branding/logo-full-color.svg",
+    "logo_icon_path": "/branding/logo-icon.svg",
+    "welcome_title": "Welcome to MammoChat",
+    "welcome_message": "I'm here to support you on your breast cancer journey. I can help you:\n\n- 🔬 **Find Clinical Trials** – Discover trials that match your diagnosis and preferences\n- 💊 **Understand Treatment Options** – Get clear information about your care choices  \n- 👥 **Connect with Community** – Join supportive groups of patients who understand\n- 💪 **Make Informed Decisions** – Feel confident about your healthcare path\n\nI remember our conversations, so you never have to repeat yourself. Your journey is unique, and I'm here to walk alongside you every step of the way.\n\n**How can I support you today?** 💗",
+    "input_placeholder": "Type your message...",
+    "thinking_text": "Thinking...",
+    "send_tooltip": "Send Message",
+    "dark_mode_tooltip": "Toggle Dark Mode",
+    "new_conversation_tooltip": "New Conversation",
+    "logout_tooltip": "Logout",
+    "new_conversation_notification": "Started new conversation",
+    "logout_notification": "Logged out successfully",
+    "response_complete_notification": "Response complete"
+  }
+}
