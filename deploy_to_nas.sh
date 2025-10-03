@@ -7,12 +7,25 @@ set -e  # Exit on any error
 
 echo "🚀 Deploying MammoChat to NAS Docker..."
 
-# Configuration
-NAS_HOST="nas.local"
-NAS_USER="idrdex"
-NAS_PATH="/volume1/docker/mammochat"
-DOCKER_COMPOSE_FILE="docker-compose.nas.yml"
-SSH_KEY="~/.ssh/id_ed25519"  # Ed25519 key for NAS connection
+# Load configuration from JSON file
+if [ ! -f "config/nas_config.json" ]; then
+    echo "Error: config/nas_config.json not found!"
+    exit 1
+fi
+
+# Check if jq is available for JSON parsing
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is required for JSON parsing. Please install jq."
+    exit 1
+fi
+
+# Load configuration
+NAS_HOST=$(jq -r '.nas.host' config/nas_config.json)
+NAS_USER=$(jq -r '.nas.user' config/nas_config.json)
+NAS_PATH=$(jq -r '.nas.path' config/nas_config.json)
+SSH_PORT=$(jq -r '.nas.ssh_port' config/nas_config.json)
+SSH_KEY=$(jq -r '.nas.ssh_key' config/nas_config.json)
+DOCKER_COMPOSE_FILE=$(jq -r '.nas.docker_compose_file' config/nas_config.json)
 
 # Colors for output
 RED='\033[0;31m'
@@ -40,17 +53,17 @@ print_info() {
 
 # Function to run SSH commands
 ssh_cmd() {
-    ssh -p 2222 -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "$NAS_USER@$NAS_HOST" "$1"
+    ssh -p "$SSH_PORT" -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "$NAS_USER@$NAS_HOST" "$1"
 }
 
 # Function to copy files to NAS
 scp_to_nas() {
-    scp -P 2222 -i "$SSH_KEY" -o StrictHostKeyChecking=no -r "$1" "$NAS_USER@$NAS_HOST:$2"
+    scp -P "$SSH_PORT" -i "$SSH_KEY" -o StrictHostKeyChecking=no -r "$1" "$NAS_USER@$NAS_HOST:$2"
 }
 
 # Function to copy single files to NAS
 scp_file_to_nas() {
-    scp -P 2222 -i "$SSH_KEY" -o StrictHostKeyChecking=no "$1" "$NAS_USER@$NAS_HOST:$2"
+    scp -P "$SSH_PORT" -i "$SSH_KEY" -o StrictHostKeyChecking=no "$1" "$NAS_USER@$NAS_HOST:$2"
 }
 
 # Function to copy files with directory creation
@@ -59,31 +72,29 @@ scp_file_to_dir() {
     local dest_dir="$2"
     # Create directory first, then copy file
     ssh_cmd "mkdir -p \"$dest_dir\""
-    scp -P 2222 -i "$SSH_KEY" -o StrictHostKeyChecking=no "$file" "$NAS_USER@$NAS_HOST:$dest_dir/"
+    scp -P "$SSH_PORT" -i "$SSH_KEY" -o StrictHostKeyChecking=no "$file" "$NAS_USER@$NAS_HOST:$dest_dir/"
 }
 
 print_status "Connecting to NAS at $NAS_HOST..."
 
 # Create necessary directories on NAS
 print_status "Creating directories on NAS..."
+
+# Create base directory
 ssh_cmd "mkdir -p $NAS_PATH"
-ssh_cmd "mkdir -p $NAS_PATH/{config,branding,prompts,data}"
+
+# Create subdirectories from configuration
+DIRS_TO_CREATE=$(jq -r '.deployment.directories[]' config/nas_config.json | sed 's/^/- /' | tr '\n' ' ')
+ssh_cmd "mkdir -p $NAS_PATH/{$DIRS_TO_CREATE}"
 
 # Copy all necessary files to NAS using tar (most reliable method)
 print_status "Copying all application files to NAS..."
 
+# Get files to copy from configuration
+FILES_TO_COPY=$(jq -r '.deployment.files_to_copy[]' config/nas_config.json | tr '\n' ' ')
+
 # Create a tar archive of all necessary files and pipe it to NAS
-tar -czf - \
-    config/app_config.json \
-    branding \
-    prompts \
-    src \
-    main.py \
-    Dockerfile \
-    "$DOCKER_COMPOSE_FILE" \
-    requirements.txt \
-    .env \
-    2>/dev/null | ssh_cmd "cd $NAS_PATH && tar -xzf -"
+tar -czf - $FILES_TO_COPY 2>/dev/null | ssh_cmd "cd $NAS_PATH && tar -xzf -"
 
 print_status "✓ Copied all application files"
 
