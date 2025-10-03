@@ -51,3 +51,14 @@ htmlcov/
 
 # AI Assistant Configuration
 .kilocode/
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose*.yml
+.docker/
+
+# Deployment files (generated during deployment)
+deploy_on_nas.sh
+add_nas_alias.sh
+mammochat*.tar.gz

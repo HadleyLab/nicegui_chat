@@ -1,6 +1,11 @@
 """Main application entry point for MammoChat."""
 
+import sys
+
 from nicegui import app, ui
+
+# Set Python path explicitly for src imports
+sys.path.insert(0, '/app')
 
 from src.__version__ import __version__
 from src.config import load_app_config
@@ -23,13 +28,9 @@ def main() -> None:
     memory_service = MemoryService(auth_service)
     chat_service = ChatService(auth_service, memory_service, config)
 
-    # Check authentication
+    # Alert user if HeySol API key is not configured
     if not auth_service.is_authenticated:
-        ui.notify(
-            "Warning: HeySol API key not configured. Memory features will be disabled.",
-            type="warning",
-            timeout=5000,
-        )
+        print("Warning: HeySol API key not configured. Memory features will be disabled.")
 
     # Build UI
     @ui.page("/")
@@ -38,8 +39,23 @@ def main() -> None:
         chat_ui = ChatUI(config, auth_service, chat_service, memory_service)
         chat_ui.build()
 
-    # Run the application
+    # Run the application with verbose output
     print(f"Starting MammoChat v{__version__}")
+    print(f"Configuration loaded: {config.app.name}")
+    print(f"Host: {config.app.host}")
+    print(f"Port: {config.app.port}")
+    print(f"Reload: {config.app.reload}")
+    print("Dark mode: True")
+    print(f"Authentication status: {'Valid' if auth_service.is_authenticated else 'Missing API key'}")
+
+    # Set environment variables for verbose logging
+    import os
+    os.environ['NICEGUI_LOG_LEVEL'] = 'DEBUG'
+    os.environ['NICEGUI_VERBOSE'] = 'true'
+
+    print("Environment variables set for verbose logging")
+    print("Starting NiceGUI server...")
+
     ui.run(
         title=f"{config.app.name} v{__version__}",
         host=config.app.host,
@@ -47,6 +63,7 @@ def main() -> None:
         reload=config.app.reload,
         dark=True,
         favicon="💗",
+        show=True,  # Show the UI in browser
     )
 
 

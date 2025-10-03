@@ -30,7 +30,12 @@ class MemoryService:
         space_list = list(space_ids) if space_ids else None
 
         try:
-            result = self._auth_service.client.search(
+            from heysol import HeySolClient
+            client = HeySolClient(
+                api_key=self._auth_service.api_key,
+                base_url=self._auth_service.base_url,
+            )
+            result = client.search(
                 query,
                 space_list,
                 limit,
@@ -73,7 +78,12 @@ class MemoryService:
             raise AuthenticationError("Authentication required for memory operations")
 
         try:
-            payload = self._auth_service.client.ingest(
+            from heysol import HeySolClient
+            client = HeySolClient(
+                api_key=self._auth_service.api_key,
+                base_url=self._auth_service.base_url,
+            )
+            payload = client.ingest(
                 message,
                 space_id,
                 session_id,
@@ -91,7 +101,12 @@ class MemoryService:
             raise AuthenticationError("Authentication required for memory operations")
 
         try:
-            payload = self._auth_service.client.get_spaces()
+            from heysol import HeySolClient
+            client = HeySolClient(
+                api_key=self._auth_service.api_key,
+                base_url=self._auth_service.base_url,
+            )
+            payload = client.get_spaces()
             return [MemorySpace.from_dict(item) for item in payload]
         except Exception as exc:
             raise ChatServiceError(f"Failed to list memory spaces: {exc}") from exc

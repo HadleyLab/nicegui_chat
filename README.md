@@ -26,13 +26,13 @@ MammoChat empowers breast cancer patients by:
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Option 1: Local Development
 
+#### Prerequisites
 - Python 3.9 or higher
 - API keys for DeepSeek and HeySol (required for full functionality)
 
-### Installation
-
+#### Installation
 1. **Clone or download the repository**
 
 2. **Install dependencies:**
@@ -44,8 +44,8 @@ pip install -r requirements.txt
 ```bash
 cp .env.example .env
 # Edit .env with your actual API keys:
-# - DEEPSEEK_API_KEY
-# - HEYSOL_API_KEY
+# - DEEPSEEK_API_KEY (required)
+# - HEYSOL_API_KEY (optional, for memory features)
 ```
 
 4. **Run the application:**
@@ -58,7 +58,53 @@ bash run.sh
 ```
 
 5. **Open your browser:**
-   Navigate to `http://localhost:8080`
+    Navigate to `http://localhost:8080`
+
+### Option 2: Docker Deployment (Recommended)
+
+#### Quick Docker Deployment
+```bash
+# 1. Set up API keys
+cp .env.example .env
+# Edit .env with your API keys
+
+# 2. Build and run with Docker Compose
+docker compose up --build -d
+
+# 3. Access the application
+# Open http://localhost:8080
+```
+
+#### Production Deployment
+```bash
+# Build for production
+docker build -t mammochat:latest .
+
+# Run with Docker Compose
+docker compose up -d
+
+# Or run directly
+docker run -d \
+  --name mammochat \
+  -p 8080:8080 \
+  -e DEEPSEEK_API_KEY=your_key \
+  -e HEYSOL_API_KEY=your_heysol_key \
+  -v $(pwd)/config:/app/config:ro \
+  -v $(pwd)/branding:/app/branding:ro \
+  -v $(pwd)/prompts:/app/prompts:ro \
+  mammochat:latest
+```
+
+#### Remote Deployment (NAS/Servers)
+```bash
+# Copy files to remote server
+scp -r . user@remote-server:/path/to/mammochat
+
+# Run on remote server
+ssh user@remote-server "cd /path/to/mammochat && docker compose up --build -d"
+```
+
+See [DOCKER_README.md](DOCKER_README.md) for complete Docker deployment guide.
 
 ## 🎨 Design Features
 
