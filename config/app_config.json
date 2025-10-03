@@ -35,7 +35,7 @@
     "logo_full_path": "/branding/logo-full-color.svg",
     "logo_icon_path": "/branding/logo-icon.svg",
     "welcome_title": "Welcome to MammoChat",
-    "welcome_message": "I'm here to support you on your breast cancer journey. I can help you:\n\n- 🔬 **Find Clinical Trials** – Discover trials that match your diagnosis and preferences\n- 💊 **Understand Treatment Options** – Get clear information about your care choices  \n- 👥 **Connect with Community** – Join supportive groups of patients who understand\n- 💪 **Make Informed Decisions** – Feel confident about your healthcare path\n\nI remember our conversations, so you never have to repeat yourself. Your journey is unique, and I'm here to walk alongside you every step of the way.\n\n**How can I support you today?** 💗",
+    "welcome_message": "I'm here to support you on your breast cancer journey. I can help you:\n\n- 🔬 **Find Clinical Trials** – Discover and match you with trials that fit your specific diagnosis and situation\n- 👥 **Connect with Peers** – Match you with other patients who share similar experiences and understand your journey\n- 💊 **Navigate Treatment Options** – Get clear information about your care choices and what to expect\n- 💪 **Make Informed Decisions** – Feel confident and empowered about your healthcare path\n\nI remember our conversations and your unique situation, so you never have to repeat yourself. Whether you need clinical trial matches, peer connections, or just someone to talk to, I'm here to walk alongside you every step of the way.\n\n**How can I support you today?** 💗",
     "input_placeholder": "Type your message...",
     "thinking_text": "Thinking...",
     "send_tooltip": "Send Message",
