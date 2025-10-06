@@ -1,11 +1,14 @@
-"""Main application entry point for MammoChat."""
+"""Main application entry point for the MammoChat SPA."""
 
+from __future__ import annotations
+
+import os
 import sys
 
 from nicegui import app, ui
 
-# Set Python path explicitly for src imports
-sys.path.insert(0, '/app')
+# Ensure src imports resolve in production containers
+sys.path.insert(0, "/app")
 
 from src.__version__ import __version__
 from src.config import load_app_config
@@ -16,54 +19,71 @@ from src.ui.chat_ui import ChatUI
 
 
 def main() -> None:
-    """Main application entry point."""
-    # Load configuration
+    """Run the MammoChat single-page application."""
     config = load_app_config()
 
-    # Add static files for branding
+    # Expose brand assets
     app.add_static_files("/branding", "branding")
 
-    # Initialize services
+    # Core services
     auth_service = AuthService(config.heysol)
     memory_service = MemoryService(auth_service)
     chat_service = ChatService(auth_service, memory_service, config)
 
-    # Alert user if HeySol API key is not configured
     if not auth_service.is_authenticated:
         print("Warning: HeySol API key not configured. Memory features will be disabled.")
 
-    # Build UI
-    @ui.page("/")
-    def index() -> None:
-        """Main page."""
-        chat_ui = ChatUI(config, auth_service, chat_service, memory_service)
-        chat_ui.build()
+    def render_chat() -> None:
+        """Render the branded chat page."""
+        ChatUI(config, auth_service, chat_service, memory_service).build()
 
-    # Run the application with verbose output
+    def root() -> None:
+        """Configure the NiceGUI 3.0 single-page shell."""
+        ui.colors(
+            primary=config.ui.primary_color,
+            secondary=config.ui.accent_color,
+            accent=config.ui.accent_color,
+            background=config.ui.background_color,
+            text=config.ui.text_color,
+        )
+
+        ui.link.default_classes(
+            "text-inherit no-underline hover:text-primary-600 transition-colors"
+        )
+
+        ui.query("body").classes(
+            "bg-rose-50 text-slate-800 antialiased min-h-screen"
+        )
+
+        ui.sub_pages({
+            "/": render_chat,
+        })
+
+    os.environ.setdefault("NICEGUI_LOG_LEVEL", "DEBUG")
+    os.environ.setdefault("NICEGUI_VERBOSE", "true")
+
     print(f"Starting MammoChat v{__version__}")
     print(f"Configuration loaded: {config.app.name}")
     print(f"Host: {config.app.host}")
     print(f"Port: {config.app.port}")
     print(f"Reload: {config.app.reload}")
-    print("Dark mode: True")
-    print(f"Authentication status: {'Valid' if auth_service.is_authenticated else 'Missing API key'}")
+    print(
+        f"Authentication status: {'Valid' if auth_service.is_authenticated else 'Missing API key'}"
+    )
 
-    # Set environment variables for verbose logging
-    import os
-    os.environ['NICEGUI_LOG_LEVEL'] = 'DEBUG'
-    os.environ['NICEGUI_VERBOSE'] = 'true'
+    favicon_path = os.path.join("branding", os.path.basename(config.ui.logo_icon_path))
 
-    print("Environment variables set for verbose logging")
-    print("Starting NiceGUI server...")
+    if os.getenv("PYTEST_CURRENT_TEST") or os.getenv("NICEGUI_TEST_MODE"):
+        return
 
     ui.run(
+        root=root,
         title=f"{config.app.name} v{__version__}",
         host=config.app.host,
         port=config.app.port,
         reload=config.app.reload,
-        dark=True,
-        favicon="💗",
-        show=True,  # Show the UI in browser
+        favicon=favicon_path,
+        show=True,
     )
 
 
