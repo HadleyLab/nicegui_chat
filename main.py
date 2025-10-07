@@ -97,37 +97,37 @@ def main() -> None:
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
         body {{
-            background: linear-gradient(135deg, {config.mint} 0%, {config.background} 50%, #FFFCF9 100%) !important;
+            background: linear-gradient(135deg, {config.mint} 0%, {config.background} 30%, #FFFCF9 100%) !important;
             font-family: 'Inter', system-ui, sans-serif !important;
             color: {config.text} !important;
             min-height: 100vh !important;
         }}
 
-        /* Enhanced header with subtle gradient */
+        /* Cohesive header with subtle pink tinge */
         .q-header {{
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(252, 248, 252, 0.95) 100%) !important;
-            backdrop-filter: blur(10px) !important;
-            border-bottom: 1px solid {config.border} !important;
-            box-shadow: 0 2px 8px rgba(244, 184, 197, 0.08) !important;
+            background: linear-gradient(135deg, rgba(255, 252, 254, 0.90) 0%, rgba(254, 250, 253, 0.85) 100%) !important;
+            backdrop-filter: blur(12px) !important;
+            border-bottom: 1px solid rgba(232, 212, 218, 0.6) !important;
+            box-shadow: 0 2px 10px rgba(244, 184, 197, 0.14) !important;
         }}
 
-        /* Enhanced user messages with soft styling */
+        /* Cohesive user messages */
         .q-message-sent .q-message-text {{
-            background: linear-gradient(135deg, {config.primary} 0%, {config.primary_dark} 100%) !important;
+            background: linear-gradient(135deg, {config.primary_dark} 0%, {config.success} 100%) !important;
             color: white !important;
-            border-radius: 18px !important;
+            border-radius: 16px !important;
             border-bottom-right-radius: 4px !important;
-            box-shadow: 0 2px 8px rgba(244, 184, 197, 0.15) !important;
+            box-shadow: 0 2px 10px rgba(199, 229, 212, 0.18) !important;
         }}
 
-        /* Enhanced assistant messages with soft styling */
+        /* Cohesive assistant messages */
         .q-message-received .q-message-text {{
-            background: linear-gradient(135deg, {config.surface} 0%, #FEFCFF 100%) !important;
+            background: linear-gradient(135deg, {config.surface} 0%, rgba(254, 252, 255, 0.8) 100%) !important;
             color: {config.text} !important;
-            border-radius: 18px !important;
+            border-radius: 16px !important;
             border-bottom-left-radius: 4px !important;
-            border: 1px solid {config.border} !important;
-            box-shadow: 0 2px 8px rgba(244, 184, 197, 0.06) !important;
+            border: 1px solid rgba(232, 212, 218, 0.7) !important;
+            box-shadow: 0 2px 10px rgba(244, 184, 197, 0.08) !important;
         }}
 
         /* Clean input styling */
@@ -142,20 +142,20 @@ def main() -> None:
             border-width: 2px !important;
         }}
 
-        /* Enhanced button styling with mint accents */
+        /* Cohesive button styling */
         .q-btn {{
-            background: linear-gradient(135deg, {config.primary} 0%, {config.mint} 100%) !important;
+            background: linear-gradient(135deg, {config.primary_dark} 0%, {config.success} 100%) !important;
             color: white !important;
-            border-radius: 12px !important;
+            border-radius: 10px !important;
             font-weight: 600 !important;
-            box-shadow: 0 2px 8px rgba(199, 229, 212, 0.15) !important;
+            box-shadow: 0 2px 10px rgba(199, 229, 212, 0.18) !important;
             transition: all 0.2s ease !important;
         }}
 
         .q-btn:hover {{
             transform: translateY(-1px) !important;
-            box-shadow: 0 4px 12px rgba(199, 229, 212, 0.25) !important;
-            background: linear-gradient(135deg, {config.mint} 0%, {config.primary} 100%) !important;
+            box-shadow: 0 4px 14px rgba(199, 229, 212, 0.28) !important;
+            background: linear-gradient(135deg, {config.success} 0%, {config.primary_dark} 100%) !important;
         }}
 
         /* Mint accent elements */
@@ -184,17 +184,17 @@ def main() -> None:
             box-shadow: 0 2px 8px rgba(90, 79, 92, 0.2) !important;
         }}
 
-        /* Enhanced footer */
+        /* Cohesive footer */
         .q-footer {{
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(252, 248, 252, 0.95) 100%) !important;
-            backdrop-filter: blur(10px) !important;
-            border-top: 1px solid {config.border} !important;
-            box-shadow: 0 -2px 8px rgba(244, 184, 197, 0.08) !important;
+            background: linear-gradient(135deg, rgba(255, 252, 254, 0.90) 0%, rgba(254, 250, 253, 0.85) 100%) !important;
+            backdrop-filter: blur(12px) !important;
+            border-top: 1px solid rgba(232, 212, 218, 0.6) !important;
+            box-shadow: 0 -2px 10px rgba(244, 184, 197, 0.14) !important;
         }}
 
-        /* Soft selection colors */
+        /* Cohesive selection colors */
         ::selection {{
-            background: rgba(244, 184, 197, 0.2) !important;
+            background: rgba(199, 229, 212, 0.25) !important;
             color: {config.text} !important;
         }}
 
@@ -206,6 +206,101 @@ def main() -> None:
 
         .markdown strong {{
             color: {config.text} !important;
+        }}
+
+        /* Cohesive healthcare dark mode */
+        body.body--dark {{
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D1B2E 60%, #1E1E1E 100%) !important;
+            color: #F8FAFC !important;
+        }}
+
+        body.body--dark .q-header {{
+            background: linear-gradient(135deg, rgba(45, 27, 46, 0.92) 0%, rgba(50, 30, 48, 0.88) 100%) !important;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.8) !important;
+            box-shadow: 0 2px 12px rgba(45, 27, 46, 0.28) !important;
+        }}
+
+        body.body--dark .q-header .text-gray-600,
+        body.body--dark .q-header .text-amber-400,
+        body.body--dark .q-toolbar__title {{
+            color: #E2E8F0 !important;
+        }}
+
+        body.body--dark .q-footer {{
+            background: linear-gradient(135deg, rgba(45, 27, 46, 0.92) 0%, rgba(50, 30, 48, 0.88) 100%) !important;
+            border-top: 1px solid rgba(71, 85, 105, 0.8) !important;
+            box-shadow: 0 -2px 12px rgba(45, 27, 46, 0.28) !important;
+        }}
+
+        body.body--dark .q-message-received .q-message-text {{
+            background: #374151 !important;
+            color: #F1F5F9 !important;
+            border: 1px solid #4B5563 !important;
+        }}
+
+        body.body--dark .q-message-received .q-message-text * {{
+            color: #F1F5F9 !important;
+        }}
+
+        body.body--dark .q-field--outlined .q-field__control {{
+            background: #374151 !important;
+            border-color: #4B5563 !important;
+            color: #F1F5F9 !important;
+        }}
+
+        body.body--dark .q-field--outlined.q-field__focused .q-field__control {{
+            border-color: {config.mint} !important;
+            border-width: 2px !important;
+            box-shadow: 0 0 0 3px rgba(199, 229, 212, 0.15) !important;
+        }}
+
+        body.body--dark .q-field__native {{
+            color: #F1F5F9 !important;
+        }}
+
+        body.body--dark .q-field__native::placeholder {{
+            color: #9CA3AF !important;
+        }}
+
+        /* Cohesive dark mode buttons */
+        body.body--dark .q-btn {{
+            background: linear-gradient(135deg, {config.primary_dark} 0%, {config.success} 100%) !important;
+            color: white !important;
+            box-shadow: 0 2px 12px rgba(45, 27, 46, 0.32) !important;
+        }}
+
+        body.body--dark .q-btn:hover {{
+            background: linear-gradient(135deg, {config.success} 0%, {config.primary_dark} 100%) !important;
+            box-shadow: 0 4px 16px rgba(199, 229, 212, 0.24) !important;
+        }}
+
+        /* Dark mode footer button */
+        body.body--dark .q-footer .q-row .q-btn {{
+            background: {config.slate_gray} !important;
+            color: white !important;
+            border: 1px solid {config.slate_gray} !important;
+        }}
+
+        body.body--dark .q-footer .q-row .q-btn:hover {{
+            background: {config.text} !important;
+            border-color: {config.text} !important;
+            box-shadow: 0 2px 8px rgba(90, 79, 92, 0.3) !important;
+        }}
+
+        /* Dark mode logo and text */
+        body.body--dark .q-header .text-gray-600,
+        body.body--dark .q-header .text-amber-400,
+        body.body--dark .q-toolbar__title {{
+            color: #E2E8F0 !important;
+        }}
+
+        /* Dark mode markdown */
+        body.body--dark .markdown p {{
+            color: #CBD5E1 !important;
+        }}
+
+        body.body--dark .markdown strong {{
+            color: #F1F5F9 !important;
         }}
     """)
 
