@@ -1,0 +1,26 @@
+{
+  "app": {
+    "name": "MammoChat",
+    "tagline": "Your journey, together",
+    "logo_icon": "/branding/logo-icon.svg",
+    "logo_full": "/branding/logo-full-color.svg"
+  },
+  "colors": {
+    "primary": "#F4B8C5",
+    "primary_dark": "#E8A0B8",
+    "secondary": "#E8A0B8",
+    "secondary_dark": "#D88098",
+    "background": "#FFFCF8",
+    "surface": "#FFFFFF",
+    "text": "#2D1B2E",
+    "text_secondary": "#5A4F5C",
+    "accent": "#F5C2A8",
+    "success": "#C7E5D4",
+    "error": "#E57373",
+    "warning": "#FFB74D",
+    "info": "#A8D8E8",
+    "border": "#E8D4DA",
+    "theme_color": "#F4B8C5",
+    "safari_theme_color": "#F4B8C5"
+  }
+}

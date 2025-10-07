@@ -1,0 +1,124 @@
+{
+    "app": {
+        "name": "MammoChat",
+        "tagline": "Your journey, together",
+        "logo_full": "/branding/logo-full-color.svg",
+        "logo_icon": "/branding/logo-icon.svg"
+    },
+    "colors": {
+        "primary": "#E8A0B8",
+        "primary_dark": "#D88BA5",
+        "primary_light": "#F4D5E0",
+        "secondary": "#DDD6FE",
+        "secondary_dark": "#C4B5FD",
+        "accent": "#A7E3D5",
+        "accent_light": "#D1FAE5",
+        "background": "#FAFBFC",
+        "surface": "#FFFFFF",
+        "surface_variant": "#F8F9FB",
+        "text": "#1F2937",
+        "text_secondary": "#6B7280",
+        "text_muted": "#9CA3AF",
+        "border": "#E5E7EB",
+        "border_light": "#F3F4F6",
+        "shadow": "rgba(0, 0, 0, 0.08)",
+        "overlay": "rgba(0, 0, 0, 0.02)",
+        "info": "#A8C9E8",
+        "success": "#B8E8C5",
+        "warning": "#F4D5A8"
+    },
+    "spacing": {
+        "xs": "0.25rem",
+        "sm": "0.5rem",
+        "md": "1rem",
+        "lg": "1.5rem",
+        "xl": "2rem",
+        "2xl": "3rem"
+    },
+    "radius": {
+        "sm": "0.5rem",
+        "md": "0.75rem",
+        "lg": "1rem",
+        "xl": "1.5rem",
+        "full": "9999px"
+    },
+    "shadows": {
+        "soft": "0 1px 3px 0 rgba(244, 184, 197, 0.08), 0 1px 2px 0 rgba(244, 184, 197, 0.04)",
+        "md": "0 4px 6px -1px rgba(244, 184, 197, 0.1), 0 2px 4px -1px rgba(244, 184, 197, 0.06)",
+        "lg": "0 10px 15px -3px rgba(244, 184, 197, 0.1), 0 4px 6px -2px rgba(244, 184, 197, 0.05)",
+        "xl": "0 20px 25px -5px rgba(244, 184, 197, 0.1), 0 10px 10px -5px rgba(244, 184, 197, 0.04)",
+        "inner": "inset 0 2px 4px 0 rgba(244, 184, 197, 0.06)"
+    },
+    "ui": {
+        "header": {
+            "background": "#FFFFFF",
+            "backdrop_blur": true,
+            "opacity": 0.95,
+            "border_color": "#F3E8EB",
+            "shadow": "0 1px 3px 0 rgba(244, 184, 197, 0.08)"
+        },
+        "chat": {
+            "container_bg": "#FAFAFA",
+            "message_spacing": "1rem",
+            "user_bubble": {
+                "background": "linear-gradient(135deg, #F4B8C5 0%, #E8A0B8 100%)",
+                "text_color": "#FFFFFF",
+                "shadow": "0 4px 6px -1px rgba(244, 184, 197, 0.2)",
+                "radius": "1.5rem 1.5rem 0.5rem 1.5rem"
+            },
+            "assistant_bubble": {
+                "background": "#FFFFFF",
+                "text_color": "#1F2937",
+                "border": "1px solid #F3E8EB",
+                "shadow": "0 1px 3px 0 rgba(244, 184, 197, 0.08)",
+                "radius": "1.5rem 1.5rem 1.5rem 0.5rem"
+            },
+            "thinking": {
+                "background": "#FFF7FB",
+                "text_color": "#6B7280",
+                "border": "1px solid #FCF5F7"
+            }
+        },
+        "input": {
+            "background": "#FFFFFF",
+            "border_color": "#F3E8EB",
+            "border_color_focus": "#F4B8C5",
+            "shadow": "0 1px 3px 0 rgba(244, 184, 197, 0.08)",
+            "shadow_focus": "0 0 0 3px rgba(244, 184, 197, 0.1)",
+            "radius": "1rem"
+        },
+        "button": {
+            "primary": {
+                "background": "linear-gradient(135deg, #F4B8C5 0%, #E8A0B8 100%)",
+                "text_color": "#FFFFFF",
+                "shadow": "0 4px 6px -1px rgba(244, 184, 197, 0.2)",
+                "shadow_hover": "0 10px 15px -3px rgba(244, 184, 197, 0.3)"
+            }
+        }
+    },
+    "animations": {
+        "duration": {
+            "fast": "150ms",
+            "normal": "200ms",
+            "slow": "300ms"
+        },
+        "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
+    },
+    "typography": {
+        "font_family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif",
+        "sizes": {
+            "xs": "0.75rem",
+            "sm": "0.875rem",
+            "base": "1rem",
+            "lg": "1.125rem",
+            "xl": "1.25rem",
+            "2xl": "1.5rem"
+        },
+        "weights": {
+            "normal": 400,
+            "medium": 500,
+            "semibold": 600,
+            "bold": 700
+        }
+    }
+}
