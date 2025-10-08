@@ -113,16 +113,20 @@ class AIService:
                     limit: int = 5,
                 ) -> list[str]:
                     """Search the user's HeySol memory store for episodes related to the query."""
+                    print(f"🧠 [DEBUG] memory_search tool called with query: '{query}', limit: {limit}")
                     deps = ctx.deps
                     if deps.heysol_client is None:
+                        print("🧠 [DEBUG] No HeySol client available")
                         return []
 
                     try:
+                        print(f"🧠 [DEBUG] Calling HeySol search for: '{query}'")
                         result = deps.heysol_client.search(
                             query,
                             space_ids=deps.space_ids or None,
                             limit=limit,
                         )
+                        print(f"🧠 [DEBUG] HeySol search completed, result type: {type(result)}")
                         # Extract episode bodies from search results
                         if hasattr(result, "episodes"):
                             return [ep.body for ep in result.episodes if hasattr(ep, "body")]
@@ -138,16 +142,20 @@ class AIService:
                     space_id: str | None = None,
                 ) -> str:
                     """Store a new note in the user's HeySol memory."""
+                    print(f"💾 [DEBUG] memory_ingest tool called with note: '{note[:50]}...', space_id: {space_id}")
                     deps = ctx.deps
                     if deps.heysol_client is None:
+                        print("💾 [DEBUG] No HeySol client available for ingest")
                         return "Memory storage unavailable"
 
                     try:
+                        print(f"💾 [DEBUG] Calling HeySol ingest for note: '{note[:50]}...'")
                         deps.heysol_client.ingest(
                             note,
                             space_id=space_id,
                             source="chat_agent",
                         )
+                        print(f"💾 [DEBUG] HeySol ingest completed successfully")
                         return f"Memory stored: {note[:50]}..."
                     except Exception as e:
                         logger.error("memory_ingest_failed", error=str(e))
@@ -182,22 +190,27 @@ class AIService:
         # Try using Pydantic AI agent first
         if self.agent is not None:
             try:
+                print(f"🤖 [DEBUG] Using Pydantic AI agent for message: '{message[:50]}...'")
                 deps = AgentDependencies(
                     heysol_client=self.heysol_client,
                     space_ids=space_ids or [],
                 )
+                print(f"🤖 [DEBUG] Agent dependencies - HeySol client: {deps.heysol_client is not None}, space_ids: {deps.space_ids}")
 
                 # Build conversation context
                 conversation_context = []
                 if history:
                     for msg in history:
                         conversation_context.append(f"{msg.get('role', 'user')}: {msg.get('content', '')}")
+                print(f"🤖 [DEBUG] Conversation history length: {len(conversation_context)}")
 
                 # Run agent
+                print(f"🤖 [DEBUG] Running agent with message: '{message[:50]}...'")
                 result = await self.agent.run(
                     message,
                     deps=deps,
                 )
+                print(f"🤖 [DEBUG] Agent run completed, output type: {type(result.output)}")
 
                 # Stream the response
                 output: AgentOutput = result.output
@@ -218,6 +231,7 @@ class AIService:
                 # Fall through to direct API call
 
         # Fallback to direct API streaming
+        print(f"🔄 [DEBUG] Falling back to direct HTTP streaming for message: '{message[:50]}...'")
         import json
 
         import httpx
@@ -228,9 +242,11 @@ class AIService:
             messages.extend(history)
 
         messages.append({"role": "user", "content": message})
+        print(f"🔄 [DEBUG] Built messages array with {len(messages)} messages")
 
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            print(f"🔄 [DEBUG] Creating HTTP client with timeout 120s")
+            async with httpx.AsyncClient(timeout=120.0) as client:
                 async with client.stream(
                     "POST",
                     f"{self.base_url}/chat/completions",
@@ -247,10 +263,14 @@ class AIService:
                 ) as response:
                     response.raise_for_status()
 
+                    print(f"🔄 [DEBUG] Starting to stream response lines...")
+                    chunk_count = 0
                     async for line in response.aiter_lines():
+                        print(f"🔄 [DEBUG] Received line: '{line[:100]}...'")
                         if line.startswith("data: "):
                             data = line[6:]
                             if data == "[DONE]":
+                                print(f"🔄 [DEBUG] Received [DONE] signal")
                                 break
 
                             try:
@@ -258,8 +278,11 @@ class AIService:
                                 if "choices" in chunk and len(chunk["choices"]) > 0:
                                     delta = chunk["choices"][0].get("delta", {})
                                     if "content" in delta:
+                                        chunk_count += 1
+                                        print(f"🔄 [DEBUG] Yielding chunk {chunk_count}: '{delta['content']}'")
                                         yield delta["content"]
-                            except json.JSONDecodeError:
+                            except json.JSONDecodeError as e:
+                                print(f"🔄 [DEBUG] JSON decode error: {e}")
                                 continue
 
         except httpx.HTTPStatusError as e:

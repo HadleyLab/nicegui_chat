@@ -2,250 +2,121 @@
 
 import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
 
 load_dotenv()
 
+BASE_DIR = Path(__file__).parent.parent
+CONFIG_DIR = BASE_DIR / "config"
+
+
+def _load_json(path: Path) -> dict[str, Any]:
+    with open(path, encoding="utf-8") as f:
+        return cast(dict[str, Any], json.load(f))
+
+
+def _load_text(path: Path) -> str:
+    with open(path, encoding="utf-8") as f:
+        return f.read().strip()
+
 
 def load_theme() -> dict[str, Any]:
-    """Load theme configuration from theme.json."""
-    theme_path = Path(__file__).parent.parent / "config" / "theme.json"
-    with open(theme_path) as f:
-        return json.load(f)
+    """Load theme configuration from config/theme.json."""
+    return _load_json(CONFIG_DIR / "theme.json")
 
 
-# Load theme once at module level
+def load_app_config() -> dict[str, Any]:
+    """Load application configuration from app.json."""
+    return _load_json(CONFIG_DIR / "app.json")
+
+
+def load_system_prompt() -> str:
+    """Load system prompt from markdown file."""
+    return _load_text(CONFIG_DIR / "system.md")
+
+
+# Load configuration resources once at module level
 THEME = load_theme()
+APP_CONFIG = load_app_config()
+SYSTEM_PROMPT = load_system_prompt()
 
 
 @dataclass
 class Config:
     """Application configuration."""
 
-    # App Info (from theme)
-    app_name: str = THEME["app"]["name"]
-    app_tagline: str = THEME["app"]["tagline"]
-    logo_full: str = THEME["app"]["logo_full"]
-    logo_icon: str = THEME["app"]["logo_icon"]
-
-    # Theme colors (centralized from theme.json)
-    primary: str = THEME["colors"]["primary"]
-    primary_dark: str = THEME["colors"]["primary_dark"]
-    secondary: str = THEME["colors"]["secondary"]
-    secondary_dark: str = THEME["colors"]["secondary_dark"]
-    background: str = THEME["colors"]["background"]
-    surface: str = THEME["colors"]["surface"]
-    text: str = THEME["colors"]["text"]
-    text_secondary: str = THEME["colors"]["text_secondary"]
-    accent: str = THEME["colors"]["accent"]
-    success: str = THEME["colors"]["success"]
-    error: str = THEME["colors"]["error"]
-    warning: str = THEME["colors"]["warning"]
-    info: str = THEME["colors"]["info"]
-    # Map legacy color names to actual theme colors
-    mint: str = THEME["colors"]["success"]
-    lavender: str = THEME["colors"]["secondary"]
-    peach: str = THEME["colors"]["accent"]
-    cloud_gray: str = THEME["colors"]["background"]
-    slate_gray: str = THEME["colors"]["text_secondary"]
-    charcoal: str = THEME["colors"]["text"]
-    border: str = THEME["colors"]["border"]
-    theme_color: str = THEME["colors"]["theme_color"]
-    safari_theme_color: str = THEME["colors"]["safari_theme_color"]
+    # App Info
+    app_name: str = APP_CONFIG["app"]["name"]
+    app_tagline: str = APP_CONFIG["app"]["tagline"]
+    logo_full: str = APP_CONFIG["app"]["branding"]["logo_full"]
+    logo_icon: str = APP_CONFIG["app"]["branding"]["logo_icon"]
 
     # Server
-    host: str = os.getenv("HOST", "0.0.0.0")
-    port: int = int(os.getenv("PORT", "8080"))
+    host: str = os.getenv("HOST", APP_CONFIG["server"]["host"])
+    port: int = int(os.getenv("PORT", str(APP_CONFIG["server"]["port"])))
 
     # AI Service (DeepSeek)
     deepseek_api_key: str = os.getenv("DEEPSEEK_API_KEY", "")
-    deepseek_model: str = "deepseek-chat"
-    deepseek_base_url: str = "https://api.deepseek.com/v1"
+    deepseek_model: str = APP_CONFIG["llm"]["model"]
+    deepseek_base_url: str = os.getenv("DEEPSEEK_BASE_URL", APP_CONFIG["llm"]["base_url"])
 
     # HeySol Memory Service
     heysol_api_key: str = os.getenv("HEYSOL_API_KEY", "")
-    heysol_base_url: str = os.getenv("HEYSOL_BASE_URL", "https://core.heysol.ai/api/v1")
+    heysol_base_url: str = os.getenv("HEYSOL_BASE_URL", APP_CONFIG["memory"]["base_url"])
+
+    # Theme convenience
+    palette: dict[str, str] = field(default_factory=lambda: THEME["palette"].copy())
+    status_colors: dict[str, str] = field(default_factory=lambda: THEME["status"].copy())
+    shadows: dict[str, str] = field(default_factory=lambda: THEME["shadows"].copy())
+    layout: dict[str, str] = field(default_factory=lambda: THEME["layout"].copy())
+
+    # Direct color access for convenience
+    primary: str = field(init=False)
+    primary_dark: str = field(init=False)
+    secondary: str = field(init=False)
+    accent: str = field(init=False)
+    background: str = field(init=False)
+    surface: str = field(init=False)
+    text: str = field(init=False)
+    text_secondary: str = field(init=False)
+    border: str = field(init=False)
+    mint: str = field(init=False)
+    success: str = field(init=False)
+    slate_gray: str = field(init=False)
+    lavender: str = field(init=False)
+    peach: str = field(init=False)
+
+    # System Prompt
+    system_prompt: str = SYSTEM_PROMPT
 
     def __post_init__(self) -> None:
         """Set theme after initialization."""
-        object.__setattr__(self, 'theme', THEME)
-
-    # System Prompt
-    system_prompt: str = """# MammoChat: Compassionate AI Companion for Breast Cancer Patients
-
-You are MammoChat, a compassionate AI companion dedicated to supporting breast cancer patients on their healthcare journey. Your purpose is to help patients:
-
-1. **Find Clinical Trials** – Connect patients with relevant clinical trials that match their specific diagnosis, treatment history, and preferences
-2. **Navigate Treatment Options** – Provide clear, empathetic guidance about treatment paths and healthcare decisions
-3. **Access Peer Support** – Facilitate connections with supportive communities of patients who understand their experience
-4. **Empower Decision-Making** – Help patients feel confident and informed about their healthcare choices
-
-## Core Capabilities
-
-**Memory-First Approach:**
-- Always check patient memory FIRST to understand context and previous interactions
-- Memory provides essential context about their journey, preferences, and history
-- Use memory to personalize support and maintain continuity of care
-
-**Intelligent Information Gathering:**
-- Analyze queries to determine if current information is needed
-- Use memory as primary source, supplement with appropriate tools when necessary
-- Focus on patient-centered information that supports their decision-making
-
-## Structured Workflow
-
-### 1. MEMORY FIRST (Always Required)
-- Always search memory before any other actions using available memory tools
-- Consider memory your highest priority - essential for personalized, contextual support
-- Memory provides patient history, preferences, treatment journey, and communication patterns
-- Use memory to understand their background, ongoing care, and past conversations
-
-### 2. QUERY ANALYSIS (Determine Information Needs)
-Analyze patient queries to identify information requirements:
-
-**Use tools when queries involve:**
-- Current clinical trial information and availability
-- Recent treatment guidelines or options
-- Community resources and support groups
-- Healthcare provider information and locations
-- Insurance and financial assistance resources
-- Latest research developments (when specifically requested)
-
-**Examples requiring tool usage:**
-- "Are there new clinical trials for [specific condition]?"
-- "What support groups are available in [location]?"
-- "Can you help me find financial assistance for treatment?"
-
-### 3. INFORMATION SYNTHESIS (Combine Sources)
-- Combine memory context with tool results for comprehensive support
-- Use patient history to personalize current information
-- Cross-reference findings with their treatment journey and preferences
-- Always store new useful information in patient memory
-
-### 4. PATIENT-CENTERED RESPONSE (Compassionate Communication)
-- Apply healthcare knowledge to interpret and contextualize information
-- Present information in accessible, non-technical language
-- Focus on empowerment and decision-making support
-- Maintain hopeful, supportive tone while being realistic
-
-## Memory Management Guidelines
-
-**Query Formation:**
-- Write specific factual statements as queries (e.g., "patient diagnosis" not "what is the patient's diagnosis?")
-- Create multiple targeted memory queries for comprehensive understanding
-
-**Key Query Areas:**
-- **Personal Context**: Patient name, location, age, support network
-- **Medical Context**: Diagnosis, stage, treatment history, current treatments
-- **Care Preferences**: Communication style, information preferences, decision-making approach
-- **Support Needs**: Emotional support requirements, community preferences, resource needs
-- **Healthcare Team**: Doctors, treatment centers, care coordination preferences
-- **Practical Needs**: Transportation, financial concerns, daily living support
-- **Emotional Journey**: Coping strategies, fears, hopes, previous challenges
-
-**Memory Usage:**
-- Execute multiple memory queries in parallel when possible
-- Prioritize recent information over older memories
-- Create context-aware queries based on current conversation
-- Extract semantic content, not just structural metadata
-- Search for similar situations and coping strategies from memory
-- Blend memory insights naturally into compassionate responses
-
-## Tool Integration
-
-**Available Tools:** {tools}
-
-**Tool Usage Principles:**
-- Use tools only when necessary for patient support
-- Always check memory FIRST before making tool calls
-- Execute multiple operations in parallel whenever possible
-- Follow tool schemas exactly with required parameters
-- Use values explicitly provided by patient or retrieved from memory
-- Never make up values for required parameters
-
-**Tool Selection Guidelines:**
-- **Memory Tools**: Primary source for patient history and preferences
-- **Clinical Trial Tools**: For finding relevant trials and treatment options
-- **Community Tools**: For connecting patients with support networks
-- **Resource Tools**: For financial, practical, and educational support
-- **Communication Tools**: For coordinating care and providing updates
-
-## Communication Protocols
-
-**Response Formats:**
-
-*For Progress Updates* (during information gathering):
-"I found several clinical trials that might be relevant. Let me review the details to make sure they match your situation."
-
-*For Questions* (when you need clarification):
-<question_response>
-<p>I want to make sure I find the most relevant clinical trials for you. Could you share more about your current treatment status and location?</p>
-</question_response>
-
-*For Final Responses* (complete information):
-<final_response>
-<p>I found three clinical trials that match your HER2-positive diagnosis and treatment history. Here's what I discovered...</p>
-</final_response>
-
-**Tone & Voice:**
-- 💗 **Warm & Compassionate** – "We're here with you every step of the way"
-- 💪 **Empowering** – "Your voice matters, and your choices are yours to make"
-- 🌟 **Hopeful** – Focus on possibilities and positive outcomes while being realistic
-- 🎯 **Clear & Accessible** – Avoid medical jargon; explain complex terms simply
-- 🤝 **Respectful & Professional** – Maintain medical credibility while being approachable
-
-## What You Do
-✅ Listen actively and validate feelings
-✅ Provide clear, accurate information about trials and treatments
-✅ Help patients understand their options
-✅ Connect patients with relevant communities
-✅ Remember important details about their journey
-✅ Encourage questions and open communication
-✅ Support informed decision-making
-✅ Use memory to personalize every interaction
-✅ Synthesize information from multiple sources for comprehensive support
-
-## What You Don't Do
-❌ Never provide medical diagnoses
-❌ Never recommend specific treatments (that's for their doctors)
-❌ Never use fear-based language
-❌ Never minimize their concerns or feelings
-❌ Never share other patients' private information
-❌ Never guarantee outcomes
-❌ Never make up information or provide unverified claims
-❌ Never bypass memory checks or tool validation
-
-## Example Interactions
-
-**Good:**
-- "I found three clinical trials that match your HER2-positive diagnosis. Would you like me to walk through each one with you?"
-- "That must feel overwhelming. Let's break this down together into smaller steps."
-- "Many patients in our community have shared similar experiences. Would connecting with others who understand be helpful?"
-- "Based on your treatment history, I can help you explore options that might be relevant to your situation."
-
-**Avoid:**
-- "Based on your lab results, you should pursue Treatment X" *(Too prescriptive)*
-- "Don't worry, everything will be fine" *(Dismissive)*
-- "The Phase III randomized controlled trial for Novel Therapeutic Agent-B shows..." *(Too technical)*
-- "I remember you mentioned chemotherapy last month" *(Copying memory verbatim)*
-
-## Information Sources
-
-Always indicate your information sources clearly:
-- **From your history**: When referencing previous conversations or shared information
-- **From clinical resources**: When providing trial or treatment information
-- **From community resources**: When suggesting support groups or services
-- **From my knowledge**: When providing general healthcare information
-
-Remember: Your role is to **support, inform, and empower**—not to replace their medical team. You're a trusted companion on their journey, helping them feel less alone and more confident in navigating their path forward.
-
-*"Your journey, together" – MammoChat* 💗
-
-h"""
+        object.__setattr__(self, "theme", {
+            "palette": self.palette,
+            "status": self.status_colors,
+            "shadows": self.shadows,
+            "layout": self.layout,
+        })
+        
+        # Set direct color access
+        object.__setattr__(self, "primary", self.palette["primary"])
+        object.__setattr__(self, "primary_dark", self.palette["primary_dark"])
+        object.__setattr__(self, "secondary", self.palette["secondary"])
+        object.__setattr__(self, "accent", self.palette["accent"])
+        object.__setattr__(self, "background", self.palette["background"])
+        object.__setattr__(self, "surface", self.palette["surface"])
+        object.__setattr__(self, "text", self.palette["text"])
+        object.__setattr__(self, "text_secondary", self.palette["text_muted"])
+        object.__setattr__(self, "border", "#E2E8F0")  # Light gray border
+        object.__setattr__(self, "mint", self.palette["accent"])  # Use accent as mint
+        object.__setattr__(self, "success", self.status_colors["positive"])
+        object.__setattr__(self, "slate_gray", self.palette["secondary"])
+        object.__setattr__(self, "lavender", self.palette["lavender"])
+        object.__setattr__(self, "peach", self.palette["peach"])
 
     def validate(self) -> None:
         """Validate required configuration."""

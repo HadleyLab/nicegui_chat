@@ -1,26 +1,68 @@
 {
-  "app": {
-    "name": "MammoChat",
-    "tagline": "Your journey, together",
-    "logo_icon": "/branding/logo-icon.svg",
-    "logo_full": "/branding/logo-full-color.svg"
-  },
-  "colors": {
+  "palette": {
     "primary": "#F4B8C5",
     "primary_dark": "#E8A0B8",
-    "secondary": "#E8A0B8",
-    "secondary_dark": "#D88098",
-    "background": "#FFFCF8",
+    "secondary": "#64748B",
+    "accent": "#A7E3D5",
+    "background": "#FAFBFC",
+    "background_soft": "#FFF5F7",
     "surface": "#FFFFFF",
-    "text": "#2D1B2E",
-    "text_secondary": "#5A4F5C",
-    "accent": "#F5C2A8",
-    "success": "#C7E5D4",
-    "error": "#E57373",
-    "warning": "#FFB74D",
-    "info": "#A8D8E8",
-    "border": "#E8D4DA",
-    "theme_color": "#F4B8C5",
-    "safari_theme_color": "#F4B8C5"
+    "text": "#334155",
+    "text_muted": "#64748B",
+    "text_inverse": "#FFFFFF",
+    "lavender": "#DDD6FE",
+    "peach": "#FED7C8",
+    "header_bg": "rgba(255, 255, 255, 0.95)",
+    "footer_bg": "rgba(255, 255, 255, 0.95)",
+    "header_border": "#E5E7EB",
+    "footer_border": "#E5E7EB",
+    "logo_primary": "#F4B8C5",
+    "logo_secondary": "#64748B",
+    "logo_accent": "#A7E3D5"
+  },
+  "status": {
+    "positive": "#A7E3D5",
+    "warning": "#FCD34D",
+    "negative": "#FCA5A5",
+    "info": "#BAE6FD"
+  },
+  "shadows": {
+    "soft": "rgba(100, 116, 139, 0.08)",
+    "bubble": "rgba(100, 116, 139, 0.08)",
+    "bubble_user": "rgba(244, 184, 197, 0.15)",
+    "header": "rgba(244, 184, 197, 0.2)",
+    "footer": "rgba(244, 184, 197, 0.08)",
+    "logo": "rgba(244, 184, 197, 0.2)"
+  },
+  "layout": {
+    "content_max_width": "64rem",
+    "page_padding": "1.5rem",
+    "header_height": "4rem",
+    "footer_height": "3.5rem"
+  },
+  "header": {
+    "background": "linear-gradient(135deg, rgba(244, 184, 197, 0.95) 0%, rgba(232, 160, 184, 0.95) 100%)",
+    "backdrop_filter": "blur(20px) saturate(1.8)",
+    "border_bottom": "1px solid rgba(229, 231, 235, 0.3)",
+    "box_shadow": "0 4px 20px rgba(244, 184, 197, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8)",
+    "padding": "1rem 1.5rem",
+    "border_radius": "0 0 1rem 1rem",
+    "margin": "0 1rem"
+  },
+  "footer": {
+    "background": "linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.95) 50%, rgba(248, 250, 252, 0.95) 100%)",
+    "backdrop_filter": "blur(20px) saturate(1.8)",
+    "border_top": "1px solid rgba(229, 231, 235, 0.8)",
+    "box_shadow": "0 -1px 3px rgba(100, 116, 139, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8)",
+    "padding": "1rem 1.5rem",
+    "border_radius": "1rem 1rem 0 0",
+    "margin": "0 1rem"
+  },
+  "logo": {
+    "heart_gradient": "linear-gradient(135deg, #F4B8C5 0%, #E8A0B8 100%)",
+    "bubble_gradient": "linear-gradient(135deg, #64748B 0%, #334155 50%)",
+    "text_primary": "#F4B8C5",
+    "text_secondary": "#64748B",
+    "drop_shadow": "rgba(244, 184, 197, 0.2)"
   }
 }

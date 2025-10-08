@@ -1,55 +1,18 @@
-const CACHE_NAME = 'nicegui-pwa-starter-v2';
-const PRECACHE_URLS = [
-    '/',
-    '/manifest.json',
-];
+// Minimal service worker to prevent 404 errors
+// This service worker does nothing but prevents browser from continuously trying to fetch it
 
-const isCacheableAsset = (url) => {
-    const { pathname } = new URL(url, self.location.origin);
-
-    if (pathname.startsWith('/_nicegui') || pathname.startsWith('/_internal')) {
-        return false;
-    }
-
-    if (PRECACHE_URLS.includes(pathname)) {
-        return true;
-    }
-
-    return pathname.startsWith('/branding/');
-};
-
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS)),
-    );
+self.addEventListener('install', function(event) {
+    // Skip waiting and activate immediately
     self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))),
-        ),
-    );
-    self.clients.claim();
+self.addEventListener('activate', function(event) {
+    // Claim all clients immediately
+    event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', (event) => {
-    if (event.request.method !== 'GET' || !isCacheableAsset(event.request.url)) {
-        return;
-    }
-
-    event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            const fetchPromise = fetch(event.request)
-                .then((networkResponse) => {
-                    const responseClone = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-                    return networkResponse;
-                })
-                .catch(() => cachedResponse);
-
-            return cachedResponse || fetchPromise;
-        }),
-    );
+// Handle all fetch events by doing nothing (no caching)
+self.addEventListener('fetch', function(event) {
+    // Don't interfere with any requests
+    return;
 });

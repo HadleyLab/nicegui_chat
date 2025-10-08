@@ -58,7 +58,7 @@ Dockerfile
 docker-compose*.yml
 .docker/
 
-# Deployment files (generated during deployment)
-deploy_on_nas.sh
-add_nas_alias.sh
-mammochat*.tar.gz
+# Deployment files
+deploy_to_nas.sh
+nas.config.json
+DEPLOYMENT.md

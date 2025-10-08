@@ -1,0 +1,21 @@
+{
+  "app": {
+    "name": "MammoChat",
+    "tagline": "Your journey, together",
+    "branding": {
+      "logo_icon": "/branding/logo-icon.svg",
+      "logo_full": "/branding/logo-full-color.svg"
+    }
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8080
+  },
+  "llm": {
+    "model": "deepseek-chat",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  "memory": {
+    "base_url": "https://core.heysol.ai/api/v1"
+  }
+}
