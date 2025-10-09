@@ -1,22 +1,14 @@
 #!/usr/bin/env python3
-"""MammoChat - Compassionate AI support for breast cancer patients.
-
-Modern, sophisticated UI built with pure NiceGUI, Tailwind, and Quasar.
-"""
 
 import structlog
-from functools import partial
 from fastapi.responses import FileResponse
 from nicegui import app, ui
 
 from src.ai_service import AIService
 from src.config import config
-from src.theme_service import theme_service
-from src.components import mammochat_logo, welcome_message, header_layout
 
 logger = structlog.get_logger()
 
-# Validate configuration
 try:
     config.validate()
 except ValueError as e:
@@ -24,16 +16,17 @@ except ValueError as e:
     print("Please create a .env file with your DEEPSEEK_API_KEY")
     exit(1)
 
-# Initialize AI service
 ai_service = AIService()
-
-# Conversation history
 messages: list[dict[str, str]] = []
+app.add_static_files("/branding", "branding")
+app.add_static_files("/public", "public")
+
 
 # PWA routes
 @app.get("/service_worker.js")
 async def service_worker():
     return FileResponse("service_worker.js")
+
 
 @app.get("/manifest.json")
 async def manifest():
@@ -42,17 +35,32 @@ async def manifest():
 
 @ui.page("/")
 def main() -> None:
-    """Main chat page with sophisticated modern design."""
 
     logger.info("page_loaded", path="/")
 
-    # Initialize styling and PWA
-    theme_service.initialize_app_styling()
+    palette = config.palette
+    status = config.status_colors
 
-    # Add PWA meta tags
-    ui.add_head_html(f"""
-        <meta name="theme-color" content="{config.primary}" media="(prefers-color-scheme: light)">
-        <meta name="theme-color" content="{config.text}" media="(prefers-color-scheme: dark)">
+    # Use NiceGUI's default dark mode functionality
+    dark = ui.dark_mode()
+
+    # Set comprehensive MammoChat colors for both light and dark themes
+    ui.colors(
+        primary=palette["primary"],
+        secondary=palette["secondary"],
+        accent=palette["accent"],
+        positive=status["positive"],
+        negative=status["negative"],
+        info=status["info"],
+        warning=status["warning"],
+        dark="auto",  # Enable automatic dark mode detection
+    )
+
+    ui.add_head_html(
+        f"""
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="{palette['primary']}" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="{palette['text']}" media="(prefers-color-scheme: dark)">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <meta name="apple-mobile-web-app-title" content="MammoChat">
@@ -65,18 +73,18 @@ def main() -> None:
                 }});
             }}
         </script>
-    """)
+    """
+    )
 
     # Load CSS from separate file
     with open("css/main.css", "r") as f:
         ui.add_css(f.read())
 
-    # The queries below are used to expand the content down to the footer
-    ui.query('.q-page').classes('flex')
-    ui.query('.nicegui-content').classes('w-full')
+    # Layout styling
+    ui.query(".q-page").classes("flex")
+    ui.query(".nicegui-content").classes("w-full")
 
     async def send() -> None:
-        """Send message and get AI response."""
         question = text.value
         text.value = ""
 
@@ -89,20 +97,25 @@ def main() -> None:
         # Add user message
         messages.append({"role": "user", "content": question})
 
-        # Display messages following NiceGUI example pattern - EXACT structure
+        # Display messages with proper NiceGUI theming and sanitization
         with message_container:
-            ui.chat_message(text=question, name="You", sent=True)
-            # Assistant response: use branded grey background
-            response_message = ui.chat_message(name="MammoChat", sent=False).props('bg-color=grey-2')
+            # User message - pink branding colors
+            ui.chat_message(text=question, name="You", sent=True).props(
+                "bg-color=primary text-color=white"
+            )
+            # Assistant response - grey styling
+            response_message = ui.chat_message(name="MammoChat", sent=False).props(
+                "bg-color=grey-3 text-color=grey-9"
+            )
 
         # Scroll down after user message is sent
         await ui.run_javascript(
             "window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})"
         )
 
-        # Minimal thinking indicator
+        # Minimal thinking indicator - use pink color directly
         with response_message:
-            ui.spinner(type="dots", size="sm", color="primary").classes('opacity-60')
+            ui.spinner(type="dots", size="sm").props("color=pink").classes("opacity-60")
 
         logger.info("streaming_ai_response", history_length=len(messages) - 1)
 
@@ -115,13 +128,13 @@ def main() -> None:
                 # Update the message in real-time
                 response_message.clear()
                 with response_message:
-                    ui.markdown(response)
+                    ui.html(response, sanitize=False)
                 ui.run_javascript("window.scrollTo(0, document.body.scrollHeight)")
         except Exception as e:
             logger.error("ai_response_failed", error=str(e))
             response_message.clear()
             with response_message:
-                ui.markdown(f"⚠️ Error: {str(e)}")
+                ui.html(f"<p>⚠️ Error: {str(e)}</p>", sanitize=False)
 
         # Store response in message history (thinking indicator auto-cleared when message updated)
         messages.append({"role": "assistant", "content": response})
@@ -130,40 +143,44 @@ def main() -> None:
         ui.run_javascript("window.scrollTo(0, document.body.scrollHeight)")
 
     def new_conversation() -> None:
-        """Start a new conversation."""
         messages.clear()
         message_container.clear()
         logger.info("new_conversation_started")
 
-    # Full-width responsive layout
-    ui.query(".q-page").classes("flex")
-    ui.query(".nicegui-content").classes("w-full")
-
-    # Create dark mode instance - start with False (light mode) to allow toggling
-    dark = ui.dark_mode(value=False)
-
-    # Header - clean and simple
+    # Clean header with white logo and visible tagline
     with ui.header().classes("q-header"):
-        with ui.row().classes("w-full items-center justify-between px-6 py-3 max-w-5xl mx-auto"):
-            # Logo using extracted component
-            with ui.row().classes('items-center gap-3'):
-                mammochat_logo()
+        with ui.row().classes(
+            "w-full items-center justify-between px-2 sm:px-4 py-3 max-w-4xl mx-auto"
+        ):
+            # Left side: Logo and tagline
+            with ui.row().classes("items-center gap-2 sm:gap-3 flex-shrink-0"):
+                ui.html(
+                    """
+                <div class="flex items-center">
+                    <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="sm:w-10 sm:h-10 w-8 h-8">
+                        <path d="M48 16C48 11.5817 44.4183 8 40 8H16C11.5817 8 8 11.5817 8 16V36C8 40.4183 11.5817 44 16 44H20V52L28 44H40C44.4183 44 48 40.4183 48 36V16Z"
+                              fill="white" opacity="0.9"/>
+                        <path d="M28 20C28 16.6863 30.6863 14 34 14C35.6569 14 37.1569 14.6716 38.2426 15.7574C39.3284 14.6716 40.8284 14 42.4853 14C45.799 14 48.4853 16.6863 48.4853 20C48.4853 21.3062 48.0615 22.512 47.3431 23.4853L38.2426 32.5858L29.1421 23.4853C28.4237 22.512 28 21.3062 28 20Z"
+                              fill="white"/>
+                    </svg>
+                    <span class="text-white font-bold text-lg sm:text-xl ml-2 sm:ml-3">MammoChat</span>
+                </div>
+                """,
+                    sanitize=False,
+                ).classes("flex items-center")
+                ui.label("Your journey, together").classes(
+                    "text-xs sm:text-sm text-white opacity-80 ml-3 sm:ml-4"
+                )
+                ui.label("Your journey, together").classes(
+                    "text-xs sm:text-sm text-white opacity-80 hidden xs:inline"
+                )
 
-            # Right side: tagline, dark mode toggle, and menu button
-            with ui.row().classes('items-center gap-4'):
-                # Tagline - warmer color for better cohesion
-                ui.label(config.app_tagline).classes('text-sm').style(f'color: {config.text_secondary}')
-
-                # Dark mode toggle button
-                dark_toggle = ui.button().props('flat round')
-                dark_toggle.bind_icon_from(dark, 'value', lambda v: 'light_mode' if v else 'dark_mode')
-                dark_toggle.on('click', lambda: dark.toggle())
-
-                # Menu button
-                with ui.button(icon='palette').props('flat round'):
-                    with ui.menu() as menu:
-                        for theme_name in theme_service.get_available_themes().keys():
-                            ui.menu_item(theme_name, on_click=partial(theme_service.switch_theme, theme_name))
+            # Right side: Dark mode toggle
+            with ui.row().classes("items-center gap-2 flex-shrink-0"):
+                # Dark mode toggle
+                ui.button(icon="dark_mode", on_click=lambda: dark.toggle()).props(
+                    "flat dense color=white"
+                ).classes("flex-shrink-0")
 
     # Spacious, comfortable message area
     with ui.column().classes(
@@ -171,47 +188,57 @@ def main() -> None:
     ):
         message_container = ui.column().classes("items-stretch")
 
-        # Welcome message when app first loads
+        # Welcome message when app first loads - grey AI styling
         with message_container:
-            welcome = ui.chat_message(name="MammoChat", sent=False).props('bg-color=grey-1')
+            welcome = ui.chat_message(name="MammoChat", sent=False).props(
+                "bg-color=grey-3 text-color=grey-9"
+            )
             with welcome:
-                ui.markdown('''
+                ui.label(
+                    """
+Welcome to MammoChat!
+
 I'm here to support you on your breast cancer journey. I can help you:
 
-- 💊 **Find Clinical Trials** – Discover and match you with trials that fit your specific diagnosis and situation
-- 👥 **Connect with Peers** – Match you with other patients who share similar experiences and understand your journey
-- 💪 **Make Informed Decisions** – Feel confident and empowered about your healthcare path
+- Find clinical trials that match your situation
+- Connect with communities of patients with similar experiences
+- Understand information about treatments and options
+- Navigate your healthcare with confidence
 
-I remember our conversations and your unique situation, so you never have to repeat yourself. Whether you need clinical trial matches, peer connections, or just someone to talk to, I'm here to walk alongside you every step of the way.
+How can I support you today?
+                """.strip()
+                ).classes("whitespace-pre-wrap")
 
-**How can I support you today?** 💗
-                '''.strip())
-
-    # Footer with sophisticated glass-morphism effect
+    # Theme-aware footer with input area
     with ui.footer().classes("q-footer"):
-        with ui.row().classes("w-full items-center gap-3 px-6 py-3 max-w-5xl mx-auto"):
-            # New conversation button
-            ui.button(icon="add", on_click=new_conversation) \
-                .props("flat round") \
-                .tooltip('Start a new conversation')
+        with ui.row().classes("w-full items-center gap-3 px-4 py-3 max-w-4xl mx-auto"):
+            # New conversation button - theme-aware styling
+            ui.button(icon="add", on_click=new_conversation).props(
+                "round unelevated"
+            ).classes("theme-aware-footer-btn").tooltip("Start a new conversation")
 
-            # Text input
+            # Text input - theme-aware styling
             text = (
                 ui.textarea(placeholder="Share what's on your mind...")
                 .props("outlined autogrow rounded")
-                .classes("flex-grow")
+                .classes("flex-grow theme-aware-input")
                 .style("max-height: 120px;")
                 .on("keydown.enter", send)
             )
 
-            # Send button
-            ui.button(icon="send", on_click=send) \
-                .props("flat round") \
-                .tooltip('Send message')
+            # Send button - theme-aware styling
+            ui.button(icon="send", on_click=send).props("round unelevated").classes(
+                "theme-aware-footer-btn"
+            ).tooltip("Send message")
 
 
 # Run the application
 if __name__ in {"__main__", "__mp_main__"}:
     logger.info("starting_application", host=config.host, port=config.port)
-    from src.app import run_app
-    run_app()
+    ui.run(
+        title="MammoChat",
+        host=config.host,
+        port=config.port,
+        reload=False,
+        show=True,
+    )
