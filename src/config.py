@@ -62,15 +62,21 @@ class Config:
     # AI Service (DeepSeek)
     deepseek_api_key: str = os.getenv("DEEPSEEK_API_KEY", "")
     deepseek_model: str = APP_CONFIG["llm"]["model"]
-    deepseek_base_url: str = os.getenv("DEEPSEEK_BASE_URL", APP_CONFIG["llm"]["base_url"])
+    deepseek_base_url: str = os.getenv(
+        "DEEPSEEK_BASE_URL", APP_CONFIG["llm"]["base_url"]
+    )
 
     # HeySol Memory Service
     heysol_api_key: str = os.getenv("HEYSOL_API_KEY", "")
-    heysol_base_url: str = os.getenv("HEYSOL_BASE_URL", APP_CONFIG["memory"]["base_url"])
+    heysol_base_url: str = os.getenv(
+        "HEYSOL_BASE_URL", APP_CONFIG["memory"]["base_url"]
+    )
 
     # Theme convenience
     palette: dict[str, str] = field(default_factory=lambda: THEME["palette"].copy())
-    status_colors: dict[str, str] = field(default_factory=lambda: THEME["status"].copy())
+    status_colors: dict[str, str] = field(
+        default_factory=lambda: THEME["status"].copy()
+    )
     shadows: dict[str, str] = field(default_factory=lambda: THEME["shadows"].copy())
     layout: dict[str, str] = field(default_factory=lambda: THEME["layout"].copy())
 
@@ -95,13 +101,17 @@ class Config:
 
     def __post_init__(self) -> None:
         """Set theme after initialization."""
-        object.__setattr__(self, "theme", {
-            "palette": self.palette,
-            "status": self.status_colors,
-            "shadows": self.shadows,
-            "layout": self.layout,
-        })
-        
+        object.__setattr__(
+            self,
+            "theme",
+            {
+                "palette": self.palette,
+                "status": self.status_colors,
+                "shadows": self.shadows,
+                "layout": self.layout,
+            },
+        )
+
         # Set direct color access
         object.__setattr__(self, "primary", self.palette["primary"])
         object.__setattr__(self, "primary_dark", self.palette["primary_dark"])

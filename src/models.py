@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
 
 class HeySolConfig(BaseModel):
@@ -16,6 +16,7 @@ class HeySolConfig(BaseModel):
 
     class Config:
         """Pydantic configuration."""
+
         validate_assignment = True
 
 
@@ -24,6 +25,7 @@ class MemoryMetadata(BaseModel):
 
     class Config:
         """Allow extra fields in metadata."""
+
         extra = "allow"
 
 
@@ -35,25 +37,33 @@ class MemoryEpisodeData(BaseModel):
     space_id: str | None = Field(default=None, description="Associated space ID")
     session_id: str | None = Field(default=None, description="Session identifier")
     source: str | None = Field(default=None, description="Source of the memory")
-    metadata: MemoryMetadata = Field(default_factory=MemoryMetadata, description="Additional metadata")
+    metadata: MemoryMetadata = Field(
+        default_factory=MemoryMetadata, description="Additional metadata"
+    )
     created_at: str | None = Field(default=None, description="Creation timestamp")
     updated_at: str | None = Field(default=None, description="Last update timestamp")
 
     class Config:
         """Allow extra fields from API responses."""
+
         extra = "allow"
 
 
 class MemorySearchResultData(BaseModel):
     """Search results for memory queries."""
 
-    episodes: list[MemoryEpisodeData] = Field(default_factory=list, description="Matching episodes")
+    episodes: list[MemoryEpisodeData] = Field(
+        default_factory=list, description="Matching episodes"
+    )
     total: int = Field(default=0, description="Total number of results")
     query: str | None = Field(default=None, description="Original search query")
-    execution_time_ms: float | None = Field(default=None, description="Query execution time")
+    execution_time_ms: float | None = Field(
+        default=None, description="Query execution time"
+    )
 
     class Config:
         """Allow extra fields from API responses."""
+
         extra = "allow"
 
 
@@ -65,10 +75,13 @@ class MemorySpaceData(BaseModel):
     description: str | None = Field(default=None, description="Space description")
     created_at: str | None = Field(default=None, description="Creation timestamp")
     updated_at: str | None = Field(default=None, description="Last update timestamp")
-    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional space metadata")
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Additional space metadata"
+    )
 
     class Config:
         """Allow extra fields from API responses."""
+
         extra = "allow"
 
 
@@ -87,7 +100,12 @@ class HeySolClientConfig(BaseModel):
 class HeySolError(Exception):
     """Base exception for HeySol errors."""
 
-    def __init__(self, message: str, status_code: int | None = None, details: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        message: str,
+        status_code: int | None = None,
+        details: dict[str, Any] | None = None,
+    ):
         super().__init__(message)
         self.status_code = status_code
         self.details = details or {}
@@ -95,21 +113,25 @@ class HeySolError(Exception):
 
 class AuthenticationError(HeySolError):
     """Authentication related errors."""
+
     pass
 
 
 class ValidationError(HeySolError):
     """Validation related errors."""
+
     pass
 
 
 class ConnectionError(HeySolError):
     """Connection related errors."""
+
     pass
 
 
 class RateLimitError(HeySolError):
     """Rate limiting errors."""
+
     pass
 
 
