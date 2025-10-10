@@ -10,6 +10,7 @@ from src.services.auth_service import AuthService
 from src.services.agent_service import ChatAgent
 
 
+@pytest.mark.integration
 @pytest.mark.skipif(
     not config.deepseek_api_key,
     reason="DEEPSEEK_API_KEY not set - skipping integration tests"
@@ -50,6 +51,7 @@ class TestAIServiceIntegration:
         assert not any("not configured" in chunk for chunk in chunks)
 
 
+@pytest.mark.integration
 @pytest.mark.skipif(
     not config.heysol_api_key,
     reason="HEYSOL_API_KEY not set - skipping integration tests"
@@ -139,6 +141,7 @@ class TestChatAgentIntegration:
         assert events[-1][0] == "final"
 
 
+@pytest.mark.integration
 @pytest.mark.skipif(
     not config.deepseek_api_key or not config.heysol_api_key,
     reason="API keys not set - skipping full integration tests"

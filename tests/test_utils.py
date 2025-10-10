@@ -40,12 +40,12 @@ class TestSetupStaticFiles:
         calls = mock_app.mount.call_args_list
         assert calls[0][0][0] == "/branding"
         assert calls[0][0][1].directory == "branding"
-        assert calls[0][0][2] == "branding"
+        assert calls[0][1]["name"] == "branding"
 
         # Check second mount call (static)
         assert calls[1][0][0] == "/static"
         assert calls[1][0][1].directory == "branding"
-        assert calls[1][0][2] == "static-branding"
+        assert calls[1][1]["name"] == "static-branding"
 
 
 class TestHandleError:
