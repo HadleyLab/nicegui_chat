@@ -3,7 +3,7 @@
     "name": "MammoChat",
     "tagline": "Your journey, together",
     "branding": {
-      "logo_icon": "/branding/logo-icon.svg",
+      "logo_icon": "/branding/logo-icon-color.svg",
       "logo_full": "/branding/logo-full-color.svg"
     }
   },

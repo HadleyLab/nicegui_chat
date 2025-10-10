@@ -13,7 +13,7 @@ This directory contains the complete branding package for **MammoChat**, an AI-p
 
 ### 🎨 Logo Files
 - **logo-full-color.svg** - Full horizontal logo with icon and wordmark (primary use)
-- **logo-icon.svg** - Icon only version for app icons and small spaces
+- **logo-icon-color.svg** - Icon only version for app icons and small spaces
 - **logo-white.svg** - White version for dark backgrounds
 - **logo-monochrome.svg** - Single-color version for limited color situations
 
@@ -46,7 +46,7 @@ This directory contains the complete branding package for **MammoChat**, an AI-p
 <img src="branding/logo-full-color.svg" alt="MammoChat" width="240">
 
 <!-- Icon Only -->
-<img src="branding/logo-icon.svg" alt="MammoChat" width="64">
+<img src="branding/logo-icon-color.svg" alt="MammoChat" width="64">
 
 <!-- On Dark Background -->
 <img src="branding/logo-white.svg" alt="MammoChat" width="240">

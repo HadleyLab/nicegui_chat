@@ -31,6 +31,7 @@ class MemoryService:
 
         try:
             from heysol import HeySolClient
+
             client = HeySolClient(
                 api_key=self._auth_service.api_key,
                 base_url=self._auth_service.base_url,
@@ -79,6 +80,7 @@ class MemoryService:
 
         try:
             from heysol import HeySolClient
+
             client = HeySolClient(
                 api_key=self._auth_service.api_key,
                 base_url=self._auth_service.base_url,
@@ -102,6 +104,7 @@ class MemoryService:
 
         try:
             from heysol import HeySolClient
+
             client = HeySolClient(
                 api_key=self._auth_service.api_key,
                 base_url=self._auth_service.base_url,

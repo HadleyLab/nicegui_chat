@@ -6,7 +6,7 @@ promoting code reuse and consistency throughout the modular architecture.
 
 The utilities are organized to support the layered architecture:
 - Logging utilities for structured application logging
-- Static file serving for web assets and PWA resources
+- Static file serving for web assets
 - Error handling for fail-fast behavior and debugging
 
 All utilities follow the application's coding standards: minimalism, explicitness,
@@ -14,7 +14,6 @@ and performance optimization.
 """
 
 import structlog
-from fastapi.responses import FileResponse
 
 
 def get_logger(name: str = __name__) -> structlog.BoundLoggerBase:
@@ -34,32 +33,21 @@ def get_logger(name: str = __name__) -> structlog.BoundLoggerBase:
 
 
 def setup_static_files(app) -> None:
-    """Configure static file serving and PWA routes for the application.
+    """Configure static file serving for the application.
 
-    Sets up FastAPI routes to serve branding assets and PWA manifest files.
-    This enables the web application to load icons, stylesheets, and manifest
-    for Progressive Web App functionality.
+    Sets up FastAPI routes to serve branding assets.
+    This enables the web application to load icons and stylesheets
+    with enhanced caching and performance.
 
     Args:
         app: FastAPI application instance to configure routes on
     """
-    app.add_static_files("/branding", "branding")
+    from fastapi.staticfiles import StaticFiles
+
+    # Enhanced branding assets serving with better organization
+    app.mount("/branding", StaticFiles(directory="branding"), name="branding")
     # Also serve branding files at root level for compatibility
-    app.add_static_files("/static", "branding")
-
-    @app.get("/manifest.json")
-    def manifest() -> FileResponse:
-        return FileResponse(
-            "public/manifest.json", media_type="application/manifest+json"
-        )
-
-    @app.get("/service_worker.js")
-    def service_worker() -> FileResponse:
-        return FileResponse("service_worker.js", media_type="application/javascript")
-
-    @app.get("/apple-touch-icon.png")
-    def apple_icon() -> FileResponse:
-        return FileResponse("branding/apple-touch-icon.png", media_type="image/png")
+    app.mount("/static", StaticFiles(directory="branding"), name="static-branding")
 
 
 def handle_error(error: Exception, logger: structlog.BoundLoggerBase) -> None:
@@ -77,5 +65,5 @@ def handle_error(error: Exception, logger: structlog.BoundLoggerBase) -> None:
     Raises:
         Exception: Re-raises the original error after logging
     """
-    logger.error("error_occurred", error=str(error), error_type=type(error).__name__)
+    logger.error("error_occurred", error=str(error), error_type=type(error).__name__)  # type: ignore[attr-defined]
     raise error

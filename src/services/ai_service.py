@@ -16,7 +16,7 @@ logger = structlog.get_logger()
 try:
     from heysol import HeySolClient
 except ImportError:
-    HeySolClient = None  # type: ignore[assignment]
+    HeySolClient = None  # type: ignore[assignment,misc]
 
 # Import Pydantic AI if available
 try:
@@ -28,18 +28,19 @@ try:
     # Try to import DeepSeek provider
     try:
         from pydantic_ai.providers.deepseek import DeepSeekProvider
+
         DEEPSEEK_PROVIDER_AVAILABLE = True
     except ImportError:
         DEEPSEEK_PROVIDER_AVAILABLE = False
-        DeepSeekProvider = None  # type: ignore[assignment]
+        DeepSeekProvider = None  # type: ignore[assignment,misc]
 
 except ImportError:
     PYDANTIC_AI_AVAILABLE = False
     DEEPSEEK_PROVIDER_AVAILABLE = False
-    Agent = None  # type: ignore[assignment]
-    RunContext = None  # type: ignore[assignment]
-    OpenAIChatModel = None  # type: ignore[assignment]
-    DeepSeekProvider = None  # type: ignore[assignment]
+    Agent = None  # type: ignore[assignment,misc]
+    RunContext = None  # type: ignore[assignment,misc]
+    OpenAIChatModel = None  # type: ignore[assignment,misc]
+    DeepSeekProvider = None  # type: ignore[assignment,misc]
 
 
 class AgentDependencies(BaseModel):  # type: ignore[misc]
@@ -106,6 +107,7 @@ class AIService:
 
             # Register memory search tool if HeySol is available
             if self.heysol_client:
+
                 @self.agent.tool  # type: ignore[misc]
                 async def memory_search(
                     ctx: RunContext[AgentDependencies],  # type: ignore[valid-type]
@@ -125,7 +127,9 @@ class AIService:
                         )
                         # Extract episode bodies from search results
                         if hasattr(result, "episodes"):
-                            return [ep.body for ep in result.episodes if hasattr(ep, "body")]
+                            return [
+                                ep.body for ep in result.episodes if hasattr(ep, "body")
+                            ]
                         return []
                     except Exception as e:
                         logger.error("memory_search_failed", error=str(e))
@@ -191,7 +195,9 @@ class AIService:
                 conversation_context = []
                 if history:
                     for msg in history:
-                        conversation_context.append(f"{msg.get('role', 'user')}: {msg.get('content', '')}")
+                        conversation_context.append(
+                            f"{msg.get('role', 'user')}: {msg.get('content', '')}"
+                        )
 
                 # Run agent
                 result = await self.agent.run(
@@ -205,7 +211,7 @@ class AIService:
                 # Yield the reply in chunks for streaming effect
                 chunk_size = 20
                 for i in range(0, len(output.reply), chunk_size):
-                    yield output.reply[i:i + chunk_size]
+                    yield output.reply[i : i + chunk_size]
 
                 # If there are referenced memories, mention them
                 if output.referenced_memories:

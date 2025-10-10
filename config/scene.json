@@ -3,51 +3,113 @@
     "primary": "#F4B8C5",
     "secondary": "#E8A0B8",
     "accent": "#E5E7EB",
-    "background": "#FFFFFF",
-    "surface": "#F9FAFB",
+    "background": "#FAFBFC",
+    "surface": "#FFFFFF",
     "text": "#334155",
-    "text_secondary": "#64748B"
+    "text_secondary": "#64748B",
+    "success": "#A7E3D5",
+    "info": "#DDD6FE",
+    "warning": "#FED7C8",
+    "error": "#FCA5A5",
+    "slate_gray": "#64748B",
+    "rose_quartz": "#F4B8C5",
+    "mint_fresh": "#A7E3D5",
+    "lavender_mist": "#DDD6FE",
+    "peach_glow": "#FED7C8"
   },
   "status": {
     "positive": "#A7E3D5",
-    "warning": "#FCD34D",
+    "warning": "#FED7C8",
     "negative": "#FCA5A5",
-    "info": "#BAE6FD",
+    "info": "#DDD6FE",
     "error_classes": "text-sm p-3 rounded-lg w-full"
   },
   "shadows": {
-    "soft": "",
-    "bubble": "",
-    "bubble_user": "",
-    "header": "",
-    "footer": "",
-    "logo": ""
+    "soft": "0 2px 8px rgba(100, 116, 139, 0.06)",
+    "bubble": "0 2px 8px rgba(0, 0, 0, 0.06)",
+    "bubble_user": "0 4px 16px rgba(244, 184, 197, 0.2)",
+    "header": "0 4px 20px rgba(244, 184, 197, 0.2)",
+    "footer": "0 -2px 8px rgba(100, 116, 139, 0.1)",
+    "logo": "0 2px 8px rgba(100, 116, 139, 0.15)",
+    "card": "0 4px 12px rgba(100, 116, 139, 0.08)",
+    "input": "0 2px 8px rgba(0, 0, 0, 0.04)",
+    "button": "0 4px 16px rgba(244, 184, 197, 0.4)"
+  },
+  "glass_effects": {
+    "backdrop_blur": "backdrop-filter: blur(12px)",
+    "backdrop_blur_light": "backdrop-filter: blur(8px)",
+    "backdrop_blur_strong": "backdrop-filter: blur(16px)",
+    "glass_bg_primary": "rgba(255, 255, 255, 0.25)",
+    "glass_bg_secondary": "rgba(255, 255, 255, 0.15)",
+    "glass_bg_surface": "rgba(255, 255, 255, 0.35)",
+    "glass_border": "rgba(255, 255, 255, 0.20)",
+    "glass_border_light": "rgba(255, 255, 255, 0.15)",
+    "glass_border_strong": "rgba(255, 255, 255, 0.30)"
   },
   "layout": {
-    "content_max_width": "max-w-5xl",
-    "page_padding": "p-6",
-    "header_height": "h-16",
-    "footer_height": "h-14",
-    "page_classes": "flex min-h-screen",
-    "content_classes": "w-full"
+    "content_max_width": "max-w-6xl",
+    "page_padding": "p-4",
+    "header_height": "h-20",
+    "footer_height": "h-16",
+    "page_classes": "flex min-h-screen bg-gradient-to-br from-slate-50 to-pink-50",
+    "content_classes": "w-full",
+    "scroll_area_classes": "flex-grow w-full overflow-y-auto",
+    "container_wrapper": "w-full max-w-4xl mx-auto"
   },
   "header": {
-    "background": "bg-white dark:bg-gray-900",
-    "padding": "px-4 py-3"
+    "background": "linear-gradient(135deg, #F4B8C5 0%, #E8A0B8 100%)",
+    "padding": "px-6 py-4",
+    "classes": "w-full items-center justify-between backdrop-blur-md bg-white/25 border-b border-white/20 transition-all duration-300",
+    "scroll_effect": "backdrop-blur-lg bg-white/35 border-b border-white/30 shadow-lg transition-all duration-300",
+    "fixed_classes": "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+    "backdrop_filter": "backdrop-filter: blur(12px) saturate(180%)",
+    "glass_morphism": "backdrop-filter: blur(16px) saturate(200%) contrast(1.2)"
   },
   "footer": {
-    "background": "bg-gray-50 dark:bg-gray-800",
-    "border_top": "border-t",
-    "padding": "p-3"
+    "background": "linear-gradient(135deg, #F4B8C5 0%, #E8A0B8 50%, #F4B8C5 100%)",
+    "border_top": "border-t border-white/20",
+    "padding": "px-6 py-4",
+    "classes": "w-full items-center backdrop-blur-md bg-white/25 border-t border-white/20 transition-all duration-300",
+    "scroll_effect": "backdrop-blur-lg bg-white/35 border-t border-white/30 shadow-xl transition-all duration-300",
+    "fixed_classes": "fixed bottom-0 left-0 right-0 z-40 transition-all duration-300",
+    "text_color": "text-white",
+    "backdrop_filter": "backdrop-filter: blur(12px) saturate(180%)",
+    "glass_morphism": "backdrop-filter: blur(16px) saturate(200%) contrast(1.2)"
   },
   "logo": {
-    "src": "/branding/logo-full-white.svg",
+    "src": "/branding/logo-full-color.svg",
     "alt": "MammoChat",
-    "classes": "h-8 flex-shrink-0"
+    "classes": "h-10 flex-shrink-0 transition-transform duration-200 hover:scale-105",
+    "drop_shadow": "drop-shadow-sm"
   },
   "chat": {
-    "welcome_message": "Welcome to MammoChat! I can help you find:\n\n- Clinical trial matching\n- Peer support communities\n- Empathetic guidance\n- Patient empowerment\n\nHow can I support you today?",
-    "container_classes": "w-full max-w-2xl mx-auto p-4 flex-grow",
-    "message_container_classes": "w-full gap-4"
+    "welcome_message": "### Welcome to MammoChat 💗\n\nI'm here to support you on your breast cancer journey. I can help you:\n\n- 🔬 **Find clinical trials** that match your situation\n- 👥 **Connect with communities** of patients with similar experiences\n- 📚 **Understand information** about treatments and options\n- 💪 **Navigate your healthcare** with confidence\n\nHow can I support you today?",
+    "container_classes": "w-full max-w-4xl mx-auto p-6 flex-grow",
+    "message_container_classes": "w-full gap-6",
+    "scroll_area_classes": "flex-grow w-full p-6 overflow-y-auto",
+    "message_bubble_classes": "rounded-2xl p-5 max-w-4xl animate-fade-in transition-all duration-300",
+    "user_message_classes": "ml-auto bg-gradient-to-br from-primary to-secondary text-white border-none backdrop-blur-sm",
+    "assistant_message_classes": "bg-white/35 border border-white/20 shadow-soft backdrop-blur-sm transition-all duration-300 hover:bg-white/45",
+    "input_container_classes": "bg-white/25 rounded-2xl p-4 border border-white/20 transition-all duration-300 focus-within:border-white/40 focus-within:shadow-input focus-within:bg-white/35 backdrop-blur-md",
+    "glass_effects": {
+      "input_glass": "backdrop-filter: blur(12px) saturate(180%)",
+      "bubble_glass": "backdrop-filter: blur(8px) saturate(150%)",
+      "hover_glass": "backdrop-filter: blur(16px) saturate(200%)"
+    }
+  },
+  "animations": {
+    "glass_transition": "transition: backdrop-filter 0.3s ease, opacity 0.3s ease, background-color 0.3s ease",
+    "fade_in_glass": "animation: fadeInGlass 0.5s ease-out forwards",
+    "hover_glass": "transition: backdrop-filter 0.2s ease, transform 0.2s ease",
+    "focus_glass": "transition: backdrop-filter 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease"
+  },
+  "opacity_scale": {
+    "glass_light": 0.15,
+    "glass_medium": 0.25,
+    "glass_strong": 0.35,
+    "glass_max": 0.45,
+    "border_light": 0.15,
+    "border_medium": 0.20,
+    "border_strong": 0.30
   }
 }

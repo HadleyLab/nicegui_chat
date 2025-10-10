@@ -20,8 +20,8 @@ This design enables maintainability, testability, and scalability.
 
 from nicegui import app, ui
 
-from src.services.ai_service import AIService
 from config import config, validate_config
+from src.services.ai_service import AIService
 from src.services.auth_service import AuthService
 from src.services.chat_service import ChatService
 from src.services.memory_service import MemoryService
@@ -58,12 +58,12 @@ def main() -> None:
 
 # Run the application
 if __name__ in {"__main__", "__mp_main__"}:
-    logger.info("starting_application", host=config.host, port=config.port)
+    logger.info("starting_application", host=config.host, port=config.port)  # type: ignore[attr-defined]
     ui.run(
         title="MammoChat - Your journey, together",
         host=config.host,
         port=8080,
-        reload=True,
+        reload=False,
         show=True,
         reconnect_timeout=30.0,  # Increase reconnect timeout
         favicon="💗",  # Heart emoji as favicon for MammoChat

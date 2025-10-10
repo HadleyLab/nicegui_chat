@@ -11,6 +11,7 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.deepseek import DeepSeekProvider
 
 from config import DeepSeekConfig
+
 from ..models.chat import ConversationState
 from ..services.memory_service import MemoryService
 from ..utils.exceptions import ChatServiceError
@@ -168,7 +169,7 @@ class ChatAgent:
                 previous_reply = ""
                 async for output in result.stream_output():
                     # output is an instance of AgentOutput
-                    new_text = output.reply[len(previous_reply):]
+                    new_text = output.reply[len(previous_reply) :]
                     if new_text:
                         yield "chunk", new_text
                     previous_reply = output.reply

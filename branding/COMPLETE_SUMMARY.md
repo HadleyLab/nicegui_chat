@@ -34,7 +34,7 @@ Step-by-step technical guide with:
 ### 3. **Logo Suite** (SVG Files)
 Four professional logo variations:
 - ✅ **logo-full-color.svg** - Primary horizontal logo with gradient
-- ✅ **logo-icon.svg** - Square icon for app icons
+- ✅ **logo-icon-color.svg** - Square icon for app icons
 - ✅ **logo-white.svg** - White version for dark backgrounds
 - ✅ **logo-monochrome.svg** - Single-color version
 
@@ -271,7 +271,7 @@ branding/
 ├── PACKAGE_SUMMARY.md           # Asset inventory
 ├── color-palette.html           # Interactive color viewer
 ├── logo-full-color.svg          # Primary logo
-├── logo-icon.svg                # Icon only
+├── logo-icon-color.svg          # Icon only
 ├── logo-white.svg               # Dark background version
 └── logo-monochrome.svg          # Single-color version
 ```

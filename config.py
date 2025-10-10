@@ -57,6 +57,7 @@ class HeysolConfig:
     api_key: str
     base_url: str
 
+
 BASE_DIR = Path(__file__).parent
 CONFIG_DIR = BASE_DIR / "config"
 
@@ -69,8 +70,6 @@ def _load_json(path: Path) -> dict[str, Any]:
 def _load_text(path: Path) -> str:
     with open(path, encoding="utf-8") as f:
         return f.read().strip()
-
-
 
 
 def load_scene() -> dict[str, Any]:
@@ -128,11 +127,15 @@ class Config:
     # AI Service (DeepSeek)
     deepseek_api_key: str = os.getenv("DEEPSEEK_API_KEY", "")
     deepseek_model: str = APP_CONFIG["llm"]["model"]
-    deepseek_base_url: str = os.getenv("DEEPSEEK_BASE_URL", APP_CONFIG["llm"]["base_url"])
+    deepseek_base_url: str = os.getenv(
+        "DEEPSEEK_BASE_URL", APP_CONFIG["llm"]["base_url"]
+    )
 
     # HeySol Memory Service
     heysol_api_key: str = os.getenv("HEYSOL_API_KEY", "")
-    heysol_base_url: str = os.getenv("HEYSOL_BASE_URL", APP_CONFIG["memory"]["base_url"])
+    heysol_base_url: str = os.getenv(
+        "HEYSOL_BASE_URL", APP_CONFIG["memory"]["base_url"]
+    )
 
     # Scene configuration for NiceGUI colors
     scene: dict[str, Any] = field(default_factory=lambda: SCENE.copy())
@@ -143,11 +146,11 @@ class Config:
     # Memory Configuration
     memory: HeysolConfig = field(init=False)
 
-
     # UI Configuration
     ui_logo_icon_path: str = APP_CONFIG["app"]["branding"]["logo_icon"]
     ui_welcome_title: str = "Welcome to MammoChat!"
-    ui_welcome_message: str = """
+    ui_welcome_message: str = (
+        """
 Welcome to MammoChat!
 
 I'm here to support you on your breast cancer journey. I can help you:
@@ -159,6 +162,7 @@ I'm here to support you on your breast cancer journey. I can help you:
 
 How can I support you today?
 """.strip()
+    )
     ui_input_placeholder: str = "Share what's on your mind..."
     ui_send_tooltip: str = "Send message"
     ui_dark_mode_tooltip: str = "Toggle dark mode"
@@ -178,18 +182,26 @@ How can I support you today?
     def __post_init__(self) -> None:
         """Set llm and memory configs after initialization."""
         # Set LLM config
-        object.__setattr__(self, "llm", DeepSeekConfig(
-            api_key=self.deepseek_api_key,
-            model=self.deepseek_model,
-            base_url=self.deepseek_base_url,
-            system_prompt=self.system_prompt,
-        ))
+        object.__setattr__(
+            self,
+            "llm",
+            DeepSeekConfig(
+                api_key=self.deepseek_api_key,
+                model=self.deepseek_model,
+                base_url=self.deepseek_base_url,
+                system_prompt=self.system_prompt,
+            ),
+        )
 
         # Set Memory config
-        object.__setattr__(self, "memory", HeysolConfig(
-            api_key=self.heysol_api_key,
-            base_url=self.heysol_base_url,
-        ))
+        object.__setattr__(
+            self,
+            "memory",
+            HeysolConfig(
+                api_key=self.heysol_api_key,
+                base_url=self.heysol_base_url,
+            ),
+        )
 
     def validate(self) -> None:
         """Validate required configuration."""

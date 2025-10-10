@@ -43,7 +43,7 @@ Replace the UI configuration with MammoChat's brand colors:
   },
   "llm": {
     "model": "deepseek-chat",
-    "base_url": "https://api.deepseek.com"
+    "base_url": "https://api.deepseek.com/v1"
   },
   "chat": {
     "enable_memory_enrichment": true,
@@ -359,7 +359,7 @@ APP_NAME=MammoChat
 # DeepSeek API Configuration
 DEEPSEEK_API_KEY=your_deepseek_api_key_here
 DEEPSEEK_MODEL=deepseek-chat
-DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
 
 # HeySol API Configuration
 HEYSOL_API_KEY=your_heysol_api_key_here
@@ -411,10 +411,10 @@ def main():
 Place the logo files in appropriate locations:
 
 ```
-src/ui/assets/
+branding/
 ├── logo-full-color.svg
-├── logo-icon.svg
-├── logo-white.svg
+├── logo-icon-color.svg
+├── logo-full-white.svg
 └── logo-monochrome.svg
 ```
 

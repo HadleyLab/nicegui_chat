@@ -121,7 +121,7 @@ This comprehensive branding package contains everything needed to implement the 
 | File | Size | Format | Use Case |
 |------|------|--------|----------|
 | logo-full-color.svg | 240x64px | SVG | Primary use |
-| logo-icon.svg | 64x64px | SVG | App icons |
+| logo-icon-color.svg | 64x64px | SVG | App icons |
 | logo-white.svg | 240x64px | SVG | Dark backgrounds |
 | logo-monochrome.svg | 240x64px | SVG | Limited color |
 
