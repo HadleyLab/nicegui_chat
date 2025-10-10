@@ -1,0 +1,331 @@
+"""Unit tests for services."""
+
+import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
+
+from src.models.chat import ConversationState, MessageRole
+from src.services.agent_service import ChatAgent
+from src.services.ai_service import AIService
+from src.services.auth_service import AuthService
+from src.services.chat_service import ChatService
+from src.services.memory_service import MemoryService
+from src.utils.exceptions import AuthenticationError, ChatServiceError
+
+
+class TestAuthService:
+    """Test AuthService."""
+
+    def test_authenticated_with_api_key(self):
+        """Test authentication when API key is present."""
+        config = MagicMock()
+        config.api_key = "test_key"
+        config.base_url = "https://api.example.com"
+
+        auth = AuthService(config)
+        assert auth.is_authenticated is True
+        assert auth.api_key == "test_key"
+        assert auth.base_url == "https://api.example.com"
+
+    def test_not_authenticated_without_api_key(self):
+        """Test authentication when API key is missing."""
+        config = MagicMock()
+        config.api_key = None
+        config.base_url = "https://api.example.com"
+
+        auth = AuthService(config)
+        assert auth.is_authenticated is False
+
+
+class TestChatService:
+    """Test ChatService."""
+
+    @pytest.fixture
+    def mock_config(self):
+        """Mock config."""
+        config = MagicMock()
+        config.memory = MagicMock()
+        config.memory.api_key = "test_key"
+        config.chat_store_user_messages = True
+        config.chat_enable_memory_enrichment = True
+        config.chat_stream_chunk_size = 10
+        return config
+
+    @pytest.fixture
+    def mock_auth_service(self):
+        """Mock auth service."""
+        auth = MagicMock()
+        auth.is_authenticated = True
+        return auth
+
+    @pytest.fixture
+    def mock_memory_service(self):
+        """Mock memory service."""
+        return MagicMock()
+
+    @pytest.fixture
+    def mock_agent(self):
+        """Mock agent."""
+        agent = MagicMock()
+        agent.generate_stream = AsyncMock()
+        return agent
+
+    @pytest.fixture
+    def chat_service(self, mock_auth_service, mock_memory_service, mock_config, mock_agent):
+        """Create ChatService instance."""
+        return ChatService(mock_auth_service, mock_memory_service, mock_config, mock_agent)
+
+    @pytest.mark.asyncio
+    async def test_stream_chat_success(self, chat_service, mock_agent):
+        """Test successful chat streaming."""
+        conversation = ConversationState()
+        user_message = "Hello"
+
+        # Mock agent stream
+        async def mock_stream():
+            yield "chunk", "Hi"
+            yield "final", MagicMock(referenced_memories=["mem1"])
+
+        mock_agent.generate_stream = mock_stream
+
+        events = []
+        async for event in chat_service.stream_chat(conversation, user_message):
+            events.append(event)
+
+        assert len(events) >= 3  # start, chunk, end, step, stream_end
+        assert events[0].event_type.value == "MESSAGE_START"
+        assert conversation.status.value == "success"
+
+    @pytest.mark.asyncio
+    async def test_stream_chat_not_authenticated(self, chat_service, mock_auth_service):
+        """Test chat streaming when not authenticated."""
+        mock_auth_service.is_authenticated = False
+        conversation = ConversationState()
+
+        with pytest.raises(AuthenticationError):
+            async for _ in chat_service.stream_chat(conversation, "Hello"):
+                pass
+
+    @pytest.mark.asyncio
+    async def test_stream_chat_empty_message(self, chat_service):
+        """Test chat streaming with empty message."""
+        conversation = ConversationState()
+
+        with pytest.raises(ChatServiceError):
+            async for _ in chat_service.stream_chat(conversation, ""):
+                pass
+
+    def test_chunk_reply(self, chat_service):
+        """Test reply chunking."""
+        reply = "This is a test message"
+        chunks = chat_service._chunk_reply(reply)
+        assert len(chunks) > 0
+        assert "".join(chunks) == reply
+
+    def test_chunk_reply_empty(self, chat_service):
+        """Test chunking empty reply."""
+        chunks = chat_service._chunk_reply("")
+        assert chunks == []
+
+
+class TestMemoryService:
+    """Test MemoryService."""
+
+    @pytest.fixture
+    def mock_auth_service(self):
+        """Mock auth service."""
+        auth = MagicMock()
+        auth.is_authenticated = True
+        auth.api_key = "test_key"
+        auth.base_url = "https://api.example.com"
+        return auth
+
+    @pytest.fixture
+    def memory_service(self, mock_auth_service):
+        """Create MemoryService instance."""
+        return MemoryService(mock_auth_service)
+
+    @pytest.mark.asyncio
+    async def test_search_success(self, memory_service):
+        """Test successful memory search."""
+        with patch("src.services.memory_service.HeySolClient") as mock_client_class:
+            mock_client = MagicMock()
+            mock_client.search.return_value = {"episodes": [], "total": 0}
+            mock_client_class.return_value = mock_client
+
+            result = await memory_service.search("test query")
+            assert result is not None
+
+    @pytest.mark.asyncio
+    async def test_search_not_authenticated(self, memory_service, mock_auth_service):
+        """Test search when not authenticated."""
+        mock_auth_service.is_authenticated = False
+
+        with pytest.raises(AuthenticationError):
+            await memory_service.search("test")
+
+    @pytest.mark.asyncio
+    async def test_add_success(self, memory_service):
+        """Test successful memory add."""
+        with patch("src.services.memory_service.HeySolClient") as mock_client_class:
+            mock_client = MagicMock()
+            mock_client.ingest.return_value = {"episode_id": "123"}
+            mock_client_class.return_value = mock_client
+
+            result = await memory_service.add("test message")
+            assert result.episode_id == "123"
+            assert result.body == "test message"
+
+    @pytest.mark.asyncio
+    async def test_list_spaces_success(self, memory_service):
+        """Test successful list spaces."""
+        with patch("src.services.memory_service.HeySolClient") as mock_client_class:
+            mock_client = MagicMock()
+            mock_client.get_spaces.return_value = [{"id": "1", "name": "Test Space"}]
+            mock_client_class.return_value = mock_client
+
+            result = await memory_service.list_spaces()
+            assert len(result) == 1
+
+
+class TestAIService:
+    """Test AIService."""
+
+    @pytest.fixture
+    def mock_config(self):
+        """Mock config."""
+        config = MagicMock()
+        config.deepseek_api_key = "test_key"
+        config.deepseek_model = "test-model"
+        config.deepseek_base_url = "https://api.example.com"
+        config.heysol_api_key = "heysol_key"
+        config.system_prompt = "You are a helpful assistant."
+        return config
+
+    @pytest.fixture
+    def ai_service(self, mock_config):
+        """Create AIService instance."""
+        with patch("src.services.ai_service.HeySolClient"), \
+             patch("src.services.ai_service.Agent"), \
+             patch("src.services.ai_service.DeepSeekProvider"):
+            return AIService()
+
+    @pytest.mark.asyncio
+    async def test_stream_chat_no_api_key(self, ai_service):
+        """Test streaming without API key."""
+        ai_service.api_key = None
+
+        chunks = []
+        async for chunk in ai_service.stream_chat("Hello"):
+            chunks.append(chunk)
+
+        assert len(chunks) == 1
+        assert "not configured" in chunks[0]
+
+    @pytest.mark.asyncio
+    async def test_stream_chat_with_agent(self, ai_service):
+        """Test streaming with agent."""
+        with patch.object(ai_service, "agent") as mock_agent:
+            mock_result = MagicMock()
+            mock_output = MagicMock()
+            mock_output.reply = "Test response"
+            mock_output.referenced_memories = []
+            mock_result.output = mock_output
+            mock_agent.run = AsyncMock(return_value=mock_result)
+
+            chunks = []
+            async for chunk in ai_service.stream_chat("Hello"):
+                chunks.append(chunk)
+
+            assert len(chunks) > 0
+            assert "Test response" in "".join(chunks)
+
+    @pytest.mark.asyncio
+    async def test_stream_chat_fallback_api(self, ai_service):
+        """Test fallback to direct API."""
+        ai_service.agent = None
+
+        with patch("httpx.AsyncClient") as mock_client_class:
+            mock_response = AsyncMock()
+            mock_response.status_code = 200
+            mock_response.raise_for_status = MagicMock()
+            mock_response.aiter_lines = AsyncMock(return_value=[
+                'data: {"choices":[{"delta":{"content":"Hi"}}]}',
+                'data: [DONE]'
+            ])
+
+            mock_client = MagicMock()
+            mock_client.stream.return_value.__aenter__ = AsyncMock(return_value=mock_response)
+            mock_client.stream.return_value.__aexit__ = AsyncMock(return_value=None)
+            mock_client_class.return_value = mock_client
+
+            chunks = []
+            async for chunk in ai_service.stream_chat("Hello"):
+                chunks.append(chunk)
+
+            assert "Hi" in "".join(chunks)
+
+
+class TestAgentService:
+    """Test AgentService."""
+
+    @pytest.fixture
+    def mock_config(self):
+        """Mock config."""
+        config = MagicMock()
+        config.api_key = "test_key"
+        config.model = "test-model"
+        config.system_prompt = "You are a helpful assistant. {tools}"
+        config.ensure_valid = MagicMock()
+        return config
+
+    @pytest.fixture
+    def mock_memory_service(self):
+        """Mock memory service."""
+        return MagicMock()
+
+    @pytest.fixture
+    def agent_service(self, mock_memory_service, mock_config):
+        """Create ChatAgent instance."""
+        with patch("src.services.agent_service.DeepSeekProvider"), \
+             patch("src.services.agent_service.OpenAIChatModel"), \
+             patch("src.services.agent_service.Agent"):
+            return ChatAgent(mock_memory_service, config=mock_config)
+
+    @pytest.mark.asyncio
+    async def test_generate_success(self, agent_service):
+        """Test successful generation."""
+        conversation = ConversationState()
+
+        with patch.object(agent_service._agent, "run") as mock_run:
+            mock_result = MagicMock()
+            mock_output = MagicMock()
+            mock_output.reply = "Test reply"
+            mock_output.referenced_memories = ["mem1"]
+            mock_result.output = mock_output
+            mock_run.return_value = mock_result
+
+            result = await agent_service.generate(conversation, "Hello")
+            assert result.reply == "Test reply"
+            assert result.referenced_memories == ["mem1"]
+
+    @pytest.mark.asyncio
+    async def test_generate_stream_success(self, agent_service):
+        """Test successful streaming generation."""
+        conversation = ConversationState()
+
+        with patch.object(agent_service._agent, "run_stream") as mock_run_stream:
+            mock_output = MagicMock()
+            mock_output.reply = "Test reply"
+            mock_output.referenced_memories = ["mem1"]
+
+            mock_result = MagicMock()
+            mock_result.stream_output = AsyncMock(return_value=[mock_output])
+            mock_run_stream.return_value.__aenter__ = AsyncMock(return_value=mock_result)
+            mock_run_stream.return_value.__aexit__ = AsyncMock(return_value=None)
+
+            events = []
+            async for event_type, data in agent_service.generate_stream(conversation, "Hello"):
+                events.append((event_type, data))
+
+            assert len(events) >= 1
+            assert events[-1][0] == "final"
