@@ -12,6 +12,11 @@ from src.models.chat import (
     ExecutionStep,
     MessageRole,
 )
+from src.models.memory import (
+    MemoryEpisode,
+    MemorySearchResult,
+    MemorySpace,
+)
 
 
 class TestChatMessage:
@@ -138,6 +143,129 @@ class TestExecutionStep:
         assert step.user_message == "test message"
         assert step.data == {"key": "value"}
         assert step.step_id is not None
+
+
+class TestMemoryEpisode:
+    """Test MemoryEpisode model."""
+
+    def test_create_memory_episode(self):
+        """Test creating a memory episode."""
+        episode = MemoryEpisode(
+            episode_id="123",
+            body="Test memory",
+            space_id="space1",
+            session_id="session1",
+            created_at="2023-01-01",
+            metadata={"key": "value"}
+        )
+        assert episode.episode_id == "123"
+        assert episode.body == "Test memory"
+        assert episode.space_id == "space1"
+        assert episode.session_id == "session1"
+        assert episode.created_at == "2023-01-01"
+        assert episode.metadata == {"key": "value"}
+
+    def test_from_api_with_episode_id(self):
+        """Test from_api method with episode_id."""
+        payload = {
+            "episode_id": "123",
+            "body": "Test content",
+            "space_id": "space1",
+            "session_id": "session1",
+            "created_at": "2023-01-01",
+            "metadata": {"key": "value"}
+        }
+        episode = MemoryEpisode.from_api(payload)
+        assert episode.episode_id == "123"
+        assert episode.body == "Test content"
+        assert episode.space_id == "space1"
+
+    def test_from_api_with_id_fallback(self):
+        """Test from_api method with id fallback."""
+        payload = {
+            "id": "456",
+            "content": "Alternative content",
+            "metadata": {}
+        }
+        episode = MemoryEpisode.from_api(payload)
+        assert episode.episode_id == "456"
+        assert episode.body == "Alternative content"
+        assert episode.space_id is None
+
+
+class TestMemorySearchResult:
+    """Test MemorySearchResult model."""
+
+    def test_create_memory_search_result(self):
+        """Test creating a memory search result."""
+        result = MemorySearchResult(episodes=[], total=0)
+        assert result.episodes == []
+        assert result.total == 0
+
+    def test_from_api_empty(self):
+        """Test from_api method with empty result."""
+        payload = {"episodes": [], "total": 0}
+        result = MemorySearchResult.from_api(payload)
+        assert result.episodes == []
+        assert result.total == 0
+
+    def test_from_api_with_episodes(self):
+        """Test from_api method with episodes."""
+        payload = {
+            "episodes": [
+                {"episode_id": "1", "body": "Episode 1", "space_id": "space1"},
+                {"id": "2", "content": "Episode 2"}
+            ],
+            "total": 2
+        }
+        result = MemorySearchResult.from_api(payload)
+        assert len(result.episodes) == 2
+        assert result.episodes[0].episode_id == "1"
+        assert result.episodes[0].body == "Episode 1"
+        assert result.episodes[1].episode_id == "2"
+        assert result.episodes[1].body == "Episode 2"
+        assert result.total == 2
+
+
+class TestMemorySpace:
+    """Test MemorySpace model."""
+
+    def test_create_memory_space(self):
+        """Test creating a memory space."""
+        space = MemorySpace(
+            space_id="space1",
+            name="Test Space",
+            description="A test space",
+            created_at="2023-01-01"
+        )
+        assert space.space_id == "space1"
+        assert space.name == "Test Space"
+        assert space.description == "A test space"
+        assert space.created_at == "2023-01-01"
+
+    def test_from_dict_with_space_id(self):
+        """Test from_dict method with space_id."""
+        payload = {
+            "space_id": "space1",
+            "name": "Test Space",
+            "description": "Description",
+            "created_at": "2023-01-01"
+        }
+        space = MemorySpace.from_dict(payload)
+        assert space.space_id == "space1"
+        assert space.name == "Test Space"
+        assert space.description == "Description"
+
+    def test_from_dict_with_id_fallback(self):
+        """Test from_dict method with id fallback."""
+        payload = {
+            "id": "space2",
+            "name": "Another Space"
+        }
+        space = MemorySpace.from_dict(payload)
+        assert space.space_id == "space2"
+        assert space.name == "Another Space"
+        assert space.description is None
 
 
 class TestEnums:

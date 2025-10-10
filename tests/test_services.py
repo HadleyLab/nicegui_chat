@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from src.models.chat import ConversationState, MessageRole
-from src.services.agent_service import ChatAgent
+from src.services.agent_service import AgentDependencies, AgentOutput, AgentResult, ChatAgent
 from src.services.ai_service import AIService
 from src.services.auth_service import AuthService
 from src.services.chat_service import ChatService
@@ -125,6 +125,31 @@ class TestChatService:
         """Test chunking empty reply."""
         chunks = chat_service._chunk_reply("")
         assert chunks == []
+
+    def test_chunk_reply_single_chunk(self, chat_service):
+        """Test chunking with single chunk."""
+        reply = "Short reply"
+        chunks = chat_service._chunk_reply(reply)
+        assert len(chunks) == 1
+        assert chunks[0] == reply
+
+    def test_chunk_reply_multiple_chunks(self, chat_service):
+        """Test chunking with multiple chunks."""
+        reply = "This is a longer reply that should be chunked into smaller pieces for streaming"
+        chunks = chat_service._chunk_reply(reply)
+        assert len(chunks) > 1
+        assert "".join(chunks) == reply
+
+    def test_chunk_reply_custom_chunk_size(self, chat_service):
+        """Test chunking with custom chunk size."""
+        # Create a service with different chunk size by mocking config
+        with patch.object(chat_service, '_app_config') as mock_config:
+            mock_config.chat_stream_chunk_size = 5
+            reply = "HelloWorld"
+            chunks = chat_service._chunk_reply(reply)
+            assert len(chunks) == 2
+            assert chunks[0] == "Hello"
+            assert chunks[1] == "World"
 
 
 class TestMemoryService:
@@ -307,25 +332,69 @@ class TestAgentService:
             result = await agent_service.generate(conversation, "Hello")
             assert result.reply == "Test reply"
             assert result.referenced_memories == ["mem1"]
+@pytest.mark.asyncio
+async def test_generate_stream_success(self, agent_service):
+    """Test successful streaming generation."""
+    conversation = ConversationState()
 
-    @pytest.mark.asyncio
-    async def test_generate_stream_success(self, agent_service):
-        """Test successful streaming generation."""
-        conversation = ConversationState()
+    with patch.object(agent_service._agent, "run_stream") as mock_run_stream:
+        mock_output = MagicMock()
+        mock_output.reply = "Test reply"
+        mock_output.referenced_memories = ["mem1"]
 
-        with patch.object(agent_service._agent, "run_stream") as mock_run_stream:
-            mock_output = MagicMock()
-            mock_output.reply = "Test reply"
-            mock_output.referenced_memories = ["mem1"]
+        mock_result = MagicMock()
+        mock_result.stream_output = AsyncMock(return_value=[mock_output])
+        mock_run_stream.return_value.__aenter__ = AsyncMock(return_value=mock_result)
+        mock_run_stream.return_value.__aexit__ = AsyncMock(return_value=None)
 
-            mock_result = MagicMock()
-            mock_result.stream_output = AsyncMock(return_value=[mock_output])
-            mock_run_stream.return_value.__aenter__ = AsyncMock(return_value=mock_result)
-            mock_run_stream.return_value.__aexit__ = AsyncMock(return_value=None)
+        events = []
+        async for event_type, data in agent_service.generate_stream(conversation, "Hello"):
+            events.append((event_type, data))
 
-            events = []
-            async for event_type, data in agent_service.generate_stream(conversation, "Hello"):
-                events.append((event_type, data))
+        assert len(events) >= 1
+        assert events[-1][0] == "final"
 
-            assert len(events) >= 1
-            assert events[-1][0] == "final"
+def test_build_system_prompt(self, agent_service):
+    """Test building system prompt with tools."""
+    prompt = agent_service._build_system_prompt()
+    assert "memory_search" in prompt
+    assert "memory_ingest" in prompt
+    assert "{tools}" not in prompt  # Should be replaced
+
+def test_agent_initialization(self, mock_memory_service, mock_config):
+    """Test agent initialization."""
+    with patch("src.services.agent_service.DeepSeekProvider"), \
+         patch("src.services.agent_service.OpenAIChatModel"), \
+         patch("src.services.agent_service.Agent") as mock_agent_class:
+
+        mock_agent_instance = MagicMock()
+        mock_agent_class.return_value = mock_agent_instance
+
+        agent = ChatAgent(mock_memory_service, config=mock_config)
+
+        # Verify agent was created
+        mock_agent_class.assert_called_once()
+        assert agent._memory_service == mock_memory_service
+        assert agent._config == mock_config
+
+def test_agent_dependencies_creation(self):
+    """Test AgentDependencies model."""
+    deps = AgentDependencies(selected_space_ids=["space1", "space2"])
+    assert deps.selected_space_ids == ["space1", "space2"]
+
+def test_agent_output_creation(self):
+    """Test AgentOutput model."""
+    output = AgentOutput(
+        reply="Test reply",
+        referenced_memories=["mem1"],
+        follow_up_actions=["action1"]
+    )
+    assert output.reply == "Test reply"
+    assert output.referenced_memories == ["mem1"]
+    assert output.follow_up_actions == ["action1"]
+
+def test_agent_result_creation(self):
+    """Test AgentResult model."""
+    result = AgentResult(reply="Reply", referenced_memories=["mem1"])
+    assert result.reply == "Reply"
+    assert result.referenced_memories == ["mem1"]
