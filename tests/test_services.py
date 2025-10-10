@@ -211,6 +211,63 @@ class TestMemoryService:
             result = await memory_service.list_spaces()
             assert len(result) == 1
 
+    @pytest.mark.asyncio
+    async def test_search_not_authenticated_duplicate(self, memory_service, mock_auth_service):
+        """Test search when not authenticated (duplicate for coverage)."""
+        mock_auth_service.is_authenticated = False
+
+        with pytest.raises(AuthenticationError):
+            await memory_service.search("test")
+
+    @pytest.mark.asyncio
+    async def test_add_not_authenticated(self, memory_service, mock_auth_service):
+        """Test add when not authenticated."""
+        mock_auth_service.is_authenticated = False
+
+        with pytest.raises(AuthenticationError):
+            await memory_service.add("test message")
+
+    @pytest.mark.asyncio
+    async def test_list_spaces_not_authenticated(self, memory_service, mock_auth_service):
+        """Test list spaces when not authenticated."""
+        mock_auth_service.is_authenticated = False
+
+        with pytest.raises(AuthenticationError):
+            await memory_service.list_spaces()
+
+    @pytest.mark.asyncio
+    async def test_search_with_exception(self, memory_service):
+        """Test search with exception to cover error handling."""
+        with patch("src.services.memory_service.HeySolClient") as mock_client_class:
+            mock_client = MagicMock()
+            mock_client.search.side_effect = Exception("API error")
+            mock_client_class.return_value = mock_client
+
+            with pytest.raises(ChatServiceError, match="Memory search failed"):
+                await memory_service.search("test")
+
+    @pytest.mark.asyncio
+    async def test_add_with_exception(self, memory_service):
+        """Test add with exception to cover error handling."""
+        with patch("src.services.memory_service.HeySolClient") as mock_client_class:
+            mock_client = MagicMock()
+            mock_client.ingest.side_effect = Exception("API error")
+            mock_client_class.return_value = mock_client
+
+            with pytest.raises(ChatServiceError, match="Memory add failed"):
+                await memory_service.add("test message")
+
+    @pytest.mark.asyncio
+    async def test_list_spaces_with_exception(self, memory_service):
+        """Test list spaces with exception to cover error handling."""
+        with patch("src.services.memory_service.HeySolClient") as mock_client_class:
+            mock_client = MagicMock()
+            mock_client.get_spaces.side_effect = Exception("API error")
+            mock_client_class.return_value = mock_client
+
+            with pytest.raises(ChatServiceError, match="Failed to list memory spaces"):
+                await memory_service.list_spaces()
+
 
 class TestAIService:
     """Test AIService."""
@@ -289,6 +346,67 @@ class TestAIService:
 
             assert "Hi" in "".join(chunks)
 
+    def test_ai_service_initialization_without_heysol(self, mock_config):
+        """Test AI service initialization without HeySol client."""
+        mock_config.heysol_api_key = None
+
+        with patch("src.services.ai_service.HeySolClient") as mock_heysol, \
+             patch("src.services.ai_service.Agent") as mock_agent, \
+             patch("src.services.ai_service.DeepSeekProvider") as mock_provider:
+
+            mock_heysol.return_value = None  # HeySol not available
+            mock_agent.return_value = None  # Agent not available
+
+            service = AIService()
+
+            assert service.heysol_client is None
+            assert service.agent is None
+
+    def test_ai_service_initialization_with_heysol(self, mock_config):
+        """Test AI service initialization with HeySol client."""
+        mock_config.heysol_api_key = "test_key"
+
+        with patch("src.services.ai_service.HeySolClient") as mock_heysol_class, \
+             patch("src.services.ai_service.Agent") as mock_agent, \
+             patch("src.services.ai_service.DeepSeekProvider") as mock_provider:
+
+            mock_heysol_instance = MagicMock()
+            mock_heysol_class.return_value = mock_heysol_instance
+            mock_agent.return_value = None  # Agent not available
+
+            service = AIService()
+
+            mock_heysol_class.assert_called_once_with(api_key="test_key")
+            assert service.heysol_client == mock_heysol_instance
+
+    def test_ai_service_initialization_with_agent(self, mock_config):
+        """Test AI service initialization with Pydantic AI agent."""
+        with patch("src.services.ai_service.HeySolClient"), \
+             patch("src.services.ai_service.Agent") as mock_agent_class, \
+             patch("src.services.ai_service.DeepSeekProvider") as mock_provider_class, \
+             patch("src.services.ai_service.OpenAIChatModel") as mock_model_class:
+
+            mock_agent_instance = MagicMock()
+            mock_agent_class.return_value = mock_agent_instance
+
+            service = AIService()
+
+            # Verify agent initialization was attempted
+            mock_provider_class.assert_called_once_with(api_key="test_key")
+            mock_model_class.assert_called_once()
+            mock_agent_class.assert_called_once()
+
+    def test_ai_service_initialization_agent_failure(self, mock_config):
+        """Test AI service initialization when agent creation fails."""
+        with patch("src.services.ai_service.HeySolClient"), \
+             patch("src.services.ai_service.Agent") as mock_agent_class:
+
+            mock_agent_class.side_effect = Exception("Agent init failed")
+
+            service = AIService()
+
+            assert service.agent is None
+
 
 class TestAgentService:
     """Test AgentService."""
@@ -332,69 +450,84 @@ class TestAgentService:
             result = await agent_service.generate(conversation, "Hello")
             assert result.reply == "Test reply"
             assert result.referenced_memories == ["mem1"]
-@pytest.mark.asyncio
-async def test_generate_stream_success(self, agent_service):
-    """Test successful streaming generation."""
-    conversation = ConversationState()
 
-    with patch.object(agent_service._agent, "run_stream") as mock_run_stream:
-        mock_output = MagicMock()
-        mock_output.reply = "Test reply"
-        mock_output.referenced_memories = ["mem1"]
+    @pytest.mark.asyncio
+    async def test_generate_stream_success(self, agent_service):
+        """Test successful streaming generation."""
+        conversation = ConversationState()
 
-        mock_result = MagicMock()
-        mock_result.stream_output = AsyncMock(return_value=[mock_output])
-        mock_run_stream.return_value.__aenter__ = AsyncMock(return_value=mock_result)
-        mock_run_stream.return_value.__aexit__ = AsyncMock(return_value=None)
+        with patch.object(agent_service._agent, "run_stream") as mock_run_stream:
+            mock_output = MagicMock()
+            mock_output.reply = "Test reply"
+            mock_output.referenced_memories = ["mem1"]
 
-        events = []
-        async for event_type, data in agent_service.generate_stream(conversation, "Hello"):
-            events.append((event_type, data))
+            mock_result = MagicMock()
+            mock_result.stream_output = AsyncMock(return_value=[mock_output])
+            mock_run_stream.return_value.__aenter__ = AsyncMock(return_value=mock_result)
+            mock_run_stream.return_value.__aexit__ = AsyncMock(return_value=None)
 
-        assert len(events) >= 1
-        assert events[-1][0] == "final"
+            events = []
+            async for event_type, data in agent_service.generate_stream(conversation, "Hello"):
+                events.append((event_type, data))
 
-def test_build_system_prompt(self, agent_service):
-    """Test building system prompt with tools."""
-    prompt = agent_service._build_system_prompt()
-    assert "memory_search" in prompt
-    assert "memory_ingest" in prompt
-    assert "{tools}" not in prompt  # Should be replaced
+            assert len(events) >= 1
+            assert events[-1][0] == "final"
 
-def test_agent_initialization(self, mock_memory_service, mock_config):
-    """Test agent initialization."""
-    with patch("src.services.agent_service.DeepSeekProvider"), \
-         patch("src.services.agent_service.OpenAIChatModel"), \
-         patch("src.services.agent_service.Agent") as mock_agent_class:
+    @pytest.mark.asyncio
+    async def test_generate_stream_with_exception(self, agent_service):
+        """Test streaming generation with exception to cover error handling."""
+        conversation = ConversationState()
 
-        mock_agent_instance = MagicMock()
-        mock_agent_class.return_value = mock_agent_instance
+        with patch.object(agent_service._agent, "run_stream") as mock_run_stream:
+            # Make run_stream raise an exception
+            mock_run_stream.return_value.__aenter__.side_effect = Exception("Test error")
+            mock_run_stream.return_value.__aexit__ = AsyncMock(return_value=None)
 
-        agent = ChatAgent(mock_memory_service, config=mock_config)
+            with pytest.raises(ChatServiceError, match="Agent streaming failed"):
+                async for _ in agent_service.generate_stream(conversation, "Hello"):
+                    pass
 
-        # Verify agent was created
-        mock_agent_class.assert_called_once()
-        assert agent._memory_service == mock_memory_service
-        assert agent._config == mock_config
+    def test_build_system_prompt(self, agent_service):
+        """Test building system prompt with tools."""
+        prompt = agent_service._build_system_prompt()
+        assert "memory_search" in prompt
+        assert "memory_ingest" in prompt
+        assert "{tools}" not in prompt  # Should be replaced
 
-def test_agent_dependencies_creation(self):
-    """Test AgentDependencies model."""
-    deps = AgentDependencies(selected_space_ids=["space1", "space2"])
-    assert deps.selected_space_ids == ["space1", "space2"]
+    def test_agent_initialization(self, mock_memory_service, mock_config):
+        """Test agent initialization."""
+        with patch("src.services.agent_service.DeepSeekProvider"), \
+             patch("src.services.agent_service.OpenAIChatModel"), \
+             patch("src.services.agent_service.Agent") as mock_agent_class:
 
-def test_agent_output_creation(self):
-    """Test AgentOutput model."""
-    output = AgentOutput(
-        reply="Test reply",
-        referenced_memories=["mem1"],
-        follow_up_actions=["action1"]
-    )
-    assert output.reply == "Test reply"
-    assert output.referenced_memories == ["mem1"]
-    assert output.follow_up_actions == ["action1"]
+            mock_agent_instance = MagicMock()
+            mock_agent_class.return_value = mock_agent_instance
 
-def test_agent_result_creation(self):
-    """Test AgentResult model."""
-    result = AgentResult(reply="Reply", referenced_memories=["mem1"])
-    assert result.reply == "Reply"
-    assert result.referenced_memories == ["mem1"]
+            agent = ChatAgent(mock_memory_service, config=mock_config)
+
+            # Verify agent was created
+            mock_agent_class.assert_called_once()
+            assert agent._memory_service == mock_memory_service
+            assert agent._config == mock_config
+
+    def test_agent_dependencies_creation(self):
+        """Test AgentDependencies model."""
+        deps = AgentDependencies(selected_space_ids=["space1", "space2"])
+        assert deps.selected_space_ids == ["space1", "space2"]
+
+    def test_agent_output_creation(self):
+        """Test AgentOutput model."""
+        output = AgentOutput(
+            reply="Test reply",
+            referenced_memories=["mem1"],
+            follow_up_actions=["action1"]
+        )
+        assert output.reply == "Test reply"
+        assert output.referenced_memories == ["mem1"]
+        assert output.follow_up_actions == ["action1"]
+
+    def test_agent_result_creation(self):
+        """Test AgentResult model."""
+        result = AgentResult(reply="Reply", referenced_memories=["mem1"])
+        assert result.reply == "Reply"
+        assert result.referenced_memories == ["mem1"]
