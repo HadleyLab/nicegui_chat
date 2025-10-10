@@ -346,6 +346,30 @@ class TestAIService:
 
             assert "Hi" in "".join(chunks)
 
+    @pytest.mark.asyncio
+    async def test_stream_chat_agent_strips_markdown(self, ai_service):
+        """Test that agent responses have markdown stripped."""
+        with patch.object(ai_service, "agent") as mock_agent, \
+             patch("src.services.ai_service.strip_markdown") as mock_strip:
+
+            mock_result = MagicMock()
+            mock_output = MagicMock()
+            mock_output.reply = "**Bold** and *italic* text"
+            mock_output.referenced_memories = []
+            mock_result.output = mock_output
+            mock_agent.run = AsyncMock(return_value=mock_result)
+
+            mock_strip.return_value = "Bold and italic text"
+
+            chunks = []
+            async for chunk in ai_service.stream_chat("Hello"):
+                chunks.append(chunk)
+
+            # Verify strip_markdown was called with the markdown reply
+            mock_strip.assert_called_once_with("**Bold** and *italic* text")
+            # Verify the stripped text is yielded
+            assert "Bold and italic text" in "".join(chunks)
+
     def test_ai_service_initialization_without_heysol(self, mock_config):
         """Test AI service initialization without HeySol client."""
         mock_config.heysol_api_key = None

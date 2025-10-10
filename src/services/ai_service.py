@@ -10,6 +10,8 @@ from pydantic import BaseModel, Field
 
 from config import config
 
+from ..utils.text_processing import strip_markdown
+
 logger = structlog.get_logger()
 
 # Import HeySol client if available
@@ -207,6 +209,9 @@ class AIService:
 
                 # Stream the response
                 output: AgentOutput = result.output
+
+                # Strip markdown formatting for plain text output
+                output.reply = strip_markdown(output.reply)
 
                 # Yield the reply in chunks for streaming effect
                 chunk_size = 20
