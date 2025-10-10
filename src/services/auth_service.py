@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..config import HeysolConfig
+from config import HeysolConfig
 
 
 class AuthService:

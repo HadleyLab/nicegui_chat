@@ -20,8 +20,8 @@ This design enables maintainability, testability, and scalability.
 
 from nicegui import app, ui
 
-from src.ai_service import AIService
-from src.config import config, validate_config
+from src.services.ai_service import AIService
+from config import config, validate_config
 from src.services.auth_service import AuthService
 from src.services.chat_service import ChatService
 from src.services.memory_service import MemoryService
@@ -64,6 +64,6 @@ if __name__ in {"__main__", "__mp_main__"}:
         host=config.host,
         port=config.port,
         reload=True,
-        show=False,
+        show=True,
         reconnect_timeout=30.0,  # Increase reconnect timeout
     )

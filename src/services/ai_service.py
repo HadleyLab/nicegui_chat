@@ -8,7 +8,7 @@ from typing import Any
 import structlog
 from pydantic import BaseModel, Field
 
-from src.config import config
+from config import config
 
 logger = structlog.get_logger()
 

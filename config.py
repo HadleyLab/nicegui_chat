@@ -57,7 +57,7 @@ class HeysolConfig:
     api_key: str
     base_url: str
 
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent
 CONFIG_DIR = BASE_DIR / "config"
 
 
@@ -76,6 +76,11 @@ def load_theme() -> dict[str, Any]:
     return _load_json(CONFIG_DIR / "theme.json")
 
 
+def load_scene() -> dict[str, Any]:
+    """Load scene configuration from config/scene.json."""
+    return _load_json(CONFIG_DIR / "scene.json")
+
+
 def load_app_config() -> dict[str, Any]:
     """Load application configuration from app.json."""
     return _load_json(CONFIG_DIR / "app.json")
@@ -88,6 +93,7 @@ def load_system_prompt() -> str:
 
 # Load configuration resources once at module level
 THEME = load_theme()
+SCENE = load_scene()
 APP_CONFIG = load_app_config()
 SYSTEM_PROMPT = load_system_prompt()
 
@@ -137,6 +143,9 @@ class Config:
     status_colors: dict[str, str] = field(default_factory=lambda: THEME["status"].copy())
     shadows: dict[str, str] = field(default_factory=lambda: THEME["shadows"].copy())
     layout: dict[str, str] = field(default_factory=lambda: THEME["layout"].copy())
+
+    # Scene configuration
+    scene: dict[str, Any] = field(default_factory=lambda: SCENE.copy())
 
     # LLM Configuration
     llm: DeepSeekConfig = field(init=False)

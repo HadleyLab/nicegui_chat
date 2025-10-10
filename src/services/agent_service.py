@@ -10,7 +10,7 @@ from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.deepseek import DeepSeekProvider
 
-from ..config import DeepSeekConfig
+from config import DeepSeekConfig
 from ..models.chat import ConversationState
 from ..services.memory_service import MemoryService
 from ..utils.exceptions import ChatServiceError

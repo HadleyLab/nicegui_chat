@@ -27,7 +27,7 @@ from collections.abc import AsyncIterator
 from typing import Any
 from uuid import uuid4
 
-from ..config import Config
+from config import Config
 from ..models.chat import (ChatEventType, ChatMessage, ChatStreamEvent,
                            ConversationState, ConversationStatus,
                            ExecutionStep, MessageRole)
