@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
+import structlog
+
 from ..models.memory import MemoryEpisode, MemorySearchResult, MemorySpace
 from ..utils.exceptions import AuthenticationError, ChatServiceError
 from .auth_service import AuthService
@@ -14,6 +16,7 @@ class MemoryService:
 
     def __init__(self, auth_service: AuthService) -> None:
         self._auth_service = auth_service
+        self._logger = structlog.get_logger()
 
     async def search(
         self,
@@ -24,6 +27,12 @@ class MemoryService:
         include_invalidated: bool = False,
     ) -> MemorySearchResult:
         """Search memory for relevant episodes."""
+        self._logger.debug(
+            "memory_search_start",
+            query=query,
+            space_ids=list(space_ids) if space_ids else None,
+            limit=limit,
+        )
         if not self._auth_service.is_authenticated:
             raise AuthenticationError("Authentication required for memory search")
 
@@ -41,6 +50,13 @@ class MemoryService:
                 space_list,
                 limit,
                 include_invalidated,
+            )
+            self._logger.debug(
+                "memory_search_success",
+                query=query,
+                result_count=(
+                    len(result.get("episodes", [])) if isinstance(result, dict) else 0
+                ),
             )
             # Convert result to dict for from_api method
             try:
@@ -75,6 +91,9 @@ class MemoryService:
         source: str | None = None,
     ) -> MemoryEpisode:
         """Add a new memory episode."""
+        self._logger.debug(
+            "memory_add_start", message=message[:50], space_id=space_id, source=source
+        )
         if not self._auth_service.is_authenticated:
             raise AuthenticationError("Authentication required for memory operations")
 
@@ -90,6 +109,10 @@ class MemoryService:
                 space_id,
                 session_id,
                 source,
+            )
+            self._logger.debug(
+                "memory_add_success",
+                episode_id=str(payload.get("episode_id") or payload.get("id") or ""),
             )
 
             episode_id = str(payload.get("episode_id") or payload.get("id") or "")

@@ -1,0 +1,16 @@
+{
+  "name": "MammoChat",
+  "short_name": "MammoChat",
+  "description": "AI-powered platform connecting patients with clinical trials and peer support communities",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFBFC",
+  "theme_color": "#F4B8C5",
+  "icons": [
+    {
+      "src": "/branding/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

@@ -18,6 +18,8 @@ The application follows a layered architecture where:
 This design enables maintainability, testability, and scalability.
 """
 
+import logging
+
 from nicegui import app, ui
 
 from config import config, validate_config
@@ -27,6 +29,9 @@ from src.services.chat_service import ChatService
 from src.services.memory_service import MemoryService
 from src.ui.main_ui import setup_ui
 from src.utils import get_logger, setup_static_files
+
+# Configure logging level
+logging.basicConfig(level=logging.DEBUG)
 
 logger = get_logger()
 

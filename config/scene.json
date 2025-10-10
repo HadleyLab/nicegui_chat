@@ -54,7 +54,8 @@
     "page_classes": "flex min-h-screen bg-gradient-to-br from-slate-50 to-pink-50",
     "content_classes": "w-full",
     "scroll_area_classes": "flex-grow w-full overflow-y-auto",
-    "container_wrapper": "w-full max-w-4xl mx-auto"
+    "container_wrapper": "w-full max-w-4xl mx-auto",
+    "root_classes": "min-h-screen bg-gradient-to-br from-slate-50 to-pink-50 w-full"
   },
   "header": {
     "background": "linear-gradient(135deg, #F4B8C5 0%, #E8A0B8 100%)",
@@ -63,7 +64,13 @@
     "scroll_effect": "backdrop-blur-lg bg-white/35 border-b border-white/30 shadow-lg transition-all duration-300",
     "fixed_classes": "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
     "backdrop_filter": "backdrop-filter: blur(12px) saturate(180%)",
-    "glass_morphism": "backdrop-filter: blur(16px) saturate(200%) contrast(1.2)"
+    "glass_morphism": "backdrop-filter: blur(16px) saturate(200%) contrast(1.2)",
+    "row_classes": "w-full items-center justify-between px-4 py-3 max-w-4xl mx-auto",
+    "logo_row_classes": "items-center gap-2 sm:gap-3 flex-shrink-0",
+    "tagline": "Your journey, together",
+    "tagline_classes": "text-xs text-grey-8 leading-tight",
+    "theme_btn_props": "flat dense color=grey-8",
+    "theme_btn_classes": "flex-shrink-0"
   },
   "footer": {
     "background": "linear-gradient(135deg, #F4B8C5 0%, #E8A0B8 50%, #F4B8C5 100%)",
@@ -74,7 +81,18 @@
     "fixed_classes": "fixed bottom-0 left-0 right-0 z-40 transition-all duration-300",
     "text_color": "text-white",
     "backdrop_filter": "backdrop-filter: blur(12px) saturate(180%)",
-    "glass_morphism": "backdrop-filter: blur(16px) saturate(200%) contrast(1.2)"
+    "glass_morphism": "backdrop-filter: blur(16px) saturate(200%) contrast(1.2)",
+    "row_classes": "w-full max-w-4xl mx-auto px-6 py-4 items-center gap-3",
+    "new_btn_props": "flat round",
+    "new_btn_classes": "hover:scale-105 transition-all duration-300 backdrop-blur-sm",
+    "new_btn_tooltip": "New conversation",
+    "input_classes": "flex-grow backdrop-blur-sm",
+    "input_props": "filled dense",
+    "input_placeholder": "Share what's on your mind...",
+    "input_tooltip": "Type your message here",
+    "send_btn_props": "flat round color=primary",
+    "send_btn_classes": "hover:scale-105 transition-all duration-300 backdrop-blur-sm",
+    "send_btn_tooltip": "Send message"
   },
   "logo": {
     "src": "/branding/logo-full-color.svg",
@@ -83,7 +101,7 @@
     "drop_shadow": "drop-shadow-sm"
   },
   "chat": {
-    "welcome_message": "### Welcome to MammoChat 💗\n\nI'm here to support you on your breast cancer journey. I can help you:\n\n- 🔬 **Find clinical trials** that match your situation\n- 👥 **Connect with communities** of patients with similar experiences\n- 📚 **Understand information** about treatments and options\n- 💪 **Navigate your healthcare** with confidence\n\nHow can I support you today?",
+    "welcome_message": "Welcome to MammoChat 💗\n\nI'm here to support you on your breast cancer journey. I can help you find clinical trials that match your situation, connect with communities of patients with similar experiences, understand information about treatments and options, and navigate your healthcare with confidence.\n\nHow can I support you today?",
     "container_classes": "w-full max-w-4xl mx-auto p-6 flex-grow",
     "message_container_classes": "w-full gap-6",
     "scroll_area_classes": "flex-grow w-full p-6 overflow-y-auto",
@@ -95,7 +113,15 @@
       "input_glass": "backdrop-filter: blur(12px) saturate(180%)",
       "bubble_glass": "backdrop-filter: blur(8px) saturate(150%)",
       "hover_glass": "backdrop-filter: blur(16px) saturate(200%)"
-    }
+    },
+    "user_message_props": "bg-color=primary text-color=white",
+    "user_message_classes": "shadow-sm",
+    "user_row_classes": "w-full justify-end",
+    "assistant_message_props": "bg-color=accent text-color=grey-8",
+    "assistant_message_classes": "shadow-sm",
+    "assistant_row_classes": "w-full justify-start",
+    "welcome_message_props": "bg-color=accent text-color=grey-8",
+    "welcome_message_classes": "shadow-sm"
   },
   "animations": {
     "glass_transition": "transition: backdrop-filter 0.3s ease, opacity 0.3s ease, background-color 0.3s ease",
