@@ -1,68 +1,53 @@
 {
   "palette": {
-    "primary": "pink-3",
-    "primary_dark": "pink-5",
-    "secondary": "blue-grey-6",
-    "accent": "teal-3",
-    "background": "grey-1",
-    "background_soft": "pink-1",
-    "surface": "white",
-    "text": "grey-9",
-    "text_muted": "blue-grey-6",
-    "text_inverse": "white",
-    "lavender": "purple-2",
-    "peach": "orange-2",
-    "header_bg": "bg-white/95",
-    "footer_bg": "bg-white/95",
-    "header_border": "border-grey-3",
-    "footer_border": "border-grey-3",
-    "logo_primary": "pink-3",
-    "logo_secondary": "blue-grey-6",
-    "logo_accent": "teal-3"
+    "primary": "#F4B8C5",
+    "secondary": "#E8A0B8",
+    "accent": "#E5E7EB",
+    "background": "#FFFFFF",
+    "surface": "#F9FAFB",
+    "text": "#334155",
+    "text_secondary": "#64748B"
   },
   "status": {
-    "positive": "positive",
-    "warning": "warning",
-    "negative": "negative",
-    "info": "info"
+    "positive": "#A7E3D5",
+    "warning": "#FCD34D",
+    "negative": "#FCA5A5",
+    "info": "#BAE6FD",
+    "error_classes": "text-sm p-3 rounded-lg w-full"
   },
   "shadows": {
-    "soft": "shadow-sm",
-    "bubble": "shadow-sm",
-    "bubble_user": "shadow-md",
-    "header": "shadow-lg",
-    "footer": "shadow-sm",
-    "logo": "shadow-lg"
+    "soft": "",
+    "bubble": "",
+    "bubble_user": "",
+    "header": "",
+    "footer": "",
+    "logo": ""
   },
   "layout": {
     "content_max_width": "max-w-5xl",
     "page_padding": "p-6",
     "header_height": "h-16",
-    "footer_height": "h-14"
+    "footer_height": "h-14",
+    "page_classes": "flex min-h-screen",
+    "content_classes": "w-full"
   },
   "header": {
-    "background": "bg-gradient-to-br from-pink-3/95 to-pink-5/95",
-    "backdrop_filter": "backdrop-blur-xl saturate-180",
-    "border_bottom": "border-b border-grey-3/30",
-    "box_shadow": "shadow-lg shadow-pink-3/20 inset-0 ring-1 ring-white/80",
-    "padding": "p-4 sm:p-6",
-    "border_radius": "rounded-b-xl rounded-t-none",
-    "margin": "mx-4"
+    "background": "bg-white dark:bg-gray-900",
+    "padding": "px-4 py-3"
   },
   "footer": {
-    "background": "bg-gradient-to-br from-grey-1/95 to-grey-2/95",
-    "backdrop_filter": "backdrop-blur-xl saturate-180",
-    "border_top": "border-t border-grey-3/80",
-    "box_shadow": "shadow-sm shadow-grey-7/12 inset-0 ring-1 ring-white/80",
-    "padding": "p-3 sm:p-4",
-    "border_radius": "rounded-t-xl rounded-b-none",
-    "margin": "mx-4"
+    "background": "bg-gray-50 dark:bg-gray-800",
+    "border_top": "border-t",
+    "padding": "p-3"
   },
   "logo": {
-    "heart_gradient": "bg-gradient-to-br from-pink-3 to-pink-5",
-    "bubble_gradient": "bg-gradient-to-br from-blue-grey-6 to-grey-9",
-    "text_primary": "text-pink-3",
-    "text_secondary": "text-blue-grey-6",
-    "drop_shadow": "drop-shadow-pink-3/20"
+    "src": "/branding/logo-full-white.svg",
+    "alt": "MammoChat",
+    "classes": "h-8 flex-shrink-0"
+  },
+  "chat": {
+    "welcome_message": "Welcome to MammoChat! I can help you find:\n\n- Clinical trial matching\n- Peer support communities\n- Empathetic guidance\n- Patient empowerment\n\nHow can I support you today?",
+    "container_classes": "w-full max-w-2xl mx-auto p-4 flex-grow",
+    "message_container_classes": "w-full gap-4"
   }
 }

@@ -71,9 +71,6 @@ def _load_text(path: Path) -> str:
         return f.read().strip()
 
 
-def load_theme() -> dict[str, Any]:
-    """Load theme configuration from config/theme.json."""
-    return _load_json(CONFIG_DIR / "theme.json")
 
 
 def load_scene() -> dict[str, Any]:
@@ -92,7 +89,6 @@ def load_system_prompt() -> str:
 
 
 # Load configuration resources once at module level
-THEME = load_theme()
 SCENE = load_scene()
 APP_CONFIG = load_app_config()
 SYSTEM_PROMPT = load_system_prompt()
@@ -138,13 +134,7 @@ class Config:
     heysol_api_key: str = os.getenv("HEYSOL_API_KEY", "")
     heysol_base_url: str = os.getenv("HEYSOL_BASE_URL", APP_CONFIG["memory"]["base_url"])
 
-    # Theme convenience
-    palette: dict[str, str] = field(default_factory=lambda: THEME["palette"].copy())
-    status_colors: dict[str, str] = field(default_factory=lambda: THEME["status"].copy())
-    shadows: dict[str, str] = field(default_factory=lambda: THEME["shadows"].copy())
-    layout: dict[str, str] = field(default_factory=lambda: THEME["layout"].copy())
-
-    # Scene configuration
+    # Scene configuration for NiceGUI colors
     scene: dict[str, Any] = field(default_factory=lambda: SCENE.copy())
 
     # LLM Configuration
@@ -153,21 +143,6 @@ class Config:
     # Memory Configuration
     memory: HeysolConfig = field(init=False)
 
-    # Direct color access for convenience
-    primary: str = field(init=False)
-    primary_dark: str = field(init=False)
-    secondary: str = field(init=False)
-    accent: str = field(init=False)
-    background: str = field(init=False)
-    surface: str = field(init=False)
-    text: str = field(init=False)
-    text_secondary: str = field(init=False)
-    border: str = field(init=False)
-    mint: str = field(init=False)
-    success: str = field(init=False)
-    slate_gray: str = field(init=False)
-    lavender: str = field(init=False)
-    peach: str = field(init=False)
 
     # UI Configuration
     ui_logo_icon_path: str = APP_CONFIG["app"]["branding"]["logo_icon"]
@@ -201,14 +176,7 @@ How can I support you today?
     system_prompt: str = SYSTEM_PROMPT
 
     def __post_init__(self) -> None:
-        """Set theme and llm after initialization."""
-        object.__setattr__(self, "theme", {
-            "palette": self.palette,
-            "status": self.status_colors,
-            "shadows": self.shadows,
-            "layout": self.layout,
-        })
-
+        """Set llm and memory configs after initialization."""
         # Set LLM config
         object.__setattr__(self, "llm", DeepSeekConfig(
             api_key=self.deepseek_api_key,
@@ -222,22 +190,6 @@ How can I support you today?
             api_key=self.heysol_api_key,
             base_url=self.heysol_base_url,
         ))
-
-        # Set direct color access
-        object.__setattr__(self, "primary", self.palette["primary"])
-        object.__setattr__(self, "primary_dark", self.palette["primary_dark"])
-        object.__setattr__(self, "secondary", self.palette["secondary"])
-        object.__setattr__(self, "accent", self.palette["accent"])
-        object.__setattr__(self, "background", self.palette["background"])
-        object.__setattr__(self, "surface", self.palette["surface"])
-        object.__setattr__(self, "text", self.palette["text"])
-        object.__setattr__(self, "text_secondary", self.palette["text_muted"])
-        object.__setattr__(self, "border", "#E2E8F0")  # Light gray border
-        object.__setattr__(self, "mint", self.palette["accent"])  # Use accent as mint
-        object.__setattr__(self, "success", self.status_colors["positive"])
-        object.__setattr__(self, "slate_gray", self.palette["secondary"])
-        object.__setattr__(self, "lavender", self.palette["lavender"])
-        object.__setattr__(self, "peach", self.palette["peach"])
 
     def validate(self) -> None:
         """Validate required configuration."""

@@ -60,10 +60,11 @@ def main() -> None:
 if __name__ in {"__main__", "__mp_main__"}:
     logger.info("starting_application", host=config.host, port=config.port)
     ui.run(
-        title="MammoChat",
+        title="MammoChat - Your journey, together",
         host=config.host,
-        port=config.port,
+        port=8080,
         reload=True,
         show=True,
         reconnect_timeout=30.0,  # Increase reconnect timeout
+        favicon="💗",  # Heart emoji as favicon for MammoChat
     )
