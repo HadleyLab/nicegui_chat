@@ -73,6 +73,6 @@ if __name__ in {"__main__", "__mp_main__"}:
         port=8080,
         reload=False,
         show=True,
-        reconnect_timeout=300.0,  # Increase reconnect timeout to 5 minutes for long AI responses
+        reconnect_timeout=600.0,  # Increase to 10 minutes for very long AI responses
         favicon="💗",  # Heart emoji as favicon for MammoChat
     )
