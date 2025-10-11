@@ -16,6 +16,8 @@ The UI follows a modular design where presentation logic is isolated from
 service operations, enabling easy testing and maintenance.
 """
 
+import asyncio
+
 import structlog
 from nicegui import ui
 
@@ -181,23 +183,47 @@ def setup_ui(chat_service: ChatService) -> None:
         with response_message:
             ui.spinner()
 
-        response_content = ""
-        try:
-            async for event in chat_service.stream_chat(conversation, question):
-                if event.event_type == "MESSAGE_CHUNK":
-                    chunk = event.payload.get("content", "")
-                    response_content += chunk
-                    response_message.clear()
-                    with response_message:
-                        ui.label(response_content)
-        except Exception as e:
-            logger.error("ai_response_failed", error=str(e))
-            response_message.clear()
-            with response_message:
-                ui.label(f"Error: {str(e)}")
-        finally:
-            text.enable()
-            send_btn.enable()
+        # Use NiceGUI's native task processing with refreshable UI
+        response_state = {"content": "", "error": None}
+
+        @ui.refreshable
+        def response_display():
+            """Refreshable UI component for streaming response."""
+            if response_state["error"]:
+                ui.label(f"Error: {response_state['error']}").classes("text-left text-red-500")
+            elif not response_state["content"]:
+                ui.spinner()
+            else:
+                ui.label(response_state["content"]).classes("text-left")
+
+        # Clear and show initial spinner
+        response_message.clear()
+        with response_message:
+            response_display()
+
+        async def stream_worker():
+            """NiceGUI native worker for streaming chat responses."""
+            try:
+                async for event in chat_service.stream_chat(conversation, question):
+                    if event.event_type == "MESSAGE_CHUNK":
+                        chunk = event.payload.get("content", "")
+                        response_state["content"] += chunk
+                        # Refresh the UI component
+                        response_display.refresh()
+                    elif event.event_type == "MESSAGE_END":
+                        # Final refresh
+                        response_display.refresh()
+            except Exception as e:
+                logger.error("ai_response_failed", error=str(e))
+                response_state["error"] = str(e)
+                response_display.refresh()
+            finally:
+                # Re-enable UI controls
+                text.enable()
+                send_btn.enable()
+
+        # Start the worker using NiceGUI's task system
+        ui.timer(0.1, lambda: asyncio.create_task(stream_worker()), once=True)
 
     def new_conversation() -> None:
         """Start a new conversation."""

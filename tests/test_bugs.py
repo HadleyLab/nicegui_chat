@@ -1,10 +1,6 @@
 """Tests for specific bugs and issues."""
 
-import pytest
-from nicegui.testing import Screen
-
 from config import config
-from src.ui.main_ui import setup_head_html
 
 
 class TestChatMessageColoring:

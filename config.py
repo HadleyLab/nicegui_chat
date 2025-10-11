@@ -176,6 +176,38 @@ How can I support you today?
     chat_enable_memory_enrichment: bool = True
     chat_stream_chunk_size: int = 50
 
+    # Performance and Memory Management
+    max_conversation_messages: int = 1000
+    max_execution_steps: int = 500
+    max_memory_search_results: int = 100
+    background_task_limit: int = 5
+    cleanup_interval_seconds: int = 60
+
+    # HTTP Client Configuration for Performance
+    http_max_connections: int = 100
+    http_max_keepalive_connections: int = 20
+    http_keepalive_expiry: float = 30.0
+    http_connect_timeout: float = 10.0
+    http_read_timeout: float = 60.0
+    http_write_timeout: float = 10.0
+    http_pool_timeout: float = 10.0
+
+    # Docker Resource Configuration
+    docker_cpu_limit: str = "1.0"
+    docker_memory_limit: str = "2g"
+    docker_memory_reservation: str = "1g"
+    docker_network_mode: str = "bridge"
+    docker_restart_policy: str = "unless-stopped"
+    docker_healthcheck_interval: str = "30s"
+    docker_healthcheck_timeout: str = "10s"
+    docker_healthcheck_retries: int = 3
+
+    # Request Processing Configuration
+    max_concurrent_requests: int = 10
+    request_timeout_seconds: int = 300
+    streaming_timeout_seconds: int = 120
+    memory_operation_timeout_seconds: int = 30
+
     # System Prompt
     system_prompt: str = SYSTEM_PROMPT
 

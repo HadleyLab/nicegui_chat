@@ -1,11 +1,10 @@
 """End-to-end tests for the chat application."""
 
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 from nicegui.testing import Screen
 
-from config import config
-from src.services.chat_service import ChatService
 from src.ui.main_ui import setup_ui
 
 
@@ -25,14 +24,32 @@ class TestE2E:
 
         # Mock streaming response
         async def mock_stream(conversation, message):
-            from src.models.chat import ChatStreamEvent, ChatEventType
+            from src.models.chat import ChatEventType, ChatStreamEvent
+
             events = [
-                ChatStreamEvent(event_type=ChatEventType.MESSAGE_START, payload={"role": "assistant"}),
-                ChatStreamEvent(event_type=ChatEventType.MESSAGE_CHUNK, payload={"content": "Hello! "}),
-                ChatStreamEvent(event_type=ChatEventType.MESSAGE_CHUNK, payload={"content": "How can I help you "}),
-                ChatStreamEvent(event_type=ChatEventType.MESSAGE_CHUNK, payload={"content": "today?"}),
-                ChatStreamEvent(event_type=ChatEventType.MESSAGE_END, payload={"content": "Hello! How can I help you today?"}),
-                ChatStreamEvent(event_type=ChatEventType.STREAM_END, payload={"type": "STREAM_END"}),
+                ChatStreamEvent(
+                    event_type=ChatEventType.MESSAGE_START,
+                    payload={"role": "assistant"},
+                ),
+                ChatStreamEvent(
+                    event_type=ChatEventType.MESSAGE_CHUNK,
+                    payload={"content": "Hello! "},
+                ),
+                ChatStreamEvent(
+                    event_type=ChatEventType.MESSAGE_CHUNK,
+                    payload={"content": "How can I help you "},
+                ),
+                ChatStreamEvent(
+                    event_type=ChatEventType.MESSAGE_CHUNK,
+                    payload={"content": "today?"},
+                ),
+                ChatStreamEvent(
+                    event_type=ChatEventType.MESSAGE_END,
+                    payload={"content": "Hello! How can I help you today?"},
+                ),
+                ChatStreamEvent(
+                    event_type=ChatEventType.STREAM_END, payload={"type": "STREAM_END"}
+                ),
             ]
             for event in events:
                 yield event
@@ -133,7 +150,6 @@ class TestE2E:
 
         # Should be dark mode now
         # Check that colors are applied correctly
-        from nicegui import ui
         # This would require checking the actual theme state
 
     def test_chat_message_styling_consistency(self, screen, mock_chat_service):
@@ -164,7 +180,8 @@ class TestE2E:
         failing_service.stream_chat = AsyncMock()
 
         async def failing_stream(conversation, message):
-            from src.models.chat import ChatStreamEvent, ChatEventType
+            from src.models.chat import ChatEventType, ChatStreamEvent
+
             yield ChatStreamEvent(event_type=ChatEventType.MESSAGE_START, payload={})
             raise Exception("Test error")
 
@@ -205,6 +222,7 @@ class TestE2E:
 
         # Check initial colors
         from nicegui import ui
+
         initial_primary = ui.colors.primary
 
         # Toggle dark mode

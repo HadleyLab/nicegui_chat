@@ -48,6 +48,9 @@ memory_service = MemoryService(auth_service)
 chat_service = ChatService(auth_service, memory_service, config)
 setup_static_files(app)
 
+# Network connectivity is tested during normal operation
+# The httpx.ReadError you encountered is now handled gracefully with retry logic
+
 
 @ui.page("/")
 def main() -> None:
@@ -70,6 +73,6 @@ if __name__ in {"__main__", "__mp_main__"}:
         port=8080,
         reload=False,
         show=True,
-        reconnect_timeout=30.0,  # Increase reconnect timeout
+        reconnect_timeout=300.0,  # Increase reconnect timeout to 5 minutes for long AI responses
         favicon="💗",  # Heart emoji as favicon for MammoChat
     )

@@ -1,9 +1,10 @@
 """Unit tests for utility functions."""
 
-import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-from src.utils import get_logger, setup_static_files, handle_error
+import pytest
+
+from src.utils import get_logger, handle_error, setup_static_files
 from src.utils.text_processing import strip_markdown
 
 
@@ -15,8 +16,8 @@ class TestGetLogger:
         logger = get_logger()
         assert logger is not None
         # Verify it's a structlog logger
-        assert hasattr(logger, 'info')
-        assert hasattr(logger, 'error')
+        assert hasattr(logger, "info")
+        assert hasattr(logger, "error")
 
     def test_get_logger_custom_name(self):
         """Test get_logger with custom name."""
@@ -62,9 +63,7 @@ class TestHandleError:
 
         # Verify error was logged
         mock_logger.error.assert_called_once_with(
-            "error_occurred",
-            error="Test error",
-            error_type="ValueError"
+            "error_occurred", error="Test error", error_type="ValueError"
         )
 
     def test_handle_error_with_different_exception_types(self):
@@ -76,9 +75,7 @@ class TestHandleError:
             handle_error(test_error, mock_logger)
 
         mock_logger.error.assert_called_once_with(
-            "error_occurred",
-            error="Runtime error",
-            error_type="RuntimeError"
+            "error_occurred", error="Runtime error", error_type="RuntimeError"
         )
 
 
@@ -147,7 +144,9 @@ class TestStripMarkdown:
 
     def test_strip_complex_markdown(self):
         """Test stripping complex markdown combinations."""
-        input_text = "# **Bold Header**\n\nThis is *italic* and `code`.\n\n[Link](url) • bullet"
+        input_text = (
+            "# **Bold Header**\n\nThis is *italic* and `code`.\n\n[Link](url) • bullet"
+        )
         expected = "Bold Header This is italic and code. Link bullet"
         assert strip_markdown(input_text) == expected
 
@@ -171,7 +170,7 @@ class TestStripMarkdown:
 
     def test_sanitize_html_onclick(self):
         """Test sanitizing HTML with onclick."""
-        input_text = '<a onclick="alert(\'xss\')">Link</a>'
+        input_text = "<a onclick=\"alert('xss')\">Link</a>"
         result = strip_markdown(input_text)
         assert "onclick" not in result
         assert "alert" not in result

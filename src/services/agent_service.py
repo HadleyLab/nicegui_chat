@@ -85,7 +85,13 @@ class ChatAgent:
                 space_ids=deps.selected_space_ids or None,
                 limit=limit,
             )
-            return [episode.body for episode in result.episodes]
+            # Handle both MemorySearchResult object and direct list return
+            if hasattr(result, 'episodes'):
+                episodes = result.episodes
+            else:
+                # If result is already a list, use it directly
+                episodes = result if isinstance(result, list) else []
+            return [episode.body for episode in episodes]
 
         # Register memory ingest tool
         @self._agent.tool  # type: ignore[misc]

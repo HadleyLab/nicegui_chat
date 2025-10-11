@@ -1,12 +1,12 @@
 """Integration tests for UI components."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 from nicegui.testing import Screen
 
 from config import config
 from src.models.chat import ConversationState
-from src.services.chat_service import ChatService
 from src.ui.main_ui import setup_ui
 
 
@@ -48,13 +48,11 @@ class TestUI:
 
             # Simulate adding a user message
             from nicegui import ui
+
             with ui.row().classes(config.scene["chat"]["user_row_classes"]):
-                ui.chat_message(
-                    text="Hello",
-                    sent=True
-                ).props(config.scene["chat"]["user_message_props"]).classes(
-                    config.scene["chat"]["user_message_classes"]
-                )
+                ui.chat_message(text="Hello", sent=True).props(
+                    config.scene["chat"]["user_message_props"]
+                ).classes(config.scene["chat"]["user_message_classes"])
 
         # Check that user message has correct styling
         user_message = screen.find("Hello")
@@ -71,10 +69,13 @@ class TestUI:
 
             # Simulate adding an assistant message
             from nicegui import ui
+
             with ui.row().classes(config.scene["chat"]["assistant_row_classes"]):
-                assistant_message = ui.chat_message(sent=False).props(
-                    config.scene["chat"]["assistant_message_props"]
-                ).classes(config.scene["chat"]["assistant_message_classes"])
+                assistant_message = (
+                    ui.chat_message(sent=False)
+                    .props(config.scene["chat"]["assistant_message_props"])
+                    .classes(config.scene["chat"]["assistant_message_classes"])
+                )
 
                 with assistant_message:
                     ui.label("Hi there")
@@ -132,9 +133,12 @@ class TestUI:
 
         # Mock the stream_chat to return some events
         async def mock_stream():
-            from src.models.chat import ChatStreamEvent, ChatEventType
+            from src.models.chat import ChatEventType, ChatStreamEvent
+
             yield ChatStreamEvent(event_type=ChatEventType.MESSAGE_START, payload={})
-            yield ChatStreamEvent(event_type=ChatEventType.MESSAGE_CHUNK, payload={"content": "Hi"})
+            yield ChatStreamEvent(
+                event_type=ChatEventType.MESSAGE_CHUNK, payload={"content": "Hi"}
+            )
             yield ChatStreamEvent(event_type=ChatEventType.MESSAGE_END, payload={})
             yield ChatStreamEvent(event_type=ChatEventType.STREAM_END, payload={})
 
@@ -189,7 +193,9 @@ class TestUI:
             with ui.row().classes(config.scene["chat"]["assistant_row_classes"]):
                 assistant_msg = ui.chat_message(sent=False)
                 with assistant_msg:
-                    ui.label("This is a very long message that should not cause internal scrolling within the chat bubble itself.")
+                    ui.label(
+                        "This is a very long message that should not cause internal scrolling within the chat bubble itself."
+                    )
 
         # The message should be in a label, not directly in chat_message
         # This prevents the scrollbar issue
@@ -224,6 +230,7 @@ class TestUI:
 
         # Check that NiceGUI colors are set from scene
         from nicegui import ui
+
         colors = ui.colors
         assert colors.primary == config.scene["palette"]["primary"]
         assert colors.secondary == config.scene["palette"]["secondary"]

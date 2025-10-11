@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from collections.abc import AsyncIterator
 from typing import Any
 
@@ -13,6 +14,21 @@ from config import config
 from ..utils.text_processing import strip_markdown
 
 logger = structlog.get_logger()
+
+# Connection pool configuration for performance optimization
+HTTPX_CONNECTION_LIMITS = {
+    "max_keepalive_connections": 20,
+    "max_connections": 100,
+    "keepalive_expiry": 30.0,
+}
+
+# Request timeout configuration
+REQUEST_TIMEOUTS = {
+    "connect": 10.0,
+    "read": 60.0,
+    "write": 10.0,
+    "pool": 10.0,
+}
 
 # Import HeySol client if available
 try:
@@ -63,14 +79,24 @@ class AgentOutput(BaseModel):  # type: ignore[misc]
 
 
 class AIService:
-    """Service for AI chat interactions with HeySol memory integration."""
+    """Service for AI chat interactions with HeySol memory integration and connection pooling."""
 
     def __init__(self):
-        """Initialize AI service with optional HeySol client."""
+        """Initialize AI service with optional HeySol client and HTTP connection pool."""
         self.api_key = config.deepseek_api_key
         self.model = config.deepseek_model
         self.base_url = config.deepseek_base_url
         self.heysol_api_key = config.heysol_api_key
+
+        # Circuit breaker for network resilience
+        self._failure_count = 0
+        self._last_failure_time = 0
+        self._circuit_open = False
+        self._circuit_open_until = 0
+
+        # Initialize persistent HTTP client with connection pooling
+        self._http_client: Any | None = None
+        self._initialize_http_client()
 
         # Initialize HeySol client if API key is available
         self.heysol_client: Any | None = None
@@ -85,6 +111,56 @@ class AIService:
         self.agent: Any | None = None
         if PYDANTIC_AI_AVAILABLE and self.api_key:
             self._initialize_agent()
+
+    def _check_circuit_breaker(self) -> bool:
+        """Check if circuit breaker should allow requests."""
+        current_time = time.time()
+
+        # Reset circuit breaker after timeout
+        if self._circuit_open and current_time > self._circuit_open_until:
+            logger.info("circuit_breaker_reset")
+            self._circuit_open = False
+            self._failure_count = 0
+
+        return not self._circuit_open
+
+    def _record_failure(self):
+        """Record a failure for circuit breaker logic."""
+        self._failure_count += 1
+        self._last_failure_time = time.time()
+
+        # Open circuit after 3 failures in 60 seconds
+        if self._failure_count >= 3:
+            self._circuit_open = True
+            self._circuit_open_until = time.time() + 60  # 60 second timeout
+            logger.warning("circuit_breaker_opened", failures=self._failure_count)
+
+    def _record_success(self):
+        """Record a success to reset failure count."""
+        if self._failure_count > 0:
+            self._failure_count = max(0, self._failure_count - 1)
+
+    def _initialize_http_client(self) -> None:
+        """Initialize persistent HTTP client with connection pooling."""
+        try:
+            import httpx
+
+            # Create persistent client with connection pooling for performance
+            self._http_client = httpx.AsyncClient(
+                limits=httpx.Limits(**HTTPX_CONNECTION_LIMITS),
+                timeout=httpx.Timeout(**REQUEST_TIMEOUTS),
+                follow_redirects=True,
+            )
+            logger.info("http_client_initialized", limits=HTTPX_CONNECTION_LIMITS)
+        except Exception as e:
+            logger.warning("http_client_init_failed", error=str(e))
+            self._http_client = None
+
+    async def close(self) -> None:
+        """Close HTTP client connections."""
+        if self._http_client:
+            await self._http_client.aclose()
+            logger.info("http_client_closed")
 
     def _initialize_agent(self) -> None:
         """Initialize Pydantic AI agent with tools."""
@@ -185,6 +261,11 @@ class AIService:
             yield "⚠️ AI service not configured. Please set DEEPSEEK_API_KEY in your .env file."
             return
 
+        # Check circuit breaker
+        if not self._check_circuit_breaker():
+            yield "⚠️ AI service temporarily unavailable due to repeated connection issues. Please try again later."
+            return
+
         # Try using Pydantic AI agent first
         if self.agent is not None:
             try:
@@ -228,10 +309,8 @@ class AIService:
                 logger.error("agent_run_failed", error=str(e))
                 # Fall through to direct API call
 
-        # Fallback to direct API streaming
+        # Fallback to direct API streaming with connection pooling
         import json
-
-        import httpx
 
         messages = [{"role": "system", "content": config.system_prompt}]
 
@@ -240,24 +319,40 @@ class AIService:
 
         messages.append({"role": "user", "content": message})
 
-        try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                async with client.stream(
-                    "POST",
-                    f"{self.base_url}/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {self.api_key}",
-                        "Content-Type": "application/json",
-                    },
-                    json={
-                        "model": self.model,
-                        "messages": messages,
-                        "stream": True,
-                        "temperature": 0.7,
-                    },
-                ) as response:
-                    response.raise_for_status()
+        # Use persistent HTTP client if available, otherwise create temporary one
+        if self._http_client:
+            client = self._http_client
+            should_close = False
+        else:
+            import httpx
 
+            # Add retry configuration for network resilience
+            client = httpx.AsyncClient(
+                timeout=httpx.Timeout(**REQUEST_TIMEOUTS),
+                transport=httpx.AsyncHTTPTransport(retries=2)
+            )
+            should_close = True
+
+        try:
+            async with client.stream(
+                "POST",
+                f"{self.base_url}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": self.model,
+                    "messages": messages,
+                    "stream": True,
+                    "temperature": 0.7,
+                },
+            ) as response:
+                response.raise_for_status()
+
+                # More robust streaming with error recovery
+                streaming_interrupted = False
+                try:
                     async for line in response.aiter_lines():
                         if line.startswith("data: "):
                             data = line[6:]
@@ -272,10 +367,39 @@ class AIService:
                                         yield delta["content"]
                             except json.JSONDecodeError:
                                 continue
+                except (httpx.ReadError, httpx.ConnectError) as stream_error:
+                    logger.warning("streaming_connection_interrupted", error=str(stream_error))
+                    streaming_interrupted = True
+                    # Try to yield a partial error message
+                    yield " [Connection interrupted - response may be incomplete]"
+                except Exception as stream_error:
+                    logger.error("streaming_unexpected_error", error=str(stream_error))
+                    streaming_interrupted = True
+                    yield " [Streaming error occurred]"
 
-        except httpx.HTTPStatusError as e:
-            logger.error("ai_service_http_error", status_code=e.response.status_code)
-            yield f"⚠️ Error communicating with AI service (Status {e.response.status_code})"
+                if streaming_interrupted:
+                    logger.info("streaming_recovered_from_error")
+
+        except httpx.TimeoutException as e:
+            logger.error("ai_service_timeout", error=str(e))
+            self._record_failure()
+            yield "⚠️ AI service request timed out. Please try again."
+        except httpx.ConnectError as e:
+            logger.error("ai_service_connection_error", error=str(e))
+            self._record_failure()
+            yield "⚠️ Unable to connect to AI service. Please check your internet connection."
+        except httpx.ReadError as e:
+            logger.error("ai_service_read_error", error=str(e))
+            self._record_failure()
+            yield "⚠️ Connection to AI service was interrupted. Please try again."
         except Exception as e:
-            logger.error("ai_service_error", error=str(e))
-            yield f"⚠️ Unexpected error: {str(e)}"
+            logger.error("ai_service_streaming_error", error=str(e))
+            self._record_failure()
+            yield f"⚠️ Error communicating with AI service: {str(e)}"
+        else:
+            # Success - record it for circuit breaker
+            self._record_success()
+        finally:
+            # Only close if we created a temporary client
+            if should_close:
+                await client.aclose()

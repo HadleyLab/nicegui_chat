@@ -1,0 +1,48 @@
+# Development Dockerfile with hot reload and debugging
+FROM python:3.11-slim
+
+# Set environment variables for development
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=0
+ENV PYTHONOPTIMIZE=0
+ENV UV_CACHE_DIR=/tmp/uv-cache
+
+# Install system dependencies for development
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for faster Python package management
+RUN pip install uv
+
+# Set work directory
+WORKDIR /app
+
+# Copy dependency files first for better layer caching
+COPY requirements.txt requirements-dev.txt* ./
+COPY pyproject.toml* ./
+
+# Install Python dependencies with development tools
+RUN uv pip install --system --no-cache -r requirements.txt
+RUN if [ -f requirements-dev.txt ]; then uv pip install --system --no-cache -r requirements-dev.txt; fi
+
+# Copy application code
+COPY . .
+
+# Create non-root user for security
+RUN useradd --create-home --shell /bin/bash app \
+    && chown -R app:app /app
+USER app
+
+# Expose port
+EXPOSE 8080
+
+# Health check for development
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Default command for development
+CMD ["python", "main.py"]

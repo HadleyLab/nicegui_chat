@@ -19,6 +19,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+
 def run_command(cmd, description):
     """Run a command and return the result."""
     print(f"\n🚀 {description}")
@@ -35,6 +36,7 @@ def run_command(cmd, description):
         print(f"\n❌ Error running command: {e}")
         return False
 
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -44,57 +46,75 @@ def main():
 
     if command == "fast":
         # Run fast unit tests only (no coverage, no integration)
-        success = run_command([
-            "pytest", "-x", "--tb=short",
-            "tests/test_models.py",
-            "tests/test_utils.py",
-            "tests/test_bugs.py"
-        ], "Running fast unit tests")
+        success = run_command(
+            [
+                "pytest",
+                "-x",
+                "--tb=short",
+                "tests/test_models.py",
+                "tests/test_utils.py",
+                "tests/test_bugs.py",
+            ],
+            "Running fast unit tests",
+        )
 
     elif command == "all":
         # Run all tests with coverage
-        success = run_command([
-            "pytest", "--cov=src", "--cov-report=term-missing",
-            "--cov-report=html", "--cov-fail-under=70"
-        ], "Running all tests with coverage")
+        success = run_command(
+            [
+                "pytest",
+                "--cov=src",
+                "--cov-report=term-missing",
+                "--cov-report=html",
+                "--cov-fail-under=70",
+            ],
+            "Running all tests with coverage",
+        )
 
     elif command == "integration":
         # Run integration tests only
-        success = run_command([
-            "pytest", "-m", "integration", "--tb=short"
-        ], "Running integration tests with real APIs")
+        success = run_command(
+            ["pytest", "-m", "integration", "--tb=short"],
+            "Running integration tests with real APIs",
+        )
 
     elif command == "ci":
         # Run CI-style tests
-        success = run_command([
-            "pytest", "--cov=src", "--cov-report=term-missing",
-            "--cov-report=xml", "--cov-fail-under=70",
-            "--junitxml=junit.xml"
-        ], "Running CI-style tests")
+        success = run_command(
+            [
+                "pytest",
+                "--cov=src",
+                "--cov-report=term-missing",
+                "--cov-report=xml",
+                "--cov-fail-under=70",
+                "--junitxml=junit.xml",
+            ],
+            "Running CI-style tests",
+        )
 
     elif command == "models":
         # Run model tests only
-        success = run_command([
-            "pytest", "tests/test_models.py", "-v"
-        ], "Running model tests")
+        success = run_command(
+            ["pytest", "tests/test_models.py", "-v"], "Running model tests"
+        )
 
     elif command == "services":
         # Run service tests only
-        success = run_command([
-            "pytest", "tests/test_services.py", "-v"
-        ], "Running service tests")
+        success = run_command(
+            ["pytest", "tests/test_services.py", "-v"], "Running service tests"
+        )
 
     elif command == "bugs":
         # Run bug-specific tests
-        success = run_command([
-            "pytest", "tests/test_bugs.py", "-v"
-        ], "Running bug-specific tests")
+        success = run_command(
+            ["pytest", "tests/test_bugs.py", "-v"], "Running bug-specific tests"
+        )
 
     elif command == "coverage":
         # Show coverage report
-        success = run_command([
-            "pytest", "--cov=src", "--cov-report=html"
-        ], "Generating coverage report")
+        success = run_command(
+            ["pytest", "--cov=src", "--cov-report=html"], "Generating coverage report"
+        )
         if success:
             print("\n📊 Coverage report generated in htmlcov/index.html")
 
@@ -108,6 +128,7 @@ def main():
     else:
         print(f"\n❌ {command} tests failed!")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

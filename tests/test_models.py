@@ -1,22 +1,15 @@
 """Unit tests for chat models."""
 
-import pytest
-from datetime import datetime, timezone
-
 from src.models.chat import (
     ChatEventType,
     ChatMessage,
+    ChatStreamEvent,
     ConversationState,
     ConversationStatus,
-    ChatStreamEvent,
     ExecutionStep,
     MessageRole,
 )
-from src.models.memory import (
-    MemoryEpisode,
-    MemorySearchResult,
-    MemorySpace,
-)
+from src.models.memory import MemoryEpisode, MemorySearchResult, MemorySpace
 
 
 class TestChatMessage:
@@ -40,11 +33,7 @@ class TestChatMessage:
     def test_message_with_metadata(self):
         """Test message with custom metadata."""
         metadata = {"source": "test"}
-        message = ChatMessage(
-            role=MessageRole.USER,
-            content="Test",
-            metadata=metadata
-        )
+        message = ChatMessage(role=MessageRole.USER, content="Test", metadata=metadata)
         assert message.metadata == metadata
 
 
@@ -100,7 +89,9 @@ class TestConversationState:
         conv = ConversationState()
         conv.append_message(ChatMessage(role=MessageRole.USER, content="Hello"))
         conv.append_message(ChatMessage(role=MessageRole.ASSISTANT, content="Hi"))
-        conv.execution_history.append(ExecutionStep(skill_name="test", status="complete"))
+        conv.execution_history.append(
+            ExecutionStep(skill_name="test", status="complete")
+        )
 
         conv.clear_messages()
 
@@ -114,7 +105,9 @@ class TestChatStreamEvent:
 
     def test_create_event(self):
         """Test creating a stream event."""
-        event = ChatStreamEvent(event_type=ChatEventType.MESSAGE_CHUNK, payload={"content": "test"})
+        event = ChatStreamEvent(
+            event_type=ChatEventType.MESSAGE_CHUNK, payload={"content": "test"}
+        )
         assert event.event_type == ChatEventType.MESSAGE_CHUNK
         assert event.payload == {"content": "test"}
 
@@ -135,7 +128,7 @@ class TestExecutionStep:
             status="complete",
             observation="test observation",
             user_message="test message",
-            data={"key": "value"}
+            data={"key": "value"},
         )
         assert step.skill_name == "memory"
         assert step.status == "complete"
@@ -156,7 +149,7 @@ class TestMemoryEpisode:
             space_id="space1",
             session_id="session1",
             created_at="2023-01-01",
-            metadata={"key": "value"}
+            metadata={"key": "value"},
         )
         assert episode.episode_id == "123"
         assert episode.body == "Test memory"
@@ -173,7 +166,7 @@ class TestMemoryEpisode:
             "space_id": "space1",
             "session_id": "session1",
             "created_at": "2023-01-01",
-            "metadata": {"key": "value"}
+            "metadata": {"key": "value"},
         }
         episode = MemoryEpisode.from_api(payload)
         assert episode.episode_id == "123"
@@ -182,11 +175,7 @@ class TestMemoryEpisode:
 
     def test_from_api_with_id_fallback(self):
         """Test from_api method with id fallback."""
-        payload = {
-            "id": "456",
-            "content": "Alternative content",
-            "metadata": {}
-        }
+        payload = {"id": "456", "content": "Alternative content", "metadata": {}}
         episode = MemoryEpisode.from_api(payload)
         assert episode.episode_id == "456"
         assert episode.body == "Alternative content"
@@ -214,9 +203,9 @@ class TestMemorySearchResult:
         payload = {
             "episodes": [
                 {"episode_id": "1", "body": "Episode 1", "space_id": "space1"},
-                {"id": "2", "content": "Episode 2"}
+                {"id": "2", "content": "Episode 2"},
             ],
-            "total": 2
+            "total": 2,
         }
         result = MemorySearchResult.from_api(payload)
         assert len(result.episodes) == 2
@@ -236,7 +225,7 @@ class TestMemorySpace:
             space_id="space1",
             name="Test Space",
             description="A test space",
-            created_at="2023-01-01"
+            created_at="2023-01-01",
         )
         assert space.space_id == "space1"
         assert space.name == "Test Space"
@@ -249,7 +238,7 @@ class TestMemorySpace:
             "space_id": "space1",
             "name": "Test Space",
             "description": "Description",
-            "created_at": "2023-01-01"
+            "created_at": "2023-01-01",
         }
         space = MemorySpace.from_dict(payload)
         assert space.space_id == "space1"
@@ -258,10 +247,7 @@ class TestMemorySpace:
 
     def test_from_dict_with_id_fallback(self):
         """Test from_dict method with id fallback."""
-        payload = {
-            "id": "space2",
-            "name": "Another Space"
-        }
+        payload = {"id": "space2", "name": "Another Space"}
         space = MemorySpace.from_dict(payload)
         assert space.space_id == "space2"
         assert space.name == "Another Space"

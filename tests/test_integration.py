@@ -1,19 +1,18 @@
 """Integration tests for external APIs (only run with real API keys)."""
 
 import pytest
-from unittest.mock import patch
 
 from config import config
-from src.services.ai_service import AIService
-from src.services.memory_service import MemoryService
-from src.services.auth_service import AuthService
 from src.services.agent_service import ChatAgent
+from src.services.ai_service import AIService
+from src.services.auth_service import AuthService
+from src.services.memory_service import MemoryService
 
 
 @pytest.mark.integration
 @pytest.mark.skipif(
     not config.deepseek_api_key,
-    reason="DEEPSEEK_API_KEY not set - skipping integration tests"
+    reason="DEEPSEEK_API_KEY not set - skipping integration tests",
 )
 class TestAIServiceIntegration:
     """Integration tests for AI service with real API calls."""
@@ -54,7 +53,7 @@ class TestAIServiceIntegration:
 @pytest.mark.integration
 @pytest.mark.skipif(
     not config.heysol_api_key,
-    reason="HEYSOL_API_KEY not set - skipping integration tests"
+    reason="HEYSOL_API_KEY not set - skipping integration tests",
 )
 class TestMemoryServiceIntegration:
     """Integration tests for memory service with real API calls."""
@@ -70,15 +69,14 @@ class TestMemoryServiceIntegration:
         """Test real memory search."""
         result = await memory_service.search("test query", limit=5)
         # Result should be valid even if empty
-        assert hasattr(result, 'episodes')
+        assert hasattr(result, "episodes")
         assert isinstance(result.episodes, list)
 
     @pytest.mark.asyncio
     async def test_real_memory_add(self, memory_service):
         """Test real memory addition."""
         episode = await memory_service.add(
-            "Integration test memory entry",
-            source="test"
+            "Integration test memory entry", source="test"
         )
         assert episode.episode_id
         assert episode.body == "Integration test memory entry"
@@ -96,11 +94,11 @@ class TestMemoryServiceIntegration:
 
 @pytest.mark.skipif(
     not config.deepseek_api_key,
-    reason="DEEPSEEK_API_KEY not set - skipping integration tests"
+    reason="DEEPSEEK_API_KEY not set - skipping integration tests",
 )
 @pytest.mark.skipif(
     not config.heysol_api_key,
-    reason="HEYSOL_API_KEY not set - skipping integration tests"
+    reason="HEYSOL_API_KEY not set - skipping integration tests",
 )
 class TestChatAgentIntegration:
     """Integration tests for chat agent with real APIs."""
@@ -108,8 +106,8 @@ class TestChatAgentIntegration:
     @pytest.fixture
     def chat_agent(self):
         """Real chat agent instance."""
-        from src.services.memory_service import MemoryService
         from src.services.auth_service import AuthService
+        from src.services.memory_service import MemoryService
 
         auth_service = AuthService(config.memory)
         memory_service = MemoryService(auth_service)
@@ -134,7 +132,9 @@ class TestChatAgentIntegration:
         conversation = ConversationState()
         events = []
 
-        async for event_type, data in chat_agent.generate_stream(conversation, "Stream test"):
+        async for event_type, data in chat_agent.generate_stream(
+            conversation, "Stream test"
+        ):
             events.append((event_type, data))
 
         assert len(events) > 0
@@ -144,7 +144,7 @@ class TestChatAgentIntegration:
 @pytest.mark.integration
 @pytest.mark.skipif(
     not config.deepseek_api_key or not config.heysol_api_key,
-    reason="API keys not set - skipping full integration tests"
+    reason="API keys not set - skipping full integration tests",
 )
 class TestFullChatFlowIntegration:
     """Full integration tests for the complete chat flow."""
@@ -152,10 +152,10 @@ class TestFullChatFlowIntegration:
     @pytest.mark.asyncio
     async def test_complete_chat_flow_with_real_services(self):
         """Test complete chat flow with real services."""
-        from src.services.chat_service import ChatService
-        from src.services.auth_service import AuthService
-        from src.services.memory_service import MemoryService
         from src.models.chat import ConversationState
+        from src.services.auth_service import AuthService
+        from src.services.chat_service import ChatService
+        from src.services.memory_service import MemoryService
 
         # Set up real services
         auth_service = AuthService(config.memory)
@@ -166,7 +166,9 @@ class TestFullChatFlowIntegration:
 
         # Test streaming chat
         events = []
-        async for event in chat_service.stream_chat(conversation, "Integration test message"):
+        async for event in chat_service.stream_chat(
+            conversation, "Integration test message"
+        ):
             events.append(event)
 
         assert len(events) >= 3  # At least start, chunk, end
