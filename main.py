@@ -68,7 +68,7 @@ def main() -> None:
 if __name__ in {"__main__", "__mp_main__"}:
     logger.info("starting_application", host=config.host, port=config.port)  # type: ignore[attr-defined]
     ui.run(
-        title="MammoChat - Your journey, together",
+        title="MammoChat™ - Your journey, together",
         host=config.host,
         port=config.port,
         reload=False,

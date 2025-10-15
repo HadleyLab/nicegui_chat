@@ -1,6 +1,6 @@
-# Contributing to MammoChat
+# Contributing to MammoChat™
 
-Thank you for your interest in contributing to MammoChat! We welcome contributions from the community to help improve this compassionate AI companion for breast cancer patients.
+Thank you for your interest in contributing to MammoChat™! We welcome contributions from the community to help improve this compassionate AI companion for breast cancer patients.
 
 ## Code of Conduct
 
@@ -130,4 +130,4 @@ This project deals with healthcare information. Always:
 
 By contributing to this project, you agree that your contributions will be licensed under the same MIT License that covers the project.
 
-Thank you for helping make MammoChat better! 💗
+Thank you for helping make MammoChat™ better! 💗

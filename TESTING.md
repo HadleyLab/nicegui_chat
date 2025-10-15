@@ -1,4 +1,4 @@
-# MammoChat Testing Framework
+# MammoChat™ Testing Framework
 
 A comprehensive testing framework designed for lean and agile development, achieving **77% code coverage** with real API integration.
 

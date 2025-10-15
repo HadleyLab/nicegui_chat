@@ -1,14 +1,14 @@
-# MammoChat Branding Package
+# MammoChat™ Branding Package
 
 ## Overview
 
-This directory contains the complete branding package for **MammoChat**, an AI-powered platform that connects breast cancer patients with suitable clinical trials and facilitates peer support communities.
+This directory contains the complete branding package for **MammoChat™**, an AI-powered platform that connects breast cancer patients with suitable clinical trials and facilitates peer support communities.
 
 ## Contents
 
 ### 📘 Documentation
 - **BRAND_GUIDELINES.md** - Complete brand guidelines including colors, typography, voice & tone
-- **IMPLEMENTATION_GUIDE.md** - Step-by-step guide to implement MammoChat branding in the app
+- **IMPLEMENTATION_GUIDE.md** - Step-by-step guide to implement MammoChat™ branding in the app
 - **PACKAGE_SUMMARY.md** - Quick overview of branding assets and usage
 
 ### 🎨 Logo Files
@@ -148,4 +148,4 @@ For questions about branding:
 
 ---
 
-© 2025 MammoChat. All brand assets are proprietary and should be used according to these guidelines.
+© 2025 MammoChat™. All brand assets are proprietary and should be used according to these guidelines.

@@ -1,6 +1,6 @@
-"""Utility Functions for MammoChat.
+"""Utility Functions for MammoChat™.
 
-This module provides shared utility functions used across the MammoChat application.
+This module provides shared utility functions used across the MammoChat™ application.
 These utilities handle common tasks like logging, static file serving, and error handling,
 promoting code reuse and consistency throughout the modular architecture.
 

@@ -1,11 +1,11 @@
-# MammoChat Testing Framework
+# MammoChat™ Testing Framework
 # Lean and agile development testing commands
 
 .PHONY: help test test-fast test-all test-integration test-ci test-models test-services test-bugs coverage lint typecheck clean install dev-install
 
 # Default target
 help:
-	@echo "MammoChat Testing Framework"
+	@echo "MammoChat™ Testing Framework"
 	@echo ""
 	@echo "Available commands:"
 	@echo "  make test-fast      - Run fast unit tests (no coverage)"

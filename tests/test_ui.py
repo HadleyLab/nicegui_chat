@@ -37,7 +37,7 @@ class TestUI:
         assert screen.find('placeholder="Share what\'s on your mind..."').exists
 
         # Check welcome message
-        assert screen.find("Welcome to MammoChat").exists
+        assert screen.find("Welcome to MammoChat™").exists
 
     def test_chat_message_user_styling(self, screen, mock_chat_service):
         """Test user chat message styling."""
@@ -113,7 +113,7 @@ class TestUI:
         new_btn.click()
 
         # Should clear messages and show welcome message
-        assert screen.find("Welcome to MammoChat").exists
+        assert screen.find("Welcome to MammoChat™").exists
 
     def test_send_message_functionality(self, screen, mock_chat_service):
         """Test sending a message."""

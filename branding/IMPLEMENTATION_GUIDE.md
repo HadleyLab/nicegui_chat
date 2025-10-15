@@ -1,8 +1,8 @@
-# MammoChat - Implementation Guide
+# MammoChat™ - Implementation Guide
 
-## Quick Start: Applying MammoChat Branding
+## Quick Start: Applying MammoChat™ Branding
 
-This guide shows you how to implement the MammoChat branding in the NiceGUI chat application.
+This guide shows you how to implement the MammoChat™ branding in the NiceGUI chat application.
 
 ---
 
@@ -10,7 +10,7 @@ This guide shows you how to implement the MammoChat branding in the NiceGUI chat
 
 ### Update `config/app_config.json`
 
-Replace the UI configuration with MammoChat's brand colors:
+Replace the UI configuration with MammoChat™'s brand colors:
 
 ```json
 {
@@ -60,10 +60,10 @@ Replace the UI configuration with MammoChat's brand colors:
 
 ### Update `prompts/system.md`
 
-Replace with MammoChat-specific prompt:
+Replace with MammoChat™-specific prompt:
 
 ```markdown
-You are MammoChat, a compassionate AI assistant helping breast cancer patients navigate their healthcare journey. You connect patients with suitable clinical trials and facilitate peer support communities.
+You are MammoChat™, a compassionate AI assistant helping breast cancer patients navigate their healthcare journey. You connect patients with suitable clinical trials and facilitate peer support communities.
 
 Your role is to:
 1. **Support & Empathy**: Provide warm, understanding responses that acknowledge the emotional journey
@@ -98,11 +98,11 @@ Remember: You're not just providing information—you're walking alongside patie
 
 ### Update `src/ui/chat_ui.py`
 
-Replace the `_apply_styles` method with MammoChat branding:
+Replace the `_apply_styles` method with MammoChat™ branding:
 
 ```python
 def _apply_styles(self):
-    """Apply MammoChat brand styling."""
+    """Apply MammoChat™ brand styling."""
     ui_config = self.config.ui
     ui.add_head_html(f"""
     <style>
@@ -283,13 +283,13 @@ def _apply_styles(self):
 
 ```python
 def _build_header(self):
-    """Build the MammoChat header."""
+    """Build the MammoChat™ header."""
     with ui.row().classes('w-full p-4 mammochat-header items-center justify-between'):
         with ui.row().classes('items-center gap-3'):
-            # Use heart icon for MammoChat
+            # Use heart icon for MammoChat™
             ui.icon('favorite', size='2rem', color='white')
             with ui.column().classes('gap-0'):
-                ui.label('MammoChat').classes('text-2xl font-bold text-white')
+                ui.label('MammoChat™').classes('text-2xl font-bold text-white')
                 ui.label('Your journey, together').classes('text-sm text-white opacity-80')
         
         with ui.row().classes('gap-2'):
@@ -331,7 +331,7 @@ def build(self):
                 with ui.row().classes('w-full'):
                     with ui.card().classes('message-bubble assistant-message max-w-full'):
                         ui.markdown("""
-                        ### Welcome to MammoChat 💗
+                        ### Welcome to MammoChat™ 💗
                         
                         I'm here to support you on your breast cancer journey. I can help you:
                         
@@ -353,8 +353,8 @@ def build(self):
 ### Update `.env`:
 
 ```bash
-# MammoChat Configuration
-APP_NAME=MammoChat
+# MammoChat™ Configuration
+APP_NAME=MammoChat™
 
 # DeepSeek API Configuration
 DEEPSEEK_API_KEY=your_deepseek_api_key_here
@@ -393,13 +393,13 @@ def main():
         chat_ui = ChatUI(config, auth_service, chat_service, memory_service)
         chat_ui.build()
     
-    # Run with MammoChat branding
+    # Run with MammoChat™ branding
     ui.run(
-        title='MammoChat - Your journey, together',
+        title='MammoChat™ - Your journey, together',
         host=config.app.host,
         port=config.app.port,
         reload=config.app.reload,
-        dark=False,  # Light theme for MammoChat
+        dark=False,  # Light theme for MammoChat™
         favicon='💗',
     )
 ```
@@ -444,7 +444,7 @@ Check that these are correctly implemented:
 - [ ] **Logo**: Visible in header with heart icon
 - [ ] **Typography**: Inter font family
 - [ ] **Animations**: Smooth slide-in effects
-- [ ] **Welcome Message**: MammoChat introduction
+- [ ] **Welcome Message**: MammoChat™ introduction
 - [ ] **Buttons**: Pink gradient with hover effects
 - [ ] **Messages**: Rounded corners, proper spacing
 - [ ] **Light Theme**: White/pink background

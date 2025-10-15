@@ -39,6 +39,9 @@ def setup_colors(scene):
 
 
 def setup_head_html(scene):
+    # Dark mode colors
+    dark_palette = scene.get('dark', {}).get('palette', {})
+
     ui.add_head_html(
         f"""
         <meta name="theme-color" content="{scene['palette']['primary']}">
@@ -67,15 +70,45 @@ def setup_head_html(scene):
                 --animation-duration: 0.3s;
             }}
 
+            /* Dark mode variables */
+            [data-theme="dark"], .dark-theme {{
+                --primary-color: {dark_palette.get('primary', scene['palette']['primary'])};
+                --secondary-color: {dark_palette.get('secondary', scene['palette']['secondary'])};
+                --background-color: {dark_palette.get('background', scene['palette']['background'])};
+                --surface-color: {dark_palette.get('surface', scene['palette']['surface'])};
+                --text-color: {dark_palette.get('text', scene['palette']['text'])};
+                --text-secondary: {dark_palette.get('text_secondary', scene['palette']['text_secondary'])};
+                --accent-color: {dark_palette.get('accent', scene['palette']['accent'])};
+                --success-color: {dark_palette.get('success', scene['palette']['success'])};
+                --border-color: {dark_palette.get('border', scene['palette']['border'])};
+            }}
+
+            /* System dark mode preference */
+            @media (prefers-color-scheme: dark) {{
+                :root:not([data-theme="light"]) {{
+                    --primary-color: {dark_palette.get('primary', scene['palette']['primary'])};
+                    --secondary-color: {dark_palette.get('secondary', scene['palette']['secondary'])};
+                    --background-color: {dark_palette.get('background', scene['palette']['background'])};
+                    --surface-color: {dark_palette.get('surface', scene['palette']['surface'])};
+                    --text-color: {dark_palette.get('text', scene['palette']['text'])};
+                    --text-secondary: {dark_palette.get('text_secondary', scene['palette']['text_secondary'])};
+                    --accent-color: {dark_palette.get('accent', scene['palette']['accent'])};
+                    --success-color: {dark_palette.get('success', scene['palette']['success'])};
+                    --border-color: {dark_palette.get('border', scene['palette']['border'])};
+                }}
+            }}
+
             body {{
-                background: linear-gradient(135deg, #FAFBFC 0%, #FFF5F7 100%);
+                background: linear-gradient(135deg, var(--background-color) 0%, var(--surface-color) 100%);
                 color: var(--text-color);
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                transition: background-color var(--animation-duration), color var(--animation-duration);
             }}
 
             .mammochat-header {{
                 background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-                box-shadow: 0 4px 20px rgba(244, 184, 197, 0.2);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                transition: background var(--animation-duration);
             }}
 
             .message-bubble {{
@@ -83,8 +116,9 @@ def setup_head_html(scene):
                 padding: 1.25rem 1.5rem;
                 max-width: 70%;
                 animation: slideIn var(--animation-duration) ease-out;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
                 line-height: 1.6;
+                transition: all var(--animation-duration);
             }}
 
             .user-message {{
@@ -151,7 +185,7 @@ def setup_head_html(scene):
                 padding: 1rem;
                 border: 2px solid var(--border-color);
                 transition: all var(--animation-duration);
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             }}
 
             .input-container:focus-within {{
@@ -175,7 +209,7 @@ def setup_head_html(scene):
 
             .btn-send:hover {{
                 transform: scale(1.05);
-                box-shadow: 0 4px 16px rgba(244, 184, 197, 0.4);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
             }}
 
             .btn-send:active {{
@@ -221,6 +255,27 @@ def setup_head_html(scene):
                 max-height: none !important;
                 overflow: visible !important;
             }}
+
+            /* Dark mode specific styles */
+            [data-theme="dark"] .mammochat-header,
+            .dark-theme .mammochat-header {{
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            }}
+
+            [data-theme="dark"] .message-bubble,
+            .dark-theme .message-bubble {{
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            }}
+
+            [data-theme="dark"] .input-container,
+            .dark-theme .input-container {{
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }}
+
+            [data-theme="dark"] .btn-send:hover,
+            .dark-theme .btn-send:hover {{
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            }}
         </style>
     """
     )
@@ -234,28 +289,20 @@ def create_header(scene, dark):
             # Use heart icon for MammoChat
             ui.icon('favorite', size='2rem', color='white')
             with ui.column().classes('gap-0'):
-                ui.label('MammoChat').classes('text-2xl font-bold text-white')
+                ui.label('MammoChat™').classes('text-2xl font-bold text-white')
                 ui.label('Your journey, together').classes('text-sm text-white opacity-80')
 
         with ui.row().classes('gap-2'):
-            ui.button(
-                icon='people',
-                on_click=lambda: None  # Placeholder for community
-            ).props('flat round color=white').tooltip('Community')
-
-            ui.button(
-                icon='science',
-                on_click=lambda: None  # Placeholder for trials
-            ).props('flat round color=white').tooltip('Clinical Trials')
-
-            ui.button(
-                icon='refresh',
-                on_click=lambda: None  # Placeholder for new conversation
-            ).props('flat round color=white').tooltip('New Conversation')
-
             def toggle_theme():
                 dark.toggle()
                 theme_btn.icon = "dark_mode" if dark.value else "light_mode"
+                # Update document class for CSS targeting
+                if dark.value:
+                    ui.run_javascript("document.body.classList.add('dark-theme')")
+                    ui.run_javascript("document.documentElement.setAttribute('data-theme', 'dark')")
+                else:
+                    ui.run_javascript("document.body.classList.remove('dark-theme')")
+                    ui.run_javascript("document.documentElement.setAttribute('data-theme', 'light')")
 
             theme_btn = (
                 ui.button(on_click=toggle_theme)
@@ -278,7 +325,7 @@ def create_chat_area(scene, conversation):
                 with ui.row().classes('w-full'):
                     with ui.card().classes('message-bubble assistant-message max-w-full'):
                         ui.markdown("""
-                        ### Welcome to MammoChat 💗
+                        ### Welcome to MammoChat™ 💗
 
                         I'm here to support you on your breast cancer journey. I can help you:
 
@@ -335,6 +382,20 @@ def setup_ui(chat_service: ChatService) -> None:
     scene = config.scene
 
     dark = ui.dark_mode()
+
+    # Initialize theme state on page load
+    ui.run_javascript(f"""
+        document.addEventListener('DOMContentLoaded', function() {{
+            const isDark = {str(dark.value).lower()};
+            if (isDark) {{
+                document.body.classList.add('dark-theme');
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }} else {{
+                document.body.classList.remove('dark-theme');
+                document.documentElement.setAttribute('data-theme', 'light');
+            }}
+        }});
+    """)
 
     setup_colors(scene)
     setup_head_html(scene)

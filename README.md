@@ -1,10 +1,10 @@
-# MammoChat 💗
+# MammoChat™ 💗
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A compassionate AI companion dedicated to supporting breast cancer patients on their healthcare journey. MammoChat helps patients find clinical trials, navigate treatment options, access peer support, and make informed healthcare decisions.
+A compassionate AI companion dedicated to supporting breast cancer patients on their healthcare journey. MammoChat™ helps patients find clinical trials, navigate treatment options, access peer support, and make informed healthcare decisions.
 
 ## Features
 
@@ -26,7 +26,7 @@ A compassionate AI companion dedicated to supporting breast cancer patients on t
 
 ## Architecture
 
-MammoChat follows a layered architecture with clear separation of concerns:
+MammoChat™ follows a layered architecture with clear separation of concerns:
 
 - **Configuration Management** (`config.py`) - Centralized settings and environment variables
 - **Business Logic** (`src/services/`) - AI interactions, chat orchestration, memory management
@@ -75,7 +75,7 @@ The application will start on `http://localhost:8080` (configurable in `config/a
 
 ## Memory-First Approach
 
-MammoChat uses a memory-first approach to provide personalized, contextual support:
+MammoChat™ uses a memory-first approach to provide personalized, contextual support:
 
 1. **Memory Check First** - Always searches patient memory before any other actions
 2. **Contextual Responses** - Uses conversation history and preferences for personalized support
@@ -180,4 +180,4 @@ For support or questions:
 
 ---
 
-*"Your journey, together" – MammoChat* 💗
+*"Your journey, together" – MammoChat™* 💗

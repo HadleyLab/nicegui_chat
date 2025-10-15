@@ -1,8 +1,8 @@
-# MammoChat Brand Guidelines
+# MammoChat™ Brand Guidelines
 
 ## Brand Identity
 
-**MammoChat** is an AI-powered platform that connects patients with suitable clinical trials and facilitates peer support communities. Our brand embodies trust, innovation, and community in healthcare.
+**MammoChat™** is an AI-powered platform that connects patients with suitable clinical trials and facilitates peer support communities. Our brand embodies trust, innovation, and community in healthcare.
 
 ## Brand Values
 
@@ -344,7 +344,7 @@ box-shadow: 0 0 0 3px rgba(244, 184, 197, 0.1);
 - Square icon for profile pictures
 - Rose Quartz and Mint Fresh for graphics
 - Share patient success stories
-- Use #MammoChat hashtag
+- Use #MammoChat™ hashtag
 
 ---
 

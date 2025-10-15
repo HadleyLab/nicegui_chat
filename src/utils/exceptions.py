@@ -1,4 +1,4 @@
-"""Custom Exception Hierarchy for MammoChat.
+"""Custom Exception Hierarchy for MammoChat™.
 
 This module defines the application's exception hierarchy, implementing
 a structured error handling system that supports the fail-fast philosophy.
@@ -18,7 +18,7 @@ clear separation of concerns across the modular architecture.
 class AppError(Exception):
     """Base exception for all application errors.
 
-    This is the root exception class for the MammoChat application.
+    This is the root exception class for the MammoChat™ application.
     All custom exceptions inherit from this class to enable unified
     error handling and logging across the modular architecture.
     """

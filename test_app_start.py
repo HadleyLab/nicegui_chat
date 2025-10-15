@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Quick test to verify the MammoChat application starts without timeout issues.
+Quick test to verify the MammoChat™ application starts without timeout issues.
 """
 
 import asyncio
@@ -11,7 +11,7 @@ import sys
 
 async def test_app_startup():
     """Test that the application starts and handles basic requests."""
-    print("🚀 Testing MammoChat application startup...")
+    print("🚀 Testing MammoChat™ application startup...")
 
     # Start the application in background
     process = subprocess.Popen([

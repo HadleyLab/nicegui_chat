@@ -12,5 +12,15 @@
       "sizes": "180x180",
       "type": "image/png"
     }
-  ]
+  ],
+  "theme_color_schemes": {
+    "light": {
+      "background_color": "#FAFBFC",
+      "theme_color": "#F4B8C5"
+    },
+    "dark": {
+      "background_color": "#111827",
+      "theme_color": "#E8A0B8"
+    }
+  }
 }

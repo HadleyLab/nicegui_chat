@@ -148,10 +148,10 @@ class Config:
 
     # UI Configuration
     ui_logo_icon_path: str = APP_CONFIG["app"]["branding"]["logo_icon"]
-    ui_welcome_title: str = "Welcome to MammoChat!"
+    ui_welcome_title: str = "Welcome to MammoChat™!"
     ui_welcome_message: str = (
         """
-Welcome to MammoChat!
+Welcome to MammoChat™!
 
 I'm here to support you on your breast cancer journey. I can help you:
 

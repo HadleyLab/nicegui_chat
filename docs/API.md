@@ -1,6 +1,6 @@
-# MammoChat API Documentation
+# MammoChat™ API Documentation
 
-This document provides detailed API documentation for the MammoChat application components.
+This document provides detailed API documentation for the MammoChat™ application components.
 
 ## Services
 

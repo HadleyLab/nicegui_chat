@@ -22,5 +22,8 @@
      <text x="175" y="40" font-family="Inter, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF">
        Chat
      </text>
+
+     <!-- Trademark symbol -->
+     <text x="235" y="32" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">™</text>
    </g>
-</svg>
+ </svg>

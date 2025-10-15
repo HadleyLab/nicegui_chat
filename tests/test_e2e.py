@@ -63,7 +63,7 @@ class TestE2E:
             setup_ui(mock_chat_service)
 
         # Check initial state
-        assert screen.find("Welcome to MammoChat").exists
+        assert screen.find("Welcome to MammoChat™").exists
         assert screen.find('placeholder="Share what\'s on your mind..."').exists
 
         # Type a message
@@ -121,7 +121,7 @@ class TestE2E:
         new_btn.click()
 
         # Check welcome message is back
-        assert screen.find("Welcome to MammoChat").exists
+        assert screen.find("Welcome to MammoChat™").exists
         # Note: In test, old messages might still be there, depending on implementation
 
     def test_empty_message_not_sent(self, screen, mock_chat_service):

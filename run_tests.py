@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test Runner Script for MammoChat
+Test Runner Script for MammoChat™
 
 This script provides convenient commands for running tests in different modes
 for lean and agile development.

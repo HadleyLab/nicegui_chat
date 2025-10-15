@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test script to verify AI response sanitization on deployed MammoChat."""
+"""Test script to verify AI response sanitization on deployed MammoChat™."""
 
 import requests
 
@@ -60,9 +60,9 @@ def test_deployed_app():
 
         # Check if the page contains expected elements
         if "MammoChat™" in response.text:
-            print("✅ Page contains MammoChat branding")
+            print("✅ Page contains MammoChat™ branding")
         else:
-            print("❌ Page missing MammoChat branding")
+            print("❌ Page missing MammoChat™ branding")
             return False
 
         return True
@@ -133,7 +133,7 @@ def simulate_chat_test():
 
 def main():
     """Run all tests."""
-    print("🚀 Starting MammoChat sanitization tests...\n")
+    print("🚀 Starting MammoChat™ sanitization tests...\n")
 
     results = []
 

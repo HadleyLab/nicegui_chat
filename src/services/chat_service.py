@@ -1,4 +1,4 @@
-"""Chat Service Layer for MammoChat with enhanced async processing.
+"""Chat Service Layer for MammoChat™ with enhanced async processing.
 
 This module implements the business logic layer for chat operations,
 serving as the orchestration point between:
