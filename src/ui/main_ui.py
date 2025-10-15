@@ -1,6 +1,6 @@
-"""User Interface Layer for MammoChat.
+"""User Interface Layer for MammoChat™.
 
-This module implements the presentation layer of the MammoChat application,
+This module implements the presentation layer of the MammoChat™ application,
 providing a web-based chat interface using the NiceGUI framework. It handles
 user interactions, message display, and UI state management while maintaining
 clear separation from business logic and data persistence.
@@ -18,7 +18,6 @@ service operations, enabling easy testing and maintenance.
 
 import asyncio
 
-import structlog
 from nicegui import ui
 
 from config import config
@@ -88,69 +87,64 @@ def setup_head_html(scene):
 
 def create_header(scene, dark):
     """Build the MammoChat header."""
-    logger = structlog.get_logger()
-
     header_classes = scene.get("header_styles", {}).get(
         "classes",
         "w-full p-6 bg-gradient-to-br from-rose-200 to-pink-300 shadow-lg transition-all duration-300 items-center justify-between",
     )
     header = ui.header().classes(header_classes)
     with header:
-        with ui.row().classes("items-center gap-6 py-2 flex-nowrap"):
-            # Use HTML img tag for reliable logo display
-            logo_src = scene.get("logo", {}).get("src", "/branding/logo-full-color.svg")
-            logo_alt = scene.get("logo", {}).get("alt", "MammoChat Logo")
-            logo_classes = scene.get("header_logo", {}).get(
-                "classes", "h-16 w-auto max-w-[250px] object-contain"
-            )
-            logger.info("creating_logo_html_element", logo_path=logo_src)
-            try:
+        # Main header row with responsive layout
+        with ui.row().classes("w-full items-center justify-between gap-4 py-2 flex-nowrap"):
+            # Left side: Logo and tagline
+            with ui.row().classes("items-center gap-3 md:gap-6 flex-shrink-0 min-w-0 flex-1"):
+                # Use HTML img tag for reliable logo display
+                logo_src = scene.get("logo", {}).get("src", "/branding/logo-full-white.svg")
+                logo_alt = scene.get("logo", {}).get("alt", "MammoChat Logo")
+                logo_classes = scene.get("header_logo", {}).get(
+                    "classes", "h-8 sm:h-10 md:h-12 lg:h-16 w-auto max-w-[120px] sm:max-w-[150px] md:max-w-[200px] lg:max-w-[250px] object-contain flex-shrink-0"
+                )
                 ui.html(
                     f'<img src="{logo_src}" alt="{logo_alt}" class="{logo_classes}">',
                     sanitize=False,
                 )
-                logger.info("logo_html_element_created_successfully")
-            except Exception as e:
-                logger.error("logo_html_creation_failed", error=str(e))
-                # Fallback to text logo if HTML fails
-                ui.label("MammoChat™").classes("text-2xl font-bold text-slate-700")
 
-            tagline = scene.get("header", {}).get("tagline", "Your journey, together")
-            tagline_classes = scene.get("header", {}).get(
-                "tagline_classes",
-                "text-sm text-slate-700 opacity-80 flex-shrink-0",
-            )
-            ui.label(tagline).classes(tagline_classes)
+                # Tagline with proper responsive styling - ensure visibility
+                tagline = scene.get("header", {}).get("tagline", "Your journey, together")
+                tagline_classes = scene.get("header", {}).get(
+                    "tagline_classes",
+                    "text-sm md:text-base text-white leading-tight drop-shadow-lg flex-shrink-0",
+                )
+                ui.label(tagline).classes(tagline_classes)
 
-        with ui.row().classes("gap-2"):
+            # Right side: Theme toggle button
+            with ui.row().classes("gap-2 flex-shrink-0"):
+                def toggle_theme():
+                    dark.toggle()
+                    theme_btn.icon = "dark_mode" if dark.value else "light_mode"
+                    # Update document class for CSS targeting
+                    if dark.value:
+                        ui.run_javascript("document.body.classList.add('dark-theme')")
+                        ui.run_javascript(
+                            "document.documentElement.setAttribute('data-theme', 'dark')"
+                        )
+                    else:
+                        ui.run_javascript("document.body.classList.remove('dark-theme')")
+                        ui.run_javascript(
+                            "document.documentElement.setAttribute('data-theme', 'light')"
+                        )
 
-            def toggle_theme():
-                dark.toggle()
+                theme_btn_props = scene.get("header", {}).get(
+                    "theme_btn_props", "flat dense color=white"
+                )
+                theme_btn_classes = scene.get("header", {}).get(
+                    "theme_btn_classes", "flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10"
+                )
+                theme_btn = (
+                    ui.button(on_click=toggle_theme)
+                    .props(theme_btn_props)
+                    .classes(theme_btn_classes)
+                )
                 theme_btn.icon = "dark_mode" if dark.value else "light_mode"
-                # Update document class for CSS targeting
-                if dark.value:
-                    ui.run_javascript("document.body.classList.add('dark-theme')")
-                    ui.run_javascript(
-                        "document.documentElement.setAttribute('data-theme', 'dark')"
-                    )
-                else:
-                    ui.run_javascript("document.body.classList.remove('dark-theme')")
-                    ui.run_javascript(
-                        "document.documentElement.setAttribute('data-theme', 'light')"
-                    )
-
-            theme_btn_props = scene.get("header", {}).get(
-                "theme_btn_props", "flat dense color=grey-8"
-            )
-            theme_btn_classes = scene.get("header", {}).get(
-                "theme_btn_classes", "flex-shrink-0"
-            )
-            theme_btn = (
-                ui.button(on_click=toggle_theme)
-                .props(theme_btn_props)
-                .classes(theme_btn_classes)
-            )
-            theme_btn.icon = "dark_mode" if dark.value else "light_mode"
 
     return header
 
@@ -261,9 +255,6 @@ def setup_ui(chat_service: ChatService) -> None:
     Args:
         chat_service: The chat service instance for handling message operations.
     """
-    logger = structlog.get_logger()
-
-    logger.info("page_loaded", path="/")
 
     scene = config.scene
 
@@ -367,7 +358,6 @@ def setup_ui(chat_service: ChatService) -> None:
                         # Final refresh
                         response_display.refresh()
             except Exception as e:
-                logger.error("ai_response_failed", error=str(e))
                 response_state["error"] = str(e)
                 response_display.refresh()
             finally:
@@ -397,7 +387,6 @@ def setup_ui(chat_service: ChatService) -> None:
                 ui.chat_message(
                     text=scene["chat"]["welcome_message"], sent=False
                 ).props(welcome_props).classes(welcome_classes)
-        logger.info("new_conversation_started")
 
     create_header(scene, dark)
     message_container = create_chat_area(scene, conversation)

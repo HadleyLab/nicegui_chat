@@ -7,7 +7,7 @@ This comprehensive branding package contains everything needed to implement the 
 ## 🎨 Visual Identity
 
 ### Logo Variations (4)
-1. **Full Color Logo** - Primary horizontal logo with gradient heart icon
+1. **Full Color Logo** - Primary horizontal logo with chat bubble featuring heart-shaped transparent mask
 2. **Icon Only** - Square icon for app icons and favicons
 3. **White Version** - For dark backgrounds and photos
 4. **Monochrome** - Single-color version for limited use

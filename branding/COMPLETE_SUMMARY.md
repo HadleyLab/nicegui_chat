@@ -88,8 +88,8 @@ The brand uses soft pinks and grays to create a warm, welcoming feel while maint
 ## 📐 Logo Specifications
 
 ### Icon Design
-- ❤️ Heart shape symbolizing care and health
-- 💬 Chat bubble representing communication
+- 💬 Chat bubble with heart-shaped transparent mask creating a heart-shaped hole
+- ❤️ Heart shape symbolizing care and health through the transparent cutout
 - ✨ Sparkle accents indicating AI innovation
 - 🎨 Gradient from Rose Quartz to Soft Mauve
 

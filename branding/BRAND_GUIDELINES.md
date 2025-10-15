@@ -151,7 +151,7 @@ caption: 0.75rem (12px) - Medium
 ### Logo Elements
 
 **Icon Design:**
-- Combines a heart shape with a chat bubble
+- Features a chat bubble with a heart-shaped transparent mask that creates a heart-shaped hole
 - Soft, rounded edges for approachability
 - Gradient from Rose Quartz to Soft Mauve
 - Optional: subtle sparkle/stars for AI innovation
@@ -365,10 +365,23 @@ box-shadow: 0 0 0 3px rgba(244, 184, 197, 0.1);
 
 ## Brand Protection
 
-### Trademark
-- MammoChat™ is a trademark
-- Use ™ symbol in formal contexts
-- Register logo and wordmark
+### Trademark Protection
+
+For comprehensive trademark rules and protection guidelines, refer to [TRADEMARK_RULES.md](TRADEMARK_RULES.md).
+
+#### Key Trademark Requirements Summary
+
+- **Trademark Status**: MammoChat™ is a trademark in the United States and select international jurisdictions under Classes 9, 42, and 44 for software, healthcare services, and medical information platforms.
+
+- **Proper Usage**: Always include the ™ symbol with "MammoChat" in formal contexts, marketing materials, website content, and digital platforms.
+
+- **Logo Specifications**: Follow detailed specifications including minimum sizes (120px for full logo, 32px for icon), clear space requirements (equal to icon height), and approved color variations as outlined in TRADEMARK_RULES.md.
+
+- **Licensing Framework**: Third-party usage requires written permission through established licensing processes. Internal teams have full access; partners need approval for co-branded materials.
+
+- **Digital Standards**: Maintain consistent trademark usage across websites, social media, mobile apps, and all digital touchpoints. Include trademark in meta tags, alt text, and app store listings.
+
+- **Enforcement**: Active monitoring and enforcement of trademark rights. Report unauthorized usage or infringement to brandprotection@mammochat.com.
 
 ### Usage Rights
 - Internal teams: Full access to all brand assets

@@ -162,7 +162,7 @@
     "row_classes": "w-full flex-wrap items-center justify-between px-3 py-2 sm:px-4 sm:py-3 max-w-4xl mx-auto",
     "logo_row_classes": "items-center gap-2 sm:gap-3 flex-shrink-0 min-w-0",
     "tagline": "Your journey, together",
-    "tagline_classes": "text-xs sm:text-sm text-white leading-tight drop-shadow-sm hidden md:block truncate",
+    "tagline_classes": "text-xs sm:text-sm text-white leading-tight drop-shadow-sm block truncate",
     "theme_btn_props": "flat dense color=white",
     "theme_btn_classes": "flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10"
   },
@@ -189,7 +189,7 @@
     "drop_shadow": "drop-shadow-sm"
   },
   "chat": {
-    "welcome_message": "Welcome to MammoChat 💗\n\nI'm here to support you on your breast cancer journey. I can help you find clinical trials that match your situation, connect with communities of patients with similar experiences, understand information about treatments and options, and navigate your healthcare with confidence.\n\nHow can I support you today?",
+    "welcome_message": "Welcome to MammoChat™ 💗\n\nI'm here to support you on your breast cancer journey. I can help you find clinical trials that match your situation, connect with communities of patients with similar experiences, understand information about treatments and options, and navigate your healthcare with confidence.\n\nHow can I support you today?",
     "container_classes": "w-full max-w-4xl mx-auto gap-4",
     "scroll_area_classes": "flex-grow w-full p-4",
     "message_bubble": {

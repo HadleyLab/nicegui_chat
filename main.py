@@ -18,22 +18,20 @@ The application follows a layered architecture where:
 This design enables maintainability, testability, and scalability.
 """
 
-import logging
-
-from nicegui import app, ui
+import os
+from nicegui import ui, app
 
 from config import config, validate_config
-from src.services.ai_service import AIService
 from src.services.auth_service import AuthService
 from src.services.chat_service import ChatService
 from src.services.memory_service import MemoryService
 from src.ui.main_ui import setup_ui
-from src.utils import get_logger, setup_static_files
 
-# Configure logging level
-logging.basicConfig(level=logging.DEBUG)
-
-logger = get_logger()
+# Set up static file serving for branding assets
+current_dir = os.path.dirname(os.path.abspath(__file__))
+branding_dir = os.path.join(current_dir, 'branding')
+if os.path.exists(branding_dir):
+    app.add_static_files('/branding', branding_dir)
 
 try:
     validate_config(config)
@@ -42,11 +40,9 @@ except ValueError as e:
     print("Please create a .env file with your DEEPSEEK_API_KEY")
     exit(1)
 
-ai_service = AIService()
 auth_service = AuthService(config.memory)
 memory_service = MemoryService(auth_service)
 chat_service = ChatService(auth_service, memory_service, config)
-setup_static_files(app)
 
 # Network connectivity is tested during normal operation
 # The httpx.ReadError you encountered is now handled gracefully with retry logic
@@ -66,7 +62,7 @@ def main() -> None:
 
 # Run the application
 if __name__ in {"__main__", "__mp_main__"}:
-    logger.info("starting_application", host=config.host, port=config.port)  # type: ignore[attr-defined]
+    print(f"Starting MammoChat on {config.host}:{config.port}")
     ui.run(
         title="MammoChat™ - Your journey, together",
         host=config.host,

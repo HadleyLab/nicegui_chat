@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="250" height="64" viewBox="0 0 250 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+   <defs>
+     <mask id="chat-mask">
+       <path d="M48 16C48 11.5817 44.4183 8 40 8H16C11.5817 8 8 11.5817 8 16V36C8 40.4183 11.5817 44 16 44H20V52L28 44H40C44.4183 44 48 40.4183 48 36V16Z"
+             fill="white"/>
+       <path d="M28 20C28 16.6863 30.6863 14 34 14C35.6569 14 37.1569 14.6716 38.2426 15.7574C39.3284 14.6716 40.8284 14 42.4853 14C45.799 14 48.4853 16.6863 48.4853 20C48.4853 21.3062 48.0615 22.512 47.3431 23.4853L38.2426 32.5858L29.1421 23.4853C28.4237 22.512 28 21.3062 28 20Z"
+             fill="black"/>
+     </mask>
+   </defs>
    <!-- Icon: Heart + Chat Bubble -->
    <g id="logo-icon">
-     <!-- Chat Bubble Background - No opacity for solid look -->
+     <!-- Chat Bubble Background with heart-shaped hole -->
      <path d="M48 16C48 11.5817 44.4183 8 40 8H16C11.5817 8 8 11.5817 8 16V36C8 40.4183 11.5817 44 16 44H20V52L28 44H40C44.4183 44 48 40.4183 48 36V16Z"
-           fill="#FFFFFF"/>
-
-     <!-- Heart Shape - Black -->
-     <path d="M28 20C28 16.6863 30.6863 14 34 14C35.6569 14 37.1569 14.6716 38.2426 15.7574C39.3284 14.6716 40.8284 14 42.4853 14C45.799 14 48.4853 16.6863 48.4853 20C48.4853 21.3062 48.0615 22.512 47.3431 23.4853L38.2426 32.5858L29.1421 23.4853C28.4237 22.512 28 21.3062 28 20Z"
-           fill="black"/>
+           fill="#FFFFFF" mask="url(#chat-mask)"/>
    </g>
 
    <!-- Wordmark: MammoChat -->

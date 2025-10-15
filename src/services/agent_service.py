@@ -14,7 +14,6 @@ from config import DeepSeekConfig
 
 from ..models.chat import ConversationState
 from ..services.memory_service import MemoryService
-from ..utils.exceptions import ChatServiceError
 
 
 class AgentDependencies(BaseModel):  # type: ignore[misc]
@@ -126,27 +125,23 @@ class ChatAgent:
         prefetch_memory: bool = True,
     ) -> AgentResult:
         """Generate a response using the LLM agent."""
-        try:
-            # Create dependencies
-            deps = AgentDependencies(selected_space_ids=selected_space_ids or [])
+        # Create dependencies
+        deps = AgentDependencies(selected_space_ids=selected_space_ids or [])
 
-            # Run the agent - let it handle the conversation internally
-            # Don't pass message_history as it causes the error
-            result = await self._agent.run(
-                user_message,
-                deps=deps,
-            )
+        # Run the agent - let it handle the conversation internally
+        # Don't pass message_history as it causes the error
+        result = await self._agent.run(
+            user_message,
+            deps=deps,
+        )
 
-            # Extract output
-            output = result.output
+        # Extract output
+        output = result.output
 
-            return AgentResult(
-                reply=output.reply,
-                referenced_memories=output.referenced_memories,
-            )
-
-        except Exception as exc:
-            raise ChatServiceError(f"Agent generation failed: {exc}") from exc
+        return AgentResult(
+            reply=output.reply,
+            referenced_memories=output.referenced_memories,
+        )
 
     async def generate_stream(
         self,
@@ -162,29 +157,25 @@ class ChatAgent:
         Yields:
             tuple: (event_type, data) where event_type is 'chunk' or 'final'
         """
-        try:
-            # Create dependencies
-            deps = AgentDependencies(selected_space_ids=selected_space_ids or [])
+        # Create dependencies
+        deps = AgentDependencies(selected_space_ids=selected_space_ids or [])
 
-            # Run the agent in streaming mode
-            async with self._agent.run_stream(
-                user_message,
-                deps=deps,
-            ) as result:
-                # Stream the output
-                previous_reply = ""
-                async for output in result.stream_output():
-                    # output is an instance of AgentOutput
-                    new_text = output.reply[len(previous_reply) :]
-                    if new_text:
-                        yield "chunk", new_text
-                    previous_reply = output.reply
+        # Run the agent in streaming mode
+        async with self._agent.run_stream(
+            user_message,
+            deps=deps,
+        ) as result:
+            # Stream the output
+            previous_reply = ""
+            async for output in result.stream_output():
+                # output is an instance of AgentOutput
+                new_text = output.reply[len(previous_reply) :]
+                if new_text:
+                    yield "chunk", new_text
+                previous_reply = output.reply
 
-                # Yield the final result
-                yield "final", AgentResult(
-                    reply=output.reply,
-                    referenced_memories=output.referenced_memories,
-                )
-
-        except Exception as exc:
-            raise ChatServiceError(f"Agent streaming failed: {exc}") from exc
+            # Yield the final result
+            yield "final", AgentResult(
+                reply=output.reply,
+                referenced_memories=output.referenced_memories,
+            )
