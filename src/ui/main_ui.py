@@ -24,6 +24,7 @@ from nicegui import ui
 from config import config
 from src.models.chat import ConversationState
 from src.services.chat_service import ChatService
+from src.utils.text_processing import strip_markdown
 
 
 def setup_colors(scene):
@@ -492,7 +493,7 @@ def setup_ui(chat_service: ChatService) -> None:
             elif not response_state["content"]:
                 ui.spinner()
             else:
-                ui.label(response_state["content"]).classes("text-left")
+                ui.label(strip_markdown(response_state["content"])).classes("text-left")
 
         # Clear and show initial spinner
         response_message.clear()
