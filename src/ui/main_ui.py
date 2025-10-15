@@ -94,14 +94,21 @@ def create_header(scene, dark):
     header = ui.header().classes(header_classes)
     with header:
         # Main header row with responsive layout
-        with ui.row().classes("w-full items-center justify-between gap-4 py-2 flex-nowrap"):
+        with ui.row().classes(
+            "w-full items-center justify-between gap-4 py-2 flex-nowrap"
+        ):
             # Left side: Logo and tagline
-            with ui.row().classes("items-center gap-3 md:gap-6 flex-shrink-0 min-w-0 flex-1"):
+            with ui.row().classes(
+                "items-center gap-3 md:gap-6 flex-shrink-0 min-w-0 flex-1"
+            ):
                 # Use HTML img tag for reliable logo display
-                logo_src = scene.get("logo", {}).get("src", "/branding/logo-full-white.svg")
+                logo_src = scene.get("logo", {}).get(
+                    "src", "/branding/logo-full-white.svg"
+                )
                 logo_alt = scene.get("logo", {}).get("alt", "MammoChat Logo")
                 logo_classes = scene.get("header_logo", {}).get(
-                    "classes", "h-8 sm:h-10 md:h-12 lg:h-16 w-auto max-w-[120px] sm:max-w-[150px] md:max-w-[200px] lg:max-w-[250px] object-contain flex-shrink-0"
+                    "classes",
+                    "h-8 sm:h-10 md:h-12 lg:h-16 w-auto max-w-[120px] sm:max-w-[150px] md:max-w-[200px] lg:max-w-[250px] object-contain flex-shrink-0",
                 )
                 ui.html(
                     f'<img src="{logo_src}" alt="{logo_alt}" class="{logo_classes}">',
@@ -109,7 +116,9 @@ def create_header(scene, dark):
                 )
 
                 # Tagline with proper responsive styling - ensure visibility
-                tagline = scene.get("header", {}).get("tagline", "Your journey, together")
+                tagline = scene.get("header", {}).get(
+                    "tagline", "Your journey, together"
+                )
                 tagline_classes = scene.get("header", {}).get(
                     "tagline_classes",
                     "text-sm md:text-base text-white leading-tight drop-shadow-lg flex-shrink-0",
@@ -118,6 +127,7 @@ def create_header(scene, dark):
 
             # Right side: Theme toggle button
             with ui.row().classes("gap-2 flex-shrink-0"):
+
                 def toggle_theme():
                     dark.toggle()
                     theme_btn.icon = "dark_mode" if dark.value else "light_mode"
@@ -128,7 +138,9 @@ def create_header(scene, dark):
                             "document.documentElement.setAttribute('data-theme', 'dark')"
                         )
                     else:
-                        ui.run_javascript("document.body.classList.remove('dark-theme')")
+                        ui.run_javascript(
+                            "document.body.classList.remove('dark-theme')"
+                        )
                         ui.run_javascript(
                             "document.documentElement.setAttribute('data-theme', 'light')"
                         )
@@ -188,10 +200,14 @@ def create_footer(scene, send, new_conversation):
     )
     with ui.footer().classes(footer_classes):
         # Main footer row with responsive layout matching header
-        with ui.row().classes("w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 items-center justify-between gap-4 flex-nowrap"):
+        with ui.row().classes(
+            "w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 items-center justify-between gap-4 flex-nowrap"
+        ):
             # Left side: New conversation button
             with ui.row().classes("gap-2 flex-shrink-0"):
-                new_btn_props = scene.get("footer", {}).get("new_btn_props", "flat round")
+                new_btn_props = scene.get("footer", {}).get(
+                    "new_btn_props", "flat round"
+                )
                 new_btn_classes = scene.get("footer", {}).get(
                     "new_btn_classes",
                     "w-8 h-8 sm:w-10 sm:h-10 hover:scale-105 transition-all duration-300 backdrop-blur-sm flex-shrink-0",
@@ -204,7 +220,9 @@ def create_footer(scene, send, new_conversation):
                 ).classes(new_btn_classes).tooltip(new_btn_tooltip)
 
             # Center: Input field with flexible growth
-            with ui.row().classes("items-center gap-3 md:gap-6 flex-shrink-0 min-w-0 flex-1"):
+            with ui.row().classes(
+                "items-center gap-3 md:gap-6 flex-shrink-0 min-w-0 flex-1"
+            ):
                 input_classes = scene.get("footer", {}).get(
                     "input_classes", "flex-grow backdrop-blur-sm min-w-0"
                 )
@@ -293,16 +311,6 @@ def setup_ui(chat_service: ChatService) -> None:
         if not question.strip():
             return
 
-        # Check if user is at bottom before adding messages
-        is_at_bottom = await ui.run_javascript("""
-            const scrollArea = document.querySelector('.q-scrollarea');
-            if (!scrollArea) return true;
-            const scrollElement = scrollArea.querySelector('.scroll');
-            if (!scrollElement) return true;
-            const threshold = 50;
-            return scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight <= threshold;
-        """)
-
         text.disable()
         send_btn.disable()
 
@@ -383,22 +391,9 @@ def setup_ui(chat_service: ChatService) -> None:
         # Start the worker using NiceGUI's task system
         ui.timer(0.1, lambda: asyncio.create_task(stream_worker()), once=True)
 
-        # Autoscroll to bottom if user was at bottom before sending
-        if is_at_bottom:
-            await ui.run_javascript("""
-                setTimeout(() => {
-                    const scrollArea = document.querySelector('.q-scrollarea');
-                    if (scrollArea) {
-                        const scrollElement = scrollArea.querySelector('.scroll');
-                        if (scrollElement) {
-                            scrollElement.scrollTo({
-                                top: scrollElement.scrollHeight,
-                                behavior: 'smooth'
-                            });
-                        }
-                    }
-                }, 100);
-            """)
+        # Autoscroll to bottom after message is added
+        await asyncio.sleep(0.1)  # Brief delay to ensure DOM updates
+        scroll_area.scroll_to(percent=1.0)
 
     def new_conversation() -> None:
         """Start a new conversation."""
@@ -419,22 +414,7 @@ def setup_ui(chat_service: ChatService) -> None:
                 ui.chat_message(
                     text=scene["chat"]["welcome_message"], sent=False
                 ).props(welcome_props).classes(welcome_classes)
-
-        # Scroll to top for new conversation
-        ui.run_javascript("""
-            setTimeout(() => {
-                const scrollArea = document.querySelector('.q-scrollarea');
-                if (scrollArea) {
-                    const scrollElement = scrollArea.querySelector('.scroll');
-                    if (scrollElement) {
-                        scrollElement.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-            }, 100);
-        """)
+        # No autoscroll on new conversation to preserve welcome message visibility
 
     create_header(scene, dark)
     scroll_area, message_container = create_chat_area(scene, conversation)
