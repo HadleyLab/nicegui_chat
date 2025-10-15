@@ -186,56 +186,60 @@ def create_footer(scene, send, new_conversation):
         "w-full items-center backdrop-blur-md bg-white/25 border-t border-white/20 transition-all duration-300",
     )
     with ui.footer().classes(footer_classes):
-        row_classes = scene.get("footer", {}).get(
-            "row_classes", "w-full max-w-4xl mx-auto px-6 py-4 items-center gap-3"
-        )
-        with ui.row().classes(row_classes):
-            new_btn_props = scene.get("footer", {}).get("new_btn_props", "flat round")
-            new_btn_classes = scene.get("footer", {}).get(
-                "new_btn_classes",
-                "hover:scale-105 transition-all duration-300 backdrop-blur-sm",
-            )
-            new_btn_tooltip = scene.get("footer", {}).get(
-                "new_btn_tooltip", "New conversation"
-            )
-            ui.button(icon="add", on_click=new_conversation, color="primary").props(
-                new_btn_props
-            ).classes(new_btn_classes).tooltip(new_btn_tooltip)
+        # Main footer row with responsive layout matching header
+        with ui.row().classes("w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 items-center justify-between gap-4 flex-nowrap"):
+            # Left side: New conversation button
+            with ui.row().classes("gap-2 flex-shrink-0"):
+                new_btn_props = scene.get("footer", {}).get("new_btn_props", "flat round")
+                new_btn_classes = scene.get("footer", {}).get(
+                    "new_btn_classes",
+                    "w-8 h-8 sm:w-10 sm:h-10 hover:scale-105 transition-all duration-300 backdrop-blur-sm flex-shrink-0",
+                )
+                new_btn_tooltip = scene.get("footer", {}).get(
+                    "new_btn_tooltip", "New conversation"
+                )
+                ui.button(icon="add", on_click=new_conversation, color="primary").props(
+                    new_btn_props
+                ).classes(new_btn_classes).tooltip(new_btn_tooltip)
 
-            input_classes = scene.get("footer", {}).get(
-                "input_classes", "flex-grow backdrop-blur-sm"
-            )
-            input_props = scene.get("footer", {}).get("input_props", "filled dense")
-            input_placeholder = scene.get("footer", {}).get(
-                "input_placeholder", "Share what's on your mind..."
-            )
-            input_tooltip = scene.get("footer", {}).get(
-                "input_tooltip", "Type your message here"
-            )
-            text = (
-                ui.input(placeholder=input_placeholder)
-                .classes(input_classes)
-                .props(input_props)
-                .on("keydown.enter", send)
-                .tooltip(input_tooltip)
-            )
+            # Center: Input field with flexible growth
+            with ui.row().classes("items-center gap-3 md:gap-6 flex-shrink-0 min-w-0 flex-1"):
+                input_classes = scene.get("footer", {}).get(
+                    "input_classes", "flex-grow backdrop-blur-sm min-w-0"
+                )
+                input_props = scene.get("footer", {}).get("input_props", "filled dense")
+                input_placeholder = scene.get("footer", {}).get(
+                    "input_placeholder", "Share what's on your mind..."
+                )
+                input_tooltip = scene.get("footer", {}).get(
+                    "input_tooltip", "Type your message here"
+                )
+                text = (
+                    ui.input(placeholder=input_placeholder)
+                    .classes(input_classes)
+                    .props(input_props)
+                    .on("keydown.enter", send)
+                    .tooltip(input_tooltip)
+                )
 
-            send_btn_props = scene.get("footer", {}).get(
-                "send_btn_props", "flat round color=primary"
-            )
-            send_btn_classes = scene.get("footer", {}).get(
-                "send_btn_classes",
-                "hover:scale-105 transition-all duration-300 backdrop-blur-sm",
-            )
-            send_btn_tooltip = scene.get("footer", {}).get(
-                "send_btn_tooltip", "Send message"
-            )
-            send_btn = (
-                ui.button(icon="send", on_click=send)
-                .props(send_btn_props)
-                .classes(send_btn_classes)
-                .tooltip(send_btn_tooltip)
-            )
+            # Right side: Send button
+            with ui.row().classes("gap-2 flex-shrink-0"):
+                send_btn_props = scene.get("footer", {}).get(
+                    "send_btn_props", "flat round color=primary"
+                )
+                send_btn_classes = scene.get("footer", {}).get(
+                    "send_btn_classes",
+                    "w-8 h-8 sm:w-10 sm:h-10 hover:scale-105 transition-all duration-300 backdrop-blur-sm flex-shrink-0",
+                )
+                send_btn_tooltip = scene.get("footer", {}).get(
+                    "send_btn_tooltip", "Send message"
+                )
+                send_btn = (
+                    ui.button(icon="send", on_click=send)
+                    .props(send_btn_props)
+                    .classes(send_btn_classes)
+                    .tooltip(send_btn_tooltip)
+                )
     return text, send_btn
 
 
