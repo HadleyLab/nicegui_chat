@@ -155,7 +155,8 @@ def create_chat_area(scene, conversation):
         scroll_classes = scene.get("chat", {}).get(
             "scroll_area_classes", "flex-grow w-full p-4"
         )
-        with ui.scroll_area().classes(scroll_classes):
+        scroll_area = ui.scroll_area().classes(scroll_classes)
+        with scroll_area:
             container_classes = scene.get("chat", {}).get(
                 "container_classes", "w-full max-w-4xl mx-auto gap-4"
             )
@@ -177,7 +178,7 @@ def create_chat_area(scene, conversation):
                     ui.chat_message(
                         text=scene["chat"]["welcome_message"], sent=False
                     ).props(welcome_props).classes(welcome_classes)
-    return chat_container
+    return scroll_area, chat_container
 
 
 def create_footer(scene, send, new_conversation):
@@ -292,6 +293,16 @@ def setup_ui(chat_service: ChatService) -> None:
         if not question.strip():
             return
 
+        # Check if user is at bottom before adding messages
+        is_at_bottom = await ui.run_javascript("""
+            const scrollArea = document.querySelector('.q-scrollarea');
+            if (!scrollArea) return true;
+            const scrollElement = scrollArea.querySelector('.scroll');
+            if (!scrollElement) return true;
+            const threshold = 50;
+            return scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight <= threshold;
+        """)
+
         text.disable()
         send_btn.disable()
 
@@ -372,6 +383,23 @@ def setup_ui(chat_service: ChatService) -> None:
         # Start the worker using NiceGUI's task system
         ui.timer(0.1, lambda: asyncio.create_task(stream_worker()), once=True)
 
+        # Autoscroll to bottom if user was at bottom before sending
+        if is_at_bottom:
+            await ui.run_javascript("""
+                setTimeout(() => {
+                    const scrollArea = document.querySelector('.q-scrollarea');
+                    if (scrollArea) {
+                        const scrollElement = scrollArea.querySelector('.scroll');
+                        if (scrollElement) {
+                            scrollElement.scrollTo({
+                                top: scrollElement.scrollHeight,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                }, 100);
+            """)
+
     def new_conversation() -> None:
         """Start a new conversation."""
         conversation.clear_messages()
@@ -392,6 +420,22 @@ def setup_ui(chat_service: ChatService) -> None:
                     text=scene["chat"]["welcome_message"], sent=False
                 ).props(welcome_props).classes(welcome_classes)
 
+        # Scroll to top for new conversation
+        ui.run_javascript("""
+            setTimeout(() => {
+                const scrollArea = document.querySelector('.q-scrollarea');
+                if (scrollArea) {
+                    const scrollElement = scrollArea.querySelector('.scroll');
+                    if (scrollElement) {
+                        scrollElement.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            }, 100);
+        """)
+
     create_header(scene, dark)
-    message_container = create_chat_area(scene, conversation)
+    scroll_area, message_container = create_chat_area(scene, conversation)
     text, send_btn = create_footer(scene, send, new_conversation)
