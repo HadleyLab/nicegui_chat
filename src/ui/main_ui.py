@@ -47,7 +47,176 @@ def setup_head_html(scene):
         <link rel="apple-touch-icon" href="/branding/apple-touch-icon.png">
         <link rel="manifest" href="/manifest.json">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+            :root {{
+                --primary-color: {scene['palette']['primary']};
+                --secondary-color: {scene['palette']['secondary']};
+                --background-color: {scene['palette']['background']};
+                --surface-color: {scene['palette']['surface']};
+                --text-color: {scene['palette']['text']};
+                --text-secondary: {scene['palette']['text_secondary']};
+                --accent-color: {scene['palette']['accent']};
+                --success-color: {scene['palette']['success']};
+                --border-color: {scene['palette']['border']};
+                --border-radius: 12px;
+                --animation-duration: 0.3s;
+            }}
+
+            body {{
+                background: linear-gradient(135deg, #FAFBFC 0%, #FFF5F7 100%);
+                color: var(--text-color);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            }}
+
+            .mammochat-header {{
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                box-shadow: 0 4px 20px rgba(244, 184, 197, 0.2);
+            }}
+
+            .message-bubble {{
+                border-radius: var(--border-radius);
+                padding: 1.25rem 1.5rem;
+                max-width: 70%;
+                animation: slideIn var(--animation-duration) ease-out;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                line-height: 1.6;
+            }}
+
+            .user-message {{
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                margin-left: auto;
+                color: white;
+                border: none;
+            }}
+
+            .assistant-message {{
+                background: var(--surface-color);
+                border: 1px solid var(--border-color);
+                color: var(--text-color);
+            }}
+
+            .typing-indicator {{
+                display: flex;
+                gap: 0.5rem;
+                padding: 1rem;
+                align-items: center;
+            }}
+
+            .typing-dot {{
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: var(--primary-color);
+                animation: typing 1.4s infinite;
+            }}
+
+            .typing-dot:nth-child(2) {{
+                animation-delay: 0.2s;
+            }}
+
+            .typing-dot:nth-child(3) {{
+                animation-delay: 0.4s;
+            }}
+
+            @keyframes slideIn {{
+                from {{
+                    opacity: 0;
+                    transform: translateY(10px);
+                }}
+                to {{
+                    opacity: 1;
+                    transform: translateY(0);
+                }}
+            }}
+
+            @keyframes typing {{
+                0%, 60%, 100% {{
+                    transform: translateY(0);
+                    opacity: 0.7;
+                }}
+                30% {{
+                    transform: translateY(-8px);
+                    opacity: 1;
+                }}
+            }}
+
+            .input-container {{
+                background: var(--surface-color);
+                border-radius: var(--border-radius);
+                padding: 1rem;
+                border: 2px solid var(--border-color);
+                transition: all var(--animation-duration);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            }}
+
+            .input-container:focus-within {{
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(244, 184, 197, 0.1);
+            }}
+
+            .btn-send {{
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                border: none;
+                border-radius: 50%;
+                width: 48px;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all var(--animation-duration);
+                color: white;
+            }}
+
+            .btn-send:hover {{
+                transform: scale(1.05);
+                box-shadow: 0 4px 16px rgba(244, 184, 197, 0.4);
+            }}
+
+            .btn-send:active {{
+                transform: scale(0.98);
+            }}
+
+            .btn-secondary {{
+                background: var(--surface-color);
+                border: 1px solid var(--border-color);
+                color: var(--text-color);
+                transition: all var(--animation-duration);
+            }}
+
+            .btn-secondary:hover {{
+                background: var(--primary-color);
+                color: white;
+                border-color: var(--primary-color);
+            }}
+
+            /* Community badge */
+            .community-badge {{
+                background: linear-gradient(135deg, #FED7C8 0%, #FCA5A5 50%);
+                padding: 0.25rem 0.75rem;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: var(--text-color);
+            }}
+
+            /* Trial match indicator */
+            .trial-match {{
+                background: linear-gradient(135deg, var(--success-color) 0%, #6EE7B7 100%);
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                font-size: 0.875rem;
+                color: var(--text-color);
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }}
+
             .q-message--received {{
                 max-height: none !important;
                 overflow: visible !important;
@@ -58,73 +227,87 @@ def setup_head_html(scene):
 
 
 def create_header(scene, dark):
-    header = ui.header().classes(
-        f"{scene['header']['fixed_classes']} {scene['header']['classes']}"
-    )
+    """Build the MammoChat header."""
+    header = ui.header().classes('w-full p-4 mammochat-header items-center justify-between')
     with header:
-        with ui.row().classes(scene["header"]["row_classes"]):
-            with ui.row().classes(scene["header"]["logo_row_classes"]):
-                ui.html(
-                    f'<img src="{scene["logo"]["src"]}" alt="{scene["logo"]["alt"]}" class="{scene["logo"]["classes"]}">',
-                    sanitize=False,
-                ),
-                ui.label(scene["header"]["tagline"]).classes(
-                    scene["header"]["tagline_classes"]
-                )
+        with ui.row().classes('items-center gap-3'):
+            # Use heart icon for MammoChat
+            ui.icon('favorite', size='2rem', color='white')
+            with ui.column().classes('gap-0'):
+                ui.label('MammoChat').classes('text-2xl font-bold text-white')
+                ui.label('Your journey, together').classes('text-sm text-white opacity-80')
+
+        with ui.row().classes('gap-2'):
+            ui.button(
+                icon='people',
+                on_click=lambda: None  # Placeholder for community
+            ).props('flat round color=white').tooltip('Community')
+
+            ui.button(
+                icon='science',
+                on_click=lambda: None  # Placeholder for trials
+            ).props('flat round color=white').tooltip('Clinical Trials')
+
+            ui.button(
+                icon='refresh',
+                on_click=lambda: None  # Placeholder for new conversation
+            ).props('flat round color=white').tooltip('New Conversation')
 
             def toggle_theme():
                 dark.toggle()
                 theme_btn.icon = "dark_mode" if dark.value else "light_mode"
 
-            with ui.row().classes("items-center gap-2"):
-                theme_btn = (
-                    ui.button(on_click=toggle_theme)
-                    .props(scene["header"]["theme_btn_props"])
-                    .classes(scene["header"]["theme_btn_classes"])
-                )
-                theme_btn.icon = "dark_mode" if dark.value else "light_mode"
+            theme_btn = (
+                ui.button(on_click=toggle_theme)
+                .props('flat dense color=white')
+                .classes('flex-shrink-0')
+            )
+            theme_btn.icon = "dark_mode" if dark.value else "light_mode"
 
     return header
 
 
 def create_chat_area(scene, conversation):
-    with ui.column().classes(scene["layout"]["root_classes"]):
-        with ui.column().classes(f"{scene['chat']['container_classes']}"):
-            message_container = ui.column().classes(
-                f"{scene['chat']['message_container_classes']}"
-            )
-            with message_container:
-                with ui.row().classes(scene["chat"]["assistant_row_classes"]):
-                    ui.chat_message(
-                        text=scene["chat"]["welcome_message"], sent=False
-                    ).props(scene["chat"]["welcome_message_props"]).classes(
-                        scene["chat"]["welcome_message_classes"]
-                    )
-    return message_container
+    """Build the main chat interface."""
+    with ui.column().classes('w-full h-screen'):
+        with ui.scroll_area().classes('flex-grow w-full p-4') as chat_scroll:
+            chat_container = ui.column().classes('w-full max-w-4xl mx-auto gap-4')
+
+            # Add welcome message
+            with chat_container:
+                with ui.row().classes('w-full'):
+                    with ui.card().classes('message-bubble assistant-message max-w-full'):
+                        ui.markdown("""
+                        ### Welcome to MammoChat 💗
+
+                        I'm here to support you on your breast cancer journey. I can help you:
+
+                        - 🔬 **Find clinical trials** that match your situation
+                        - 👥 **Connect with communities** of patients with similar experiences
+                        - 📚 **Understand information** about treatments and options
+                        - 💪 **Navigate your healthcare** with confidence
+
+                        How can I support you today?
+                        """)
+    return chat_container
 
 
 def create_footer(scene, send, new_conversation):
-    with ui.footer().classes(
-        f'{scene["footer"]["fixed_classes"]} {scene["footer"]["classes"]}'
-    ):
-        with ui.row().classes(scene["footer"]["row_classes"]):
-            ui.button(icon="add", on_click=new_conversation, color="primary").props(
-                scene["footer"]["new_btn_props"]
-            ).classes(scene["footer"]["new_btn_classes"]).tooltip(
-                scene["footer"]["new_btn_tooltip"]
-            )
+    with ui.footer().classes('w-full items-center backdrop-blur-md bg-white/25 border-t border-white/20 transition-all duration-300'):
+        with ui.row().classes('w-full max-w-4xl mx-auto px-6 py-4 items-center gap-3'):
+            ui.button(icon="add", on_click=new_conversation, color="primary").props('flat round').classes('hover:scale-105 transition-all duration-300 backdrop-blur-sm').tooltip('New conversation')
             text = (
-                ui.input(placeholder=scene["footer"]["input_placeholder"])
-                .classes(scene["footer"]["input_classes"])
-                .props(scene["footer"]["input_props"])
+                ui.input(placeholder='Share what\'s on your mind...')
+                .classes('flex-grow backdrop-blur-sm')
+                .props('filled dense')
                 .on("keydown.enter", send)
-                .tooltip(scene["footer"]["input_tooltip"])
+                .tooltip('Type your message here')
             )
             send_btn = (
                 ui.button(icon="send", on_click=send)
-                .props(scene["footer"]["send_btn_props"])
-                .classes(scene["footer"]["send_btn_classes"])
-                .tooltip(scene["footer"]["send_btn_tooltip"])
+                .props('flat round color=primary')
+                .classes('hover:scale-105 transition-all duration-300 backdrop-blur-sm')
+                .tooltip('Send message')
             )
     return text, send_btn
 

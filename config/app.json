@@ -1,21 +1,46 @@
 {
   "app": {
-    "name": "MammoChat",
+    "name": "MammoChat™",
     "tagline": "Your journey, together",
     "branding": {
-      "logo_icon": "/branding/logo-icon-color.svg",
-      "logo_full": "/branding/logo-full-color.svg"
+      "logo_full": "branding/logo-full-color.svg",
+      "logo_icon": "branding/logo-icon-color.svg"
     }
   },
   "server": {
     "host": "0.0.0.0",
-    "port": 8080
+    "port": 8080,
+    "reload": false
+  },
+  "ui": {
+    "theme": "light",
+    "primary_color": "#F4B8C5",
+    "secondary_color": "#E8A0B8",
+    "background_color": "#FAFBFC",
+    "surface_color": "#FFFFFF",
+    "text_color": "#334155",
+    "text_secondary": "#64748B",
+    "accent_color": "#DDD6FE",
+    "success_color": "#A7E3D5",
+    "border_color": "#E5E7EB",
+    "border_radius": "12px",
+    "animation_duration": "0.3s"
+  },
+  "prompts": {
+    "root": "prompts",
+    "system": "system"
+  },
+  "memory": {
+    "base_url": "https://core.heysol.ai/api/v1"
   },
   "llm": {
     "model": "deepseek-chat",
     "base_url": "https://api.deepseek.com/v1"
   },
-  "memory": {
-    "base_url": "https://core.heysol.ai/api/v1"
+  "chat": {
+    "enable_memory_enrichment": true,
+    "store_user_messages": true,
+    "stream_chunk_size": 50,
+    "max_history_display": 50
   }
 }

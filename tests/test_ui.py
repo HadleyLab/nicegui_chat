@@ -31,7 +31,7 @@ class TestUI:
             setup_ui(mock_chat_service)
 
         # Check header exists
-        assert screen.find("MammoChat").exists
+        assert screen.find("MammoChat™").exists
 
         # Check footer with input
         assert screen.find('placeholder="Share what\'s on your mind..."').exists

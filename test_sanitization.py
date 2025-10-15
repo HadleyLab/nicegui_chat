@@ -59,7 +59,7 @@ def test_deployed_app():
             return False
 
         # Check if the page contains expected elements
-        if "MammoChat" in response.text:
+        if "MammoChat™" in response.text:
             print("✅ Page contains MammoChat branding")
         else:
             print("❌ Page missing MammoChat branding")

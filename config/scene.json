@@ -11,6 +11,7 @@
     "info": "#DDD6FE",
     "warning": "#FED7C8",
     "error": "#FCA5A5",
+    "border": "#E5E7EB",
     "slate_gray": "#64748B",
     "rose_quartz": "#F4B8C5",
     "mint_fresh": "#A7E3D5",
@@ -96,7 +97,7 @@
   },
   "logo": {
     "src": "/branding/logo-full-color.svg",
-    "alt": "MammoChat",
+    "alt": "MammoChat™",
     "classes": "h-10 flex-shrink-0 transition-transform duration-200 hover:scale-105",
     "drop_shadow": "drop-shadow-sm"
   },

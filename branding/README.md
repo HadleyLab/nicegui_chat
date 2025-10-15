@@ -43,13 +43,13 @@ This directory contains the complete branding package for **MammoChat**, an AI-p
 
 ```html
 <!-- Full Logo -->
-<img src="branding/logo-full-color.svg" alt="MammoChat" width="240">
+<img src="branding/logo-full-color.svg" alt="MammoChat™" width="240">
 
 <!-- Icon Only -->
-<img src="branding/logo-icon-color.svg" alt="MammoChat" width="64">
+<img src="branding/logo-icon-color.svg" alt="MammoChat™" width="64">
 
 <!-- On Dark Background -->
-<img src="branding/logo-white.svg" alt="MammoChat" width="240">
+<img src="branding/logo-white.svg" alt="MammoChat™" width="240">
 ```
 
 ## Brand Values

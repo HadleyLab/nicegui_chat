@@ -70,9 +70,10 @@ if __name__ in {"__main__", "__mp_main__"}:
     ui.run(
         title="MammoChat - Your journey, together",
         host=config.host,
-        port=8080,
+        port=config.port,
         reload=False,
         show=True,
         reconnect_timeout=600.0,  # Increase to 10 minutes for very long AI responses
         favicon="💗",  # Heart emoji as favicon for MammoChat
+        dark=False,  # Light theme for MammoChat
     )

@@ -129,12 +129,12 @@ caption: 0.75rem (12px) - Medium
 ### Logo Variations
 
 1. **Full Logo** (Horizontal)
-   - Icon + "MammoChat" text
+   - Icon + "MammoChat™" text
    - Use: Main marketing materials, headers
    - Minimum width: 120px
 
 2. **Stacked Logo** (Vertical)
-   - Icon above "MammoChat" text
+   - Icon above "MammoChat™" text
    - Use: Mobile apps, square spaces
    - Minimum width: 80px
 
@@ -144,7 +144,7 @@ caption: 0.75rem (12px) - Medium
    - Minimum size: 32px
 
 4. **Wordmark**
-   - "MammoChat" text only
+   - "MammoChat™" text only
    - Use: Navigation bars, tight spaces
    - Minimum width: 100px
 

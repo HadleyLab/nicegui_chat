@@ -15,7 +15,7 @@ Replace the UI configuration with MammoChat's brand colors:
 ```json
 {
   "app": {
-    "name": "MammoChat",
+    "name": "MammoChat™",
     "host": "0.0.0.0",
     "port": 8080,
     "reload": false
