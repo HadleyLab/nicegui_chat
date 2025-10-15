@@ -48,6 +48,8 @@ def setup_static_files(app) -> None:
     app.mount("/branding", StaticFiles(directory="branding"), name="branding")
     # Also serve branding files at root level for compatibility
     app.mount("/static", StaticFiles(directory="branding"), name="static-branding")
+    # Serve public directory for additional static assets
+    app.mount("/public", StaticFiles(directory="public"), name="public")
 
 
 def handle_error(error: Exception, logger: structlog.BoundLoggerBase) -> None:

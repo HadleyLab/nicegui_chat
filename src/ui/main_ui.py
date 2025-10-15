@@ -48,7 +48,7 @@ def setup_head_html(scene):
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <link rel="apple-touch-icon" href="/branding/apple-touch-icon.png">
-        <link rel="manifest" href="/manifest.json">
+        <link rel="manifest" href="/public/manifest.json">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,6 +68,7 @@ def setup_head_html(scene):
                 --border-color: {scene['palette']['border']};
                 --border-radius: 12px;
                 --animation-duration: 0.3s;
+                --focus-shadow: rgba(244, 184, 197, 0.1);
             }}
 
             /* Dark mode variables */
@@ -95,6 +96,7 @@ def setup_head_html(scene):
                     --accent-color: {dark_palette.get('accent', scene['palette']['accent'])};
                     --success-color: {dark_palette.get('success', scene['palette']['success'])};
                     --border-color: {dark_palette.get('border', scene['palette']['border'])};
+                    --focus-shadow: rgba(232, 160, 184, 0.2);
                 }}
             }}
 
@@ -103,12 +105,44 @@ def setup_head_html(scene):
                 color: var(--text-color);
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
                 transition: background-color var(--animation-duration), color var(--animation-duration);
+                min-width: 768px;
             }}
 
             .mammochat-header {{
                 background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
                 transition: background var(--animation-duration);
+            }}
+
+            .mammochat-header img {{
+                height: 4rem;
+                width: auto;
+                max-width: 250px;
+                object-fit: contain;
+            }}
+
+            @media (max-width: 768px) {{
+                .mammochat-header img {{
+                    height: 3rem;
+                    max-width: 200px;
+                }}
+            }}
+
+            @media (max-width: 480px) {{
+                .mammochat-header img {{
+                    height: 2.5rem;
+                    max-width: 150px;
+                }}
+            }}
+
+            .header-tagline {{
+                display: block;
+            }}
+
+            @media (max-width: 640px) {{
+                .header-tagline {{
+                    display: none;
+                }}
             }}
 
             .message-bubble {{
@@ -132,6 +166,20 @@ def setup_head_html(scene):
                 background: var(--surface-color);
                 border: 1px solid var(--border-color);
                 color: var(--text-color);
+            }}
+
+            /* Dark mode message bubbles */
+            [data-theme="dark"] .assistant-message,
+            .dark-theme .assistant-message {{
+                background: var(--surface-color);
+                border: 1px solid var(--border-color);
+                color: var(--text-color);
+            }}
+
+            [data-theme="dark"] .user-message,
+            .dark-theme .user-message {{
+                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+                color: white;
             }}
 
             .typing-indicator {{
@@ -190,7 +238,7 @@ def setup_head_html(scene):
 
             .input-container:focus-within {{
                 border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px rgba(244, 184, 197, 0.1);
+                box-shadow: 0 0 0 3px var(--focus-shadow);
             }}
 
             .btn-send {{
@@ -276,6 +324,13 @@ def setup_head_html(scene):
             .dark-theme .btn-send:hover {{
                 box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
             }}
+
+            /* Footer dark mode styles */
+            [data-theme="dark"] .footer-container,
+            .dark-theme .footer-container {{
+                background: var(--surface-color);
+                border-top: 1px solid var(--border-color);
+            }}
         </style>
     """
     )
@@ -283,14 +338,21 @@ def setup_head_html(scene):
 
 def create_header(scene, dark):
     """Build the MammoChat header."""
-    header = ui.header().classes('w-full p-4 mammochat-header items-center justify-between')
+    logger = structlog.get_logger()
+
+    header = ui.header().classes('w-full p-6 mammochat-header items-center justify-between')
     with header:
-        with ui.row().classes('items-center gap-3'):
-            # Use heart icon for MammoChat
-            ui.icon('favorite', size='2rem', color='white')
-            with ui.column().classes('gap-0'):
+        with ui.row().classes('items-center gap-6 py-2 flex-nowrap'):
+            # Use HTML img tag for reliable logo display
+            logger.info("creating_logo_html_element", logo_path="public/logo-full-white.svg")
+            try:
+                ui.html('<img src="public/logo-full-white.svg" alt="MammoChat Logo">', sanitize=False)
+                logger.info("logo_html_element_created_successfully")
+            except Exception as e:
+                logger.error("logo_html_creation_failed", error=str(e))
+                # Fallback to text logo if HTML fails
                 ui.label('MammoChat™').classes('text-2xl font-bold text-white')
-                ui.label('Your journey, together').classes('text-sm text-white opacity-80')
+            ui.label('Your journey, together').classes('text-sm text-white opacity-80 header-tagline flex-shrink-0')
 
         with ui.row().classes('gap-2'):
             def toggle_theme():
@@ -322,25 +384,17 @@ def create_chat_area(scene, conversation):
 
             # Add welcome message
             with chat_container:
-                with ui.row().classes('w-full'):
-                    with ui.card().classes('message-bubble assistant-message max-w-full'):
-                        ui.markdown("""
-                        ### Welcome to MammoChat™ 💗
-
-                        I'm here to support you on your breast cancer journey. I can help you:
-
-                        - 🔬 **Find clinical trials** that match your situation
-                        - 👥 **Connect with communities** of patients with similar experiences
-                        - 📚 **Understand information** about treatments and options
-                        - 💪 **Navigate your healthcare** with confidence
-
-                        How can I support you today?
-                        """)
+                with ui.row().classes(scene["chat"]["assistant_row_classes"]):
+                    ui.chat_message(
+                        text=scene["chat"]["welcome_message"], sent=False
+                    ).props(scene["chat"]["welcome_message_props"]).classes(
+                        scene["chat"]["welcome_message_classes"]
+                    )
     return chat_container
 
 
 def create_footer(scene, send, new_conversation):
-    with ui.footer().classes('w-full items-center backdrop-blur-md bg-white/25 border-t border-white/20 transition-all duration-300'):
+    with ui.footer().classes('w-full items-center footer-container backdrop-blur-md bg-white/25 border-t border-white/20 transition-all duration-300'):
         with ui.row().classes('w-full max-w-4xl mx-auto px-6 py-4 items-center gap-3'):
             ui.button(icon="add", on_click=new_conversation, color="primary").props('flat round').classes('hover:scale-105 transition-all duration-300 backdrop-blur-sm').tooltip('New conversation')
             text = (
@@ -434,7 +488,7 @@ def setup_ui(chat_service: ChatService) -> None:
         def response_display():
             """Refreshable UI component for streaming response."""
             if response_state["error"]:
-                ui.label(f"Error: {response_state['error']}").classes("text-left text-red-500")
+                ui.label(f"Error: {response_state['error']}").classes("text-left")
             elif not response_state["content"]:
                 ui.spinner()
             else:
