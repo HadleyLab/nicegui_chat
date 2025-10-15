@@ -18,6 +18,32 @@
     "lavender_mist": "#DDD6FE",
     "peach_glow": "#FED7C8"
   },
+  "css_variables": {
+    "primary_color": "var(--primary-color)",
+    "secondary_color": "var(--secondary-color)",
+    "background_color": "var(--background-color)",
+    "surface_color": "var(--surface-color)",
+    "text_color": "var(--text-color)",
+    "text_secondary": "var(--text-secondary)",
+    "accent_color": "var(--accent-color)",
+    "success_color": "var(--success-color)",
+    "border_color": "var(--border-color)",
+    "border_radius": "12px",
+    "animation_duration": "0.3s",
+    "focus_shadow": "rgba(244, 184, 197, 0.1)"
+  },
+  "dark_css_variables": {
+    "primary_color": "var(--primary-color)",
+    "secondary_color": "var(--secondary-color)",
+    "background_color": "var(--background-color)",
+    "surface_color": "var(--surface-color)",
+    "text_color": "var(--text-color)",
+    "text_secondary": "var(--text-secondary)",
+    "accent_color": "var(--accent-color)",
+    "success_color": "var(--success-color)",
+    "border_color": "var(--border-color)",
+    "focus_shadow": "rgba(232, 160, 184, 0.2)"
+  },
   "dark": {
     "palette": {
       "primary": "#E8A0B8",
@@ -99,71 +125,81 @@
   },
   "layout": {
     "content_max_width": "max-w-6xl",
-    "page_padding": "p-4",
-    "header_height": "h-20",
-    "footer_height": "h-16",
+    "page_padding": "p-2 sm:p-4",
+    "header_height": "h-16 sm:h-20",
+    "footer_height": "h-14 sm:h-16",
     "page_classes": "flex min-h-screen bg-gradient-to-br from-slate-50 to-pink-50",
     "content_classes": "w-full",
     "scroll_area_classes": "flex-grow w-full overflow-y-auto",
-    "container_wrapper": "w-full max-w-4xl mx-auto",
+    "container_wrapper": "w-full max-w-4xl mx-auto px-2 sm:px-4",
     "root_classes": "min-h-screen bg-gradient-to-br from-slate-50 to-pink-50 w-full"
   },
+  "body": {
+    "classes": "min-h-screen bg-gradient-to-br from-slate-50 to-pink-50 text-slate-700 font-inter transition-colors duration-300"
+  },
+  "header_styles": {
+    "classes": "w-full p-6 bg-gradient-to-br from-rose-200 to-pink-300 shadow-lg transition-all duration-300 items-center justify-between"
+  },
+  "header_logo": {
+    "classes": "h-8 sm:h-10 md:h-12 lg:h-16 w-auto max-w-[120px] sm:max-w-[150px] md:max-w-[200px] lg:max-w-[250px] object-contain flex-shrink-0"
+  },
+  "header_logo_mobile": {
+    "classes": "h-12 max-w-[200px]"
+  },
+  "header_logo_mobile_small": {
+    "classes": "h-10 max-w-[150px]"
+  },
+  "header_tagline": {
+    "classes": "block"
+  },
+  "header_tagline_mobile": {
+    "classes": "hidden"
+  },
   "header": {
-    "background": "linear-gradient(135deg, #F4B8C5 0%, #E8A0B8 100%)",
-    "padding": "px-6 py-4",
     "classes": "w-full items-center justify-between backdrop-blur-md bg-white/25 border-b border-white/20 transition-all duration-300",
     "scroll_effect": "backdrop-blur-lg bg-white/35 border-b border-white/30 shadow-lg transition-all duration-300",
     "fixed_classes": "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-    "backdrop_filter": "backdrop-filter: blur(12px) saturate(180%)",
-    "glass_morphism": "backdrop-filter: blur(16px) saturate(200%) contrast(1.2)",
-    "row_classes": "w-full items-center justify-between px-4 py-3 max-w-4xl mx-auto",
-    "logo_row_classes": "items-center gap-2 sm:gap-3 flex-shrink-0",
+    "row_classes": "w-full flex-wrap items-center justify-between px-3 py-2 sm:px-4 sm:py-3 max-w-4xl mx-auto",
+    "logo_row_classes": "items-center gap-2 sm:gap-3 flex-shrink-0 min-w-0",
     "tagline": "Your journey, together",
-    "tagline_classes": "text-xs text-grey-8 leading-tight",
-    "theme_btn_props": "flat dense color=grey-8",
-    "theme_btn_classes": "flex-shrink-0"
+    "tagline_classes": "text-xs sm:text-sm text-white leading-tight drop-shadow-sm hidden md:block truncate",
+    "theme_btn_props": "flat dense color=white",
+    "theme_btn_classes": "flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10"
   },
   "footer": {
-    "background": "linear-gradient(135deg, #F4B8C5 0%, #E8A0B8 50%, #F4B8C5 100%)",
-    "border_top": "border-t border-white/20",
-    "padding": "px-6 py-4",
     "classes": "w-full items-center backdrop-blur-md bg-white/25 border-t border-white/20 transition-all duration-300",
     "scroll_effect": "backdrop-blur-lg bg-white/35 border-t border-white/30 shadow-xl transition-all duration-300",
     "fixed_classes": "fixed bottom-0 left-0 right-0 z-40 transition-all duration-300",
-    "text_color": "text-white",
-    "backdrop_filter": "backdrop-filter: blur(12px) saturate(180%)",
-    "glass_morphism": "backdrop-filter: blur(16px) saturate(200%) contrast(1.2)",
-    "row_classes": "w-full max-w-4xl mx-auto px-6 py-4 items-center gap-3",
+    "row_classes": "w-full max-w-4xl mx-auto px-3 py-3 sm:px-6 sm:py-4 items-center gap-2 sm:gap-3 flex-col sm:flex-row",
     "new_btn_props": "flat round",
-    "new_btn_classes": "hover:scale-105 transition-all duration-300 backdrop-blur-sm",
+    "new_btn_classes": "hover:scale-105 transition-all duration-300 backdrop-blur-sm flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12",
     "new_btn_tooltip": "New conversation",
-    "input_classes": "flex-grow backdrop-blur-sm",
+    "input_classes": "flex-grow backdrop-blur-sm mx-2 sm:mx-0",
     "input_props": "filled dense",
     "input_placeholder": "Share what's on your mind...",
     "input_tooltip": "Type your message here",
     "send_btn_props": "flat round color=primary",
-    "send_btn_classes": "hover:scale-105 transition-all duration-300 backdrop-blur-sm",
+    "send_btn_classes": "hover:scale-105 transition-all duration-300 backdrop-blur-sm flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12",
     "send_btn_tooltip": "Send message"
   },
   "logo": {
-    "src": "/branding/logo-full-color.svg",
+    "src": "/branding/logo-full-white.svg",
     "alt": "MammoChat™",
     "classes": "h-10 flex-shrink-0 transition-transform duration-200 hover:scale-105",
     "drop_shadow": "drop-shadow-sm"
   },
   "chat": {
     "welcome_message": "Welcome to MammoChat 💗\n\nI'm here to support you on your breast cancer journey. I can help you find clinical trials that match your situation, connect with communities of patients with similar experiences, understand information about treatments and options, and navigate your healthcare with confidence.\n\nHow can I support you today?",
-    "container_classes": "w-full max-w-4xl mx-auto p-6 flex-grow",
-    "message_container_classes": "w-full gap-6",
-    "scroll_area_classes": "flex-grow w-full p-6 overflow-y-auto",
-    "message_bubble_classes": "rounded-2xl p-5 max-w-4xl animate-fade-in transition-all duration-300",
-    "user_message_classes": "ml-auto bg-gradient-to-br from-primary to-secondary text-white border-none backdrop-blur-sm",
-    "assistant_message_classes": "bg-white/35 border border-white/20 shadow-soft backdrop-blur-sm transition-all duration-300 hover:bg-white/45",
-    "input_container_classes": "bg-white/25 rounded-2xl p-4 border border-white/20 transition-all duration-300 focus-within:border-white/40 focus-within:shadow-input focus-within:bg-white/35 backdrop-blur-md",
-    "glass_effects": {
-      "input_glass": "backdrop-filter: blur(12px) saturate(180%)",
-      "bubble_glass": "backdrop-filter: blur(8px) saturate(150%)",
-      "hover_glass": "backdrop-filter: blur(16px) saturate(200%)"
+    "container_classes": "w-full max-w-4xl mx-auto gap-4",
+    "scroll_area_classes": "flex-grow w-full p-4",
+    "message_bubble": {
+      "classes": "rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] shadow-md leading-relaxed transition-all duration-300"
+    },
+    "user_message": {
+      "classes": "bg-gradient-to-br from-rose-200 to-pink-300 ml-auto text-white border-none"
+    },
+    "assistant_message": {
+      "classes": "bg-white border border-slate-200 text-slate-700"
     },
     "user_message_props": "bg-color=primary text-color=white",
     "user_message_classes": "shadow-sm",
@@ -188,5 +224,47 @@
     "border_light": 0.15,
     "border_medium": 0.20,
     "border_strong": 0.30
+  },
+  "input_container": {
+    "classes": "bg-white rounded-2xl p-4 border-2 border-slate-200 transition-all duration-300 shadow-md"
+  },
+  "input_container_focus": {
+    "classes": "border-rose-300 shadow-[0_0_0_3px_rgba(244,184,197,0.1)]"
+  },
+  "btn_send": {
+    "classes": "bg-gradient-to-br from-rose-200 to-pink-300 border-none rounded-full w-12 h-12 flex items-center justify-center cursor-pointer transition-all duration-300 text-white"
+  },
+  "btn_send_hover": {
+    "classes": "scale-105 shadow-xl"
+  },
+  "btn_send_active": {
+    "classes": "scale-95"
+  },
+  "btn_secondary": {
+    "classes": "bg-white border border-slate-200 text-slate-700 transition-all duration-300"
+  },
+  "btn_secondary_hover": {
+    "classes": "bg-rose-200 text-white border-rose-200"
+  },
+  "typing_indicator": {
+    "classes": "flex gap-2 p-4 items-center"
+  },
+  "typing_dot": {
+    "classes": "w-2 h-2 rounded-full bg-rose-200 animate-[typing_1.4s_infinite]"
+  },
+  "keyframes_slideIn": {
+    "from": "opacity: 0; transform: translateY(10px);",
+    "to": "opacity: 1; transform: translateY(0);"
+  },
+  "keyframes_typing": {
+    "0%, 60%, 100%": "transform: translateY(0); opacity: 0.7;",
+    "30%": "transform: translateY(-8px); opacity: 1;"
+  },
+  "dark_mode_styles": {
+    "header_classes": "shadow-2xl",
+    "message_bubble_classes": "shadow-lg",
+    "input_container_classes": "shadow-md",
+    "btn_send_hover_classes": "shadow-2xl",
+    "footer_classes": "bg-slate-800 border-slate-700"
   }
 }

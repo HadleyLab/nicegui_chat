@@ -40,9 +40,7 @@ def setup_colors(scene):
 
 
 def setup_head_html(scene):
-    # Dark mode colors
-    dark_palette = scene.get('dark', {}).get('palette', {})
-
+    """Set up PWA meta tags and fonts without custom CSS generation."""
     ui.add_head_html(
         f"""
         <meta name="theme-color" content="{scene['palette']['primary']}">
@@ -56,155 +54,6 @@ def setup_head_html(scene):
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-            :root {{
-                --primary-color: {scene['palette']['primary']};
-                --secondary-color: {scene['palette']['secondary']};
-                --background-color: {scene['palette']['background']};
-                --surface-color: {scene['palette']['surface']};
-                --text-color: {scene['palette']['text']};
-                --text-secondary: {scene['palette']['text_secondary']};
-                --accent-color: {scene['palette']['accent']};
-                --success-color: {scene['palette']['success']};
-                --border-color: {scene['palette']['border']};
-                --border-radius: 12px;
-                --animation-duration: 0.3s;
-                --focus-shadow: rgba(244, 184, 197, 0.1);
-            }}
-
-            /* Dark mode variables */
-            [data-theme="dark"], .dark-theme {{
-                --primary-color: {dark_palette.get('primary', scene['palette']['primary'])};
-                --secondary-color: {dark_palette.get('secondary', scene['palette']['secondary'])};
-                --background-color: {dark_palette.get('background', scene['palette']['background'])};
-                --surface-color: {dark_palette.get('surface', scene['palette']['surface'])};
-                --text-color: {dark_palette.get('text', scene['palette']['text'])};
-                --text-secondary: {dark_palette.get('text_secondary', scene['palette']['text_secondary'])};
-                --accent-color: {dark_palette.get('accent', scene['palette']['accent'])};
-                --success-color: {dark_palette.get('success', scene['palette']['success'])};
-                --border-color: {dark_palette.get('border', scene['palette']['border'])};
-            }}
-
-            /* System dark mode preference */
-            @media (prefers-color-scheme: dark) {{
-                :root:not([data-theme="light"]) {{
-                    --primary-color: {dark_palette.get('primary', scene['palette']['primary'])};
-                    --secondary-color: {dark_palette.get('secondary', scene['palette']['secondary'])};
-                    --background-color: {dark_palette.get('background', scene['palette']['background'])};
-                    --surface-color: {dark_palette.get('surface', scene['palette']['surface'])};
-                    --text-color: {dark_palette.get('text', scene['palette']['text'])};
-                    --text-secondary: {dark_palette.get('text_secondary', scene['palette']['text_secondary'])};
-                    --accent-color: {dark_palette.get('accent', scene['palette']['accent'])};
-                    --success-color: {dark_palette.get('success', scene['palette']['success'])};
-                    --border-color: {dark_palette.get('border', scene['palette']['border'])};
-                    --focus-shadow: rgba(232, 160, 184, 0.2);
-                }}
-            }}
-
-            body {{
-                background: linear-gradient(135deg, var(--background-color) 0%, var(--surface-color) 100%);
-                color: var(--text-color);
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-                transition: background-color var(--animation-duration), color var(--animation-duration);
-                min-width: 768px;
-            }}
-
-            .mammochat-header {{
-                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-                transition: background var(--animation-duration);
-            }}
-
-            .mammochat-header img {{
-                height: 4rem;
-                width: auto;
-                max-width: 250px;
-                object-fit: contain;
-            }}
-
-            @media (max-width: 768px) {{
-                .mammochat-header img {{
-                    height: 3rem;
-                    max-width: 200px;
-                }}
-            }}
-
-            @media (max-width: 480px) {{
-                .mammochat-header img {{
-                    height: 2.5rem;
-                    max-width: 150px;
-                }}
-            }}
-
-            .header-tagline {{
-                display: block;
-            }}
-
-            @media (max-width: 640px) {{
-                .header-tagline {{
-                    display: none;
-                }}
-            }}
-
-            .message-bubble {{
-                border-radius: var(--border-radius);
-                padding: 1.25rem 1.5rem;
-                max-width: 70%;
-                animation: slideIn var(--animation-duration) ease-out;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                line-height: 1.6;
-                transition: all var(--animation-duration);
-            }}
-
-            .user-message {{
-                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-                margin-left: auto;
-                color: white;
-                border: none;
-            }}
-
-            .assistant-message {{
-                background: var(--surface-color);
-                border: 1px solid var(--border-color);
-                color: var(--text-color);
-            }}
-
-            /* Dark mode message bubbles */
-            [data-theme="dark"] .assistant-message,
-            .dark-theme .assistant-message {{
-                background: var(--surface-color);
-                border: 1px solid var(--border-color);
-                color: var(--text-color);
-            }}
-
-            [data-theme="dark"] .user-message,
-            .dark-theme .user-message {{
-                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-                color: white;
-            }}
-
-            .typing-indicator {{
-                display: flex;
-                gap: 0.5rem;
-                padding: 1rem;
-                align-items: center;
-            }}
-
-            .typing-dot {{
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: var(--primary-color);
-                animation: typing 1.4s infinite;
-            }}
-
-            .typing-dot:nth-child(2) {{
-                animation-delay: 0.2s;
-            }}
-
-            .typing-dot:nth-child(3) {{
-                animation-delay: 0.4s;
-            }}
 
             @keyframes slideIn {{
                 from {{
@@ -228,109 +77,9 @@ def setup_head_html(scene):
                 }}
             }}
 
-            .input-container {{
-                background: var(--surface-color);
-                border-radius: var(--border-radius);
-                padding: 1rem;
-                border: 2px solid var(--border-color);
-                transition: all var(--animation-duration);
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            }}
-
-            .input-container:focus-within {{
-                border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px var(--focus-shadow);
-            }}
-
-            .btn-send {{
-                background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-                border: none;
-                border-radius: 50%;
-                width: 48px;
-                height: 48px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: all var(--animation-duration);
-                color: white;
-            }}
-
-            .btn-send:hover {{
-                transform: scale(1.05);
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            }}
-
-            .btn-send:active {{
-                transform: scale(0.98);
-            }}
-
-            .btn-secondary {{
-                background: var(--surface-color);
-                border: 1px solid var(--border-color);
-                color: var(--text-color);
-                transition: all var(--animation-duration);
-            }}
-
-            .btn-secondary:hover {{
-                background: var(--primary-color);
-                color: white;
-                border-color: var(--primary-color);
-            }}
-
-            /* Community badge */
-            .community-badge {{
-                background: linear-gradient(135deg, #FED7C8 0%, #FCA5A5 50%);
-                padding: 0.25rem 0.75rem;
-                border-radius: 12px;
-                font-size: 0.75rem;
-                font-weight: 600;
-                color: var(--text-color);
-            }}
-
-            /* Trial match indicator */
-            .trial-match {{
-                background: linear-gradient(135deg, var(--success-color) 0%, #6EE7B7 100%);
-                padding: 0.5rem 1rem;
-                border-radius: 8px;
-                font-size: 0.875rem;
-                color: var(--text-color);
-                display: inline-flex;
-                align-items: center;
-                gap: 0.5rem;
-            }}
-
             .q-message--received {{
                 max-height: none !important;
                 overflow: visible !important;
-            }}
-
-            /* Dark mode specific styles */
-            [data-theme="dark"] .mammochat-header,
-            .dark-theme .mammochat-header {{
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            }}
-
-            [data-theme="dark"] .message-bubble,
-            .dark-theme .message-bubble {{
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            }}
-
-            [data-theme="dark"] .input-container,
-            .dark-theme .input-container {{
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            }}
-
-            [data-theme="dark"] .btn-send:hover,
-            .dark-theme .btn-send:hover {{
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            }}
-
-            /* Footer dark mode styles */
-            [data-theme="dark"] .footer-container,
-            .dark-theme .footer-container {{
-                background: var(--surface-color);
-                border-top: 1px solid var(--border-color);
             }}
         </style>
     """
@@ -341,36 +90,65 @@ def create_header(scene, dark):
     """Build the MammoChat header."""
     logger = structlog.get_logger()
 
-    header = ui.header().classes('w-full p-6 mammochat-header items-center justify-between')
+    header_classes = scene.get("header_styles", {}).get(
+        "classes",
+        "w-full p-6 bg-gradient-to-br from-rose-200 to-pink-300 shadow-lg transition-all duration-300 items-center justify-between",
+    )
+    header = ui.header().classes(header_classes)
     with header:
-        with ui.row().classes('items-center gap-6 py-2 flex-nowrap'):
+        with ui.row().classes("items-center gap-6 py-2 flex-nowrap"):
             # Use HTML img tag for reliable logo display
-            logger.info("creating_logo_html_element", logo_path="public/logo-full-white.svg")
+            logo_src = scene.get("logo", {}).get("src", "/branding/logo-full-color.svg")
+            logo_alt = scene.get("logo", {}).get("alt", "MammoChat Logo")
+            logo_classes = scene.get("header_logo", {}).get(
+                "classes", "h-16 w-auto max-w-[250px] object-contain"
+            )
+            logger.info("creating_logo_html_element", logo_path=logo_src)
             try:
-                ui.html('<img src="public/logo-full-white.svg" alt="MammoChat Logo">', sanitize=False)
+                ui.html(
+                    f'<img src="{logo_src}" alt="{logo_alt}" class="{logo_classes}">',
+                    sanitize=False,
+                )
                 logger.info("logo_html_element_created_successfully")
             except Exception as e:
                 logger.error("logo_html_creation_failed", error=str(e))
                 # Fallback to text logo if HTML fails
-                ui.label('MammoChat™').classes('text-2xl font-bold text-white')
-            ui.label('Your journey, together').classes('text-sm text-white opacity-80 header-tagline flex-shrink-0')
+                ui.label("MammoChat™").classes("text-2xl font-bold text-slate-700")
 
-        with ui.row().classes('gap-2'):
+            tagline = scene.get("header", {}).get("tagline", "Your journey, together")
+            tagline_classes = scene.get("header", {}).get(
+                "tagline_classes",
+                "text-sm text-slate-700 opacity-80 flex-shrink-0",
+            )
+            ui.label(tagline).classes(tagline_classes)
+
+        with ui.row().classes("gap-2"):
+
             def toggle_theme():
                 dark.toggle()
                 theme_btn.icon = "dark_mode" if dark.value else "light_mode"
                 # Update document class for CSS targeting
                 if dark.value:
                     ui.run_javascript("document.body.classList.add('dark-theme')")
-                    ui.run_javascript("document.documentElement.setAttribute('data-theme', 'dark')")
+                    ui.run_javascript(
+                        "document.documentElement.setAttribute('data-theme', 'dark')"
+                    )
                 else:
                     ui.run_javascript("document.body.classList.remove('dark-theme')")
-                    ui.run_javascript("document.documentElement.setAttribute('data-theme', 'light')")
+                    ui.run_javascript(
+                        "document.documentElement.setAttribute('data-theme', 'light')"
+                    )
 
+            theme_btn_props = scene.get("header", {}).get(
+                "theme_btn_props", "flat dense color=grey-8"
+            )
+            theme_btn_classes = scene.get("header", {}).get(
+                "theme_btn_classes", "flex-shrink-0"
+            )
             theme_btn = (
                 ui.button(on_click=toggle_theme)
-                .props('flat dense color=white')
-                .classes('flex-shrink-0')
+                .props(theme_btn_props)
+                .classes(theme_btn_classes)
             )
             theme_btn.icon = "dark_mode" if dark.value else "light_mode"
 
@@ -379,37 +157,90 @@ def create_header(scene, dark):
 
 def create_chat_area(scene, conversation):
     """Build the main chat interface."""
-    with ui.column().classes('w-full h-screen'):
-        with ui.scroll_area().classes('flex-grow w-full p-4') as chat_scroll:
-            chat_container = ui.column().classes('w-full max-w-4xl mx-auto gap-4')
+    with ui.column().classes("w-full h-screen"):
+        scroll_classes = scene.get("chat", {}).get(
+            "scroll_area_classes", "flex-grow w-full p-4"
+        )
+        with ui.scroll_area().classes(scroll_classes):
+            container_classes = scene.get("chat", {}).get(
+                "container_classes", "w-full max-w-4xl mx-auto gap-4"
+            )
+            chat_container = ui.column().classes(container_classes)
 
             # Add welcome message
             with chat_container:
-                with ui.row().classes(scene["chat"]["assistant_row_classes"]):
+                assistant_row_classes = scene.get("chat", {}).get(
+                    "assistant_row_classes", "w-full justify-start"
+                )
+                welcome_props = scene.get("chat", {}).get(
+                    "welcome_message_props", "bg-color=accent text-color=grey-8"
+                )
+                welcome_classes = scene.get("chat", {}).get(
+                    "welcome_message_classes",
+                    "bg-white border border-slate-200 text-slate-700 shadow-md rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] leading-relaxed transition-all duration-300",
+                )
+                with ui.row().classes(assistant_row_classes):
                     ui.chat_message(
                         text=scene["chat"]["welcome_message"], sent=False
-                    ).props(scene["chat"]["welcome_message_props"]).classes(
-                        scene["chat"]["welcome_message_classes"]
-                    )
+                    ).props(welcome_props).classes(welcome_classes)
     return chat_container
 
 
 def create_footer(scene, send, new_conversation):
-    with ui.footer().classes('w-full items-center footer-container backdrop-blur-md bg-white/25 border-t border-white/20 transition-all duration-300'):
-        with ui.row().classes('w-full max-w-4xl mx-auto px-6 py-4 items-center gap-3'):
-            ui.button(icon="add", on_click=new_conversation, color="primary").props('flat round').classes('hover:scale-105 transition-all duration-300 backdrop-blur-sm').tooltip('New conversation')
+    footer_classes = scene.get("footer", {}).get(
+        "classes",
+        "w-full items-center backdrop-blur-md bg-white/25 border-t border-white/20 transition-all duration-300",
+    )
+    with ui.footer().classes(footer_classes):
+        row_classes = scene.get("footer", {}).get(
+            "row_classes", "w-full max-w-4xl mx-auto px-6 py-4 items-center gap-3"
+        )
+        with ui.row().classes(row_classes):
+            new_btn_props = scene.get("footer", {}).get("new_btn_props", "flat round")
+            new_btn_classes = scene.get("footer", {}).get(
+                "new_btn_classes",
+                "hover:scale-105 transition-all duration-300 backdrop-blur-sm",
+            )
+            new_btn_tooltip = scene.get("footer", {}).get(
+                "new_btn_tooltip", "New conversation"
+            )
+            ui.button(icon="add", on_click=new_conversation, color="primary").props(
+                new_btn_props
+            ).classes(new_btn_classes).tooltip(new_btn_tooltip)
+
+            input_classes = scene.get("footer", {}).get(
+                "input_classes", "flex-grow backdrop-blur-sm"
+            )
+            input_props = scene.get("footer", {}).get("input_props", "filled dense")
+            input_placeholder = scene.get("footer", {}).get(
+                "input_placeholder", "Share what's on your mind..."
+            )
+            input_tooltip = scene.get("footer", {}).get(
+                "input_tooltip", "Type your message here"
+            )
             text = (
-                ui.input(placeholder='Share what\'s on your mind...')
-                .classes('flex-grow backdrop-blur-sm')
-                .props('filled dense')
+                ui.input(placeholder=input_placeholder)
+                .classes(input_classes)
+                .props(input_props)
                 .on("keydown.enter", send)
-                .tooltip('Type your message here')
+                .tooltip(input_tooltip)
+            )
+
+            send_btn_props = scene.get("footer", {}).get(
+                "send_btn_props", "flat round color=primary"
+            )
+            send_btn_classes = scene.get("footer", {}).get(
+                "send_btn_classes",
+                "hover:scale-105 transition-all duration-300 backdrop-blur-sm",
+            )
+            send_btn_tooltip = scene.get("footer", {}).get(
+                "send_btn_tooltip", "Send message"
             )
             send_btn = (
                 ui.button(icon="send", on_click=send)
-                .props('flat round color=primary')
-                .classes('hover:scale-105 transition-all duration-300 backdrop-blur-sm')
-                .tooltip('Send message')
+                .props(send_btn_props)
+                .classes(send_btn_classes)
+                .tooltip(send_btn_tooltip)
             )
     return text, send_btn
 
@@ -439,7 +270,8 @@ def setup_ui(chat_service: ChatService) -> None:
     dark = ui.dark_mode()
 
     # Initialize theme state on page load
-    ui.run_javascript(f"""
+    ui.run_javascript(
+        f"""
         document.addEventListener('DOMContentLoaded', function() {{
             const isDark = {str(dark.value).lower()};
             if (isDark) {{
@@ -450,7 +282,8 @@ def setup_ui(chat_service: ChatService) -> None:
                 document.documentElement.setAttribute('data-theme', 'light');
             }}
         }});
-    """)
+    """
+    )
 
     setup_colors(scene)
     setup_head_html(scene)
@@ -468,15 +301,36 @@ def setup_ui(chat_service: ChatService) -> None:
         send_btn.disable()
 
         with message_container:
-            with ui.row().classes(scene["chat"]["user_row_classes"]):
-                ui.chat_message(text=question, sent=True).props(
-                    scene["chat"]["user_message_props"]
-                ).classes(scene["chat"]["user_message_classes"])
-            with ui.row().classes(scene["chat"]["assistant_row_classes"]):
+            user_row_classes = scene.get("chat", {}).get(
+                "user_row_classes", "w-full justify-end"
+            )
+            user_props = scene.get("chat", {}).get(
+                "user_message_props", "bg-color=primary text-color=white"
+            )
+            user_classes = scene.get("chat", {}).get(
+                "user_message_classes",
+                "bg-gradient-to-br from-rose-200 to-pink-300 ml-auto text-white border-none shadow-md rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] leading-relaxed transition-all duration-300",
+            )
+            with ui.row().classes(user_row_classes):
+                ui.chat_message(text=question, sent=True).props(user_props).classes(
+                    user_classes
+                )
+
+            assistant_row_classes = scene.get("chat", {}).get(
+                "assistant_row_classes", "w-full justify-start"
+            )
+            assistant_props = scene.get("chat", {}).get(
+                "assistant_message_props", "bg-color=accent text-color=grey-8"
+            )
+            assistant_classes = scene.get("chat", {}).get(
+                "assistant_message_classes",
+                "bg-white border border-slate-200 text-slate-700 shadow-md rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] leading-relaxed transition-all duration-300",
+            )
+            with ui.row().classes(assistant_row_classes):
                 response_message = (
                     ui.chat_message(sent=False)
-                    .props(scene["chat"]["assistant_message_props"])
-                    .classes(scene["chat"]["assistant_message_classes"])
+                    .props(assistant_props)
+                    .classes(assistant_classes)
                 )
 
         with response_message:
@@ -529,12 +383,20 @@ def setup_ui(chat_service: ChatService) -> None:
         conversation.clear_messages()
         message_container.clear()
         with message_container:
-            with ui.row().classes(scene["chat"]["assistant_row_classes"]):
+            assistant_row_classes = scene.get("chat", {}).get(
+                "assistant_row_classes", "w-full justify-start"
+            )
+            welcome_props = scene.get("chat", {}).get(
+                "welcome_message_props", "bg-color=accent text-color=grey-8"
+            )
+            welcome_classes = scene.get("chat", {}).get(
+                "welcome_message_classes",
+                "bg-white border border-slate-200 text-slate-700 shadow-md rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] leading-relaxed transition-all duration-300",
+            )
+            with ui.row().classes(assistant_row_classes):
                 ui.chat_message(
                     text=scene["chat"]["welcome_message"], sent=False
-                ).props(scene["chat"]["welcome_message_props"]).classes(
-                    scene["chat"]["welcome_message_classes"]
-                )
+                ).props(welcome_props).classes(welcome_classes)
         logger.info("new_conversation_started")
 
     create_header(scene, dark)
