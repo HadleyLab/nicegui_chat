@@ -58,7 +58,11 @@ class HeysolConfig:
     base_url: str
 
 
-BASE_DIR = Path(__file__).parent
+try:
+    BASE_DIR = Path(__file__).parent
+except NameError:
+    # Fallback when __file__ is not defined (e.g., in certain container contexts)
+    BASE_DIR = Path.cwd()
 CONFIG_DIR = BASE_DIR / "config"
 
 

@@ -22,15 +22,9 @@ from uuid import uuid4
 
 from config import Config
 
-from ..models.chat import (
-    ChatEventType,
-    ChatMessage,
-    ChatStreamEvent,
-    ConversationState,
-    ConversationStatus,
-    ExecutionStep,
-    MessageRole,
-)
+from ..models.chat import (ChatEventType, ChatMessage, ChatStreamEvent,
+                           ConversationState, ConversationStatus,
+                           ExecutionStep, MessageRole)
 from ..services.agent_service import ChatAgent
 from ..services.auth_service import AuthService
 from ..services.memory_service import MemoryService
@@ -93,115 +87,116 @@ class ChatService:
         metadata: dict[str, Any] | None = None,
         store_user_message: bool = True,
     ) -> AsyncIterator[ChatStreamEvent]:
-            """Stream AI-generated chat responses.
+        """Stream AI-generated chat responses.
 
-            This method orchestrates the complete chat flow:
-            - Validates user authentication and message content
-            - Stores user messages in conversation history (if enabled)
-            - Generates AI responses through the agent service
-            - Streams response chunks for real-time UI updates
-            - Tracks execution steps for memory references
-            - Manages conversation state transitions
+        This method orchestrates the complete chat flow:
+        - Validates user authentication and message content
+        - Stores user messages in conversation history (if enabled)
+        - Generates AI responses through the agent service
+        - Streams response chunks for real-time UI updates
+        - Tracks execution steps for memory references
+        - Manages conversation state transitions
 
-            Args:
-                conversation: Current conversation state to update
-                user_message: User's input message to process
-                selected_space_ids: Optional memory space filtering
-                metadata: Additional context for response generation
-                store_user_message: Whether to persist user message in history
+        Args:
+            conversation: Current conversation state to update
+            user_message: User's input message to process
+            selected_space_ids: Optional memory space filtering
+            metadata: Additional context for response generation
+            store_user_message: Whether to persist user message in history
 
-            Yields:
-                ChatStreamEvent: Streaming events for UI consumption
+        Yields:
+            ChatStreamEvent: Streaming events for UI consumption
 
-            Raises:
-                AuthenticationError: If user is not authenticated
-                ChatServiceError: If message is empty or service fails
-            """
-            if not self._auth_service.is_authenticated:
-                raise AuthenticationError("Authentication is required")
-            if not user_message.strip():
-                raise ChatServiceError("Cannot send an empty message")
+        Raises:
+            AuthenticationError: If user is not authenticated
+            ChatServiceError: If message is empty or service fails
+        """
+        if not self._auth_service.is_authenticated:
+            raise AuthenticationError("Authentication is required")
+        if not user_message.strip():
+            raise ChatServiceError("Cannot send an empty message")
 
-            conversation.status = ConversationStatus.RUNNING
+        conversation.status = ConversationStatus.RUNNING
 
-            if store_user_message and self._app_config.chat_store_user_messages:
-                user_chat_message = ChatMessage(
-                    message_id=str(uuid4()),
-                    role=MessageRole.USER,
-                    content=user_message,
-                )
-                conversation.append_message(user_chat_message)
-
-            assistant_message = ChatMessage(
+        if store_user_message and self._app_config.chat_store_user_messages:
+            user_chat_message = ChatMessage(
                 message_id=str(uuid4()),
-                role=MessageRole.ASSISTANT,
-                content="",
+                role=MessageRole.USER,
+                content=user_message,
             )
-            conversation.append_message(assistant_message)
+            conversation.append_message(user_chat_message)
 
+        assistant_message = ChatMessage(
+            message_id=str(uuid4()),
+            role=MessageRole.ASSISTANT,
+            content="",
+        )
+        conversation.append_message(assistant_message)
+
+        yield ChatStreamEvent(
+            event_type=ChatEventType.MESSAGE_START,
+            payload={"role": MessageRole.ASSISTANT.value},
+        )
+
+        # Stream response using the agent's streaming method
+        referenced_memories: list[str] = []
+        agent_result = None
+
+        try:
+            async for event_type, data in self._agent.generate_stream(
+                conversation,
+                user_message,
+                selected_space_ids=selected_space_ids,
+                metadata=metadata,
+                prefetch_memory=self._app_config.chat_enable_memory_enrichment,
+            ):
+                if event_type == "chunk":
+                    chunk = data
+                    assistant_message.content += chunk
+                    yield ChatStreamEvent(
+                        event_type=ChatEventType.MESSAGE_CHUNK,
+                        payload={"content": chunk},
+                    )
+                elif event_type == "final":
+                    agent_result = data
+                    referenced_memories = agent_result.referenced_memories
+
+        except Exception as e:
             yield ChatStreamEvent(
-                event_type=ChatEventType.MESSAGE_START,
-                payload={"role": MessageRole.ASSISTANT.value},
+                event_type=ChatEventType.ERROR,
+                payload={"error": str(e)},
             )
+            conversation.status = ConversationStatus.FAILED
+            return
 
-            # Stream response using the agent's streaming method
-            referenced_memories: list[str] = []
-            agent_result = None
+        yield ChatStreamEvent(
+            event_type=ChatEventType.MESSAGE_END,
+            payload={"content": assistant_message.content},
+        )
 
-            try:
-                async for event_type, data in self._agent.generate_stream(
-                    conversation,
-                    user_message,
-                    selected_space_ids=selected_space_ids,
-                    metadata=metadata,
-                    prefetch_memory=self._app_config.chat_enable_memory_enrichment,
-                ):
-                    if event_type == "chunk":
-                        chunk = data
-                        assistant_message.content += chunk
-                        yield ChatStreamEvent(
-                            event_type=ChatEventType.MESSAGE_CHUNK, payload={"content": chunk}
-                        )
-                    elif event_type == "final":
-                        agent_result = data
-                        referenced_memories = agent_result.referenced_memories
-
-            except Exception as e:
-                yield ChatStreamEvent(
-                    event_type=ChatEventType.ERROR,
-                    payload={"error": str(e)},
-                )
-                conversation.status = ConversationStatus.FAILED
-                return
-
-            yield ChatStreamEvent(
-                event_type=ChatEventType.MESSAGE_END,
-                payload={"content": assistant_message.content},
+        # Add execution steps for memory references
+        if referenced_memories:
+            step_payload = {
+                "skillName": "memory",
+                "skillStatus": "complete",
+                "userMessage": "",
+                "observation": {
+                    "referenced": referenced_memories,
+                },
+            }
+            execution_step = ExecutionStep(
+                step_id=str(uuid4()),
+                skill_name="memory",
+                status="complete",
+                observation=json.dumps(step_payload["observation"]),
+                user_message="",
+                data=step_payload,
             )
+            conversation.append_execution_step(execution_step)
+            yield ChatStreamEvent(event_type=ChatEventType.STEP, payload=step_payload)
 
-            # Add execution steps for memory references
-            if referenced_memories:
-                step_payload = {
-                    "skillName": "memory",
-                    "skillStatus": "complete",
-                    "userMessage": "",
-                    "observation": {
-                        "referenced": referenced_memories,
-                    },
-                }
-                execution_step = ExecutionStep(
-                    step_id=str(uuid4()),
-                    skill_name="memory",
-                    status="complete",
-                    observation=json.dumps(step_payload["observation"]),
-                    user_message="",
-                    data=step_payload,
-                )
-                conversation.append_execution_step(execution_step)
-                yield ChatStreamEvent(event_type=ChatEventType.STEP, payload=step_payload)
-
-            conversation.status = ConversationStatus.SUCCESS
-            yield ChatStreamEvent(
-                event_type=ChatEventType.STREAM_END,
-                payload={"type": ChatEventType.STREAM_END.value},
-            )
+        conversation.status = ConversationStatus.SUCCESS
+        yield ChatStreamEvent(
+            event_type=ChatEventType.STREAM_END,
+            payload={"type": ChatEventType.STREAM_END.value},
+        )

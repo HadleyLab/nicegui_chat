@@ -19,7 +19,8 @@ This design enables maintainability, testability, and scalability.
 """
 
 import os
-from nicegui import ui, app
+
+from nicegui import app, ui
 
 from config import config, validate_config
 from src.services.auth_service import AuthService
@@ -28,10 +29,19 @@ from src.services.memory_service import MemoryService
 from src.ui.main_ui import setup_ui
 
 # Set up static file serving for branding assets
-current_dir = os.path.dirname(os.path.abspath(__file__))
-branding_dir = os.path.join(current_dir, 'branding')
+try:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+except NameError:
+    # Fallback when __file__ is not defined (e.g., in certain container contexts)
+    current_dir = os.getcwd()
+
+branding_dir = os.path.join(current_dir, "branding")
 if os.path.exists(branding_dir):
-    app.add_static_files('/branding', branding_dir)
+    app.add_static_files("/branding", branding_dir)
+
+public_dir = os.path.join(current_dir, "public")
+if os.path.exists(public_dir):
+    app.add_static_files("/public", public_dir)
 
 try:
     validate_config(config)

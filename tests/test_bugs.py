@@ -35,8 +35,8 @@ class TestChatMessageColoring:
         """Test that colors work in dark mode."""
         # The colors should be theme-aware, not hardcoded
         # Check that we're using theme-aware classes
-        user_classes = config.scene["chat"]["user_message_classes"]
-        assistant_classes = config.scene["chat"]["assistant_message_classes"]
+        config.scene["chat"]["user_message_classes"]
+        config.scene["chat"]["assistant_message_classes"]
 
         # Should use theme-aware classes, not hardcoded colors
         # This is handled by NiceGUI's theme system
@@ -110,7 +110,7 @@ class TestDarkModeCompatibility:
         """Test that chat message props don't use hardcoded colors."""
         # Should use theme-aware props like bg-color=primary instead of hardcoded hex
         user_props = config.scene["chat"]["user_message_props"]
-        assistant_props = config.scene["chat"]["assistant_message_props"]
+        config.scene["chat"]["assistant_message_props"]
 
         # Should not contain hardcoded color values
         assert "bg-color=" in user_props  # Theme-aware

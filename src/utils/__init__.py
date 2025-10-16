@@ -8,6 +8,22 @@ All utilities follow the application's coding standards: minimalism, explicitnes
 and performance optimization.
 """
 
+from pathlib import Path
+
+import structlog
+from nicegui import app as nicegui_app
+
+
+def get_logger(name: str = "mammochat") -> structlog.WriteLogger:
+    """Get a structured logger instance."""
+    return structlog.get_logger(name)
+
+
+def handle_error(error: Exception, logger: structlog.WriteLogger) -> None:
+    """Handle and log an error, then re-raise it."""
+    logger.error(f"An error occurred: {error} (type: {type(error).__name__})")
+    raise error
+
 
 def setup_static_files(app) -> None:
     """Configure static file serving for the application.
@@ -18,6 +34,19 @@ def setup_static_files(app) -> None:
     Args:
         app: NiceGUI application instance to configure routes on
     """
-    # NiceGUI handles static files automatically
-    # This function is kept for compatibility but simplified
-    pass
+    # Mount branding directory
+    branding_path = Path("branding")
+    if branding_path.exists():
+        from fastapi.staticfiles import StaticFiles
+        nicegui_app.mount(
+            "/branding", StaticFiles(directory="branding"), name="branding"
+        )
+
+    # Mount static directory for backward compatibility
+    if branding_path.exists():
+        from fastapi.staticfiles import StaticFiles
+        nicegui_app.mount(
+            "/static",
+            StaticFiles(directory="branding"),
+            name="static-branding",
+        )

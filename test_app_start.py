@@ -4,19 +4,22 @@ Quick test to verify the MammoChat™ application starts without timeout issues.
 """
 
 import asyncio
-import time
 import subprocess
-import signal
 import sys
+import time
+
 
 async def test_app_startup():
     """Test that the application starts and handles basic requests."""
     print("🚀 Testing MammoChat™ application startup...")
 
     # Start the application in background
-    process = subprocess.Popen([
-        sys.executable, "main.py"
-    ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    process = subprocess.Popen(
+        [sys.executable, "main.py"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
 
     try:
         # Wait for startup
@@ -35,13 +38,13 @@ async def test_app_startup():
                 return True
             else:
                 stdout, stderr = process.communicate()
-                print(f"❌ Application crashed after startup")
+                print("❌ Application crashed after startup")
                 print(f"STDOUT: {stdout}")
                 print(f"STDERR: {stderr}")
                 return False
         else:
             stdout, stderr = process.communicate()
-            print(f"❌ Application failed to start")
+            print("❌ Application failed to start")
             print(f"STDOUT: {stdout}")
             print(f"STDERR: {stderr}")
             return False
@@ -55,6 +58,7 @@ async def test_app_startup():
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
+
 
 if __name__ == "__main__":
     success = asyncio.run(test_app_startup())

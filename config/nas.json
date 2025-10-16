@@ -6,17 +6,14 @@
   "ssh_key": "~/.ssh/id_ed25519",
   "ssh_port": 2222,
   "deployment_files": [
-    "config.py",
-    "config/app.json",
-    "config/system.md",
-    "config/scene.json",
-    "config/nas.json",
-    "branding",
-    "src",
     "main.py",
-    "Dockerfile",
+    "config.py",
+    "src",
+    "config",
+    "branding",
+    "public",
     "requirements.txt",
-    ".env"
+    "Dockerfile.dev"
   ],
   "dockerignore_content": [
     ".git",

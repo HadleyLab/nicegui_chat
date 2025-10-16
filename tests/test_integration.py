@@ -4,50 +4,10 @@ import pytest
 
 from config import config
 from src.services.agent_service import ChatAgent
-from src.services.ai_service import AIService
 from src.services.auth_service import AuthService
 from src.services.memory_service import MemoryService
 
-
-@pytest.mark.integration
-@pytest.mark.skipif(
-    not config.deepseek_api_key,
-    reason="DEEPSEEK_API_KEY not set - skipping integration tests",
-)
-class TestAIServiceIntegration:
-    """Integration tests for AI service with real API calls."""
-
-    @pytest.fixture
-    def ai_service(self):
-        """Real AI service instance."""
-        return AIService()
-
-    @pytest.mark.asyncio
-    async def test_real_stream_chat_with_agent(self, ai_service):
-        """Test streaming chat with real agent."""
-        if not ai_service.agent:
-            pytest.skip("Pydantic AI agent not available")
-
-        chunks = []
-        async for chunk in ai_service.stream_chat("Hello, this is a test message"):
-            chunks.append(chunk)
-
-        assert len(chunks) > 0
-        assert any("Hello" in chunk or "test" in chunk for chunk in chunks)
-
-    @pytest.mark.asyncio
-    async def test_real_stream_chat_fallback(self, ai_service):
-        """Test streaming chat with fallback API."""
-        # Force fallback by disabling agent
-        ai_service.agent = None
-
-        chunks = []
-        async for chunk in ai_service.stream_chat("Hello from fallback API"):
-            chunks.append(chunk)
-
-        assert len(chunks) > 0
-        # Should not contain error messages
-        assert not any("not configured" in chunk for chunk in chunks)
+# AIService removed - no longer exists
 
 
 @pytest.mark.integration

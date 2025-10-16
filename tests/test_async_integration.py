@@ -20,10 +20,12 @@ from typing import Any, Dict, List, Optional
 from unittest.mock import MagicMock
 from uuid import uuid4
 
+import pytest
 import structlog
 
 from config import config
-from src.models.chat import ChatEventType, ConversationState, ConversationStatus
+from src.models.chat import (ChatEventType, ConversationState,
+                             ConversationStatus)
 from src.services.auth_service import AuthService
 from src.services.chat_service import ChatService
 from src.services.memory_service import MemoryService
@@ -170,7 +172,7 @@ class AsyncIntegrationTester:
             success = failed_chats == 0 and tasks_created > 0
 
             if not success:
-                error_msg = f"{failed_chats} chats failed, {tasks_created} background tasks created"
+                error_msg = f"{failed_chats or 0} chats failed, {tasks_created or 0} background tasks created"
             else:
                 error_msg = None
 
@@ -372,10 +374,10 @@ class AsyncIntegrationTester:
 
             if avg_cleanup_time > 500:  # More than 500ms average
                 if not success:
-                    error_msg += "; "
+                    error_msg = (error_msg or "") + "; "
                 else:
                     success = False
-                error_msg += f"Slow service cleanup: {avg_cleanup_time:.2f}ms average"
+                    error_msg = f"Slow service cleanup: {avg_cleanup_time:.2f}ms average"
 
             result = AsyncOperationResult(
                 operation_name=test_name,
@@ -422,7 +424,7 @@ class AsyncIntegrationTester:
         chat_service, _, memory_service = await self.setup_test_services()
 
         try:
-            results = {}
+            results: Dict[str, Dict[str, Any]] = {}
 
             for scenario in error_scenarios:
                 scenario_start = time.time()
@@ -510,11 +512,11 @@ class AsyncIntegrationTester:
                 except Exception as e:
                     results[scenario] = {
                         "success": False,
-                        "error": str(e),
+                        "error_message": str(e),
                         "error_handled": False,
                     }
 
-                scenario_time = (time.time() - scenario_start) * 1000
+                scenario_execution_time_ms = (time.time() - scenario_start) * 1000
 
             execution_time_ms = (time.time() - start_time) * 1000
 
@@ -573,7 +575,7 @@ class AsyncIntegrationTester:
         logger.info("Starting comprehensive async integration tests")
 
         # Define test scenarios
-        test_scenarios = [
+        test_scenarios: List[Dict[str, Any]] = [
             {
                 "name": "background_task_processing",
                 "concurrent_chats": 5,

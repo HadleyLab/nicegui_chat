@@ -85,7 +85,7 @@ class ChatAgent:
                 limit=limit,
             )
             # Handle both MemorySearchResult object and direct list return
-            if hasattr(result, 'episodes'):
+            if hasattr(result, "episodes"):
                 episodes = result.episodes
             else:
                 # If result is already a list, use it directly

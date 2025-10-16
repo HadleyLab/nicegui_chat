@@ -10,8 +10,12 @@ def test_text_sanitization():
 
     # Import the text processing function
     import sys
+    import os
 
-    sys.path.append("src")
+    # Add current directory to path first to prioritize local modules
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, current_dir)
+
     from utils.text_processing import strip_markdown
 
     # Test cases for markdown stripping
