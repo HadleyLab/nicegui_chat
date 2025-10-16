@@ -5,8 +5,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from src.models.chat import ConversationState
-from src.services.agent_service import (AgentDependencies, AgentOutput,
-                                        AgentResult, ChatAgent)
+from src.services.agent_service import (
+    AgentDependencies,
+    AgentOutput,
+    AgentResult,
+    ChatAgent,
+)
 from src.services.auth_service import AuthService
 from src.services.chat_service import ChatService
 from src.services.memory_service import MemoryService
@@ -367,9 +371,11 @@ class TestAgentService:
     @pytest.fixture
     def agent_service(self, mock_memory_service, mock_config):
         """Create ChatAgent instance."""
-        with patch("src.services.agent_service.DeepSeekProvider"), patch(
-            "src.services.agent_service.OpenAIChatModel"
-        ), patch("src.services.agent_service.Agent"):
+        with (
+            patch("src.services.agent_service.DeepSeekProvider"),
+            patch("src.services.agent_service.OpenAIChatModel"),
+            patch("src.services.agent_service.Agent"),
+        ):
             return ChatAgent(mock_memory_service, config=mock_config)
 
     @pytest.mark.asyncio
@@ -445,10 +451,11 @@ class TestAgentService:
 
     def test_agent_initialization(self, mock_memory_service, mock_config):
         """Test agent initialization."""
-        with patch("src.services.agent_service.DeepSeekProvider"), patch(
-            "src.services.agent_service.OpenAIChatModel"
-        ), patch("src.services.agent_service.Agent") as mock_agent_class:
-
+        with (
+            patch("src.services.agent_service.DeepSeekProvider"),
+            patch("src.services.agent_service.OpenAIChatModel"),
+            patch("src.services.agent_service.Agent") as mock_agent_class,
+        ):
             mock_agent_instance = MagicMock()
             mock_agent_class.return_value = mock_agent_instance
 

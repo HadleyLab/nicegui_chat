@@ -9,12 +9,18 @@ import asyncio
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-
 from config import config
+
 from src.models.chat import ConversationState, ConversationStatus
 from src.services.chat_service import ChatService
-from src.ui.main_ui import (create_chat_area, create_footer, create_header,
-                            setup_colors, setup_head_html, setup_ui)
+from src.ui.main_ui import (
+    create_chat_area,
+    create_footer,
+    create_header,
+    setup_colors,
+    setup_head_html,
+    setup_ui,
+)
 
 
 class TestSetupColors:
@@ -112,7 +118,7 @@ class TestCreateHeader:
         mock_header.return_value.__exit__ = Mock(return_value=None)
 
         mock_row_instances = []
-        for i in range(3):  # We have 3 ui.row() calls
+        for _i in range(3):  # We have 3 ui.row() calls
             mock_row_instance = Mock()
             mock_row_instances.append(mock_row_instance)
             mock_row.return_value.__enter__ = Mock(return_value=mock_row_instance)
@@ -234,7 +240,7 @@ class TestCreateFooter:
         mock_footer.return_value.__exit__ = Mock(return_value=None)
 
         mock_row_instances = []
-        for i in range(3):  # We have 3 ui.row() calls
+        for _i in range(3):  # We have 3 ui.row() calls
             mock_row_instance = Mock()
             mock_row_instances.append(mock_row_instance)
             mock_row.return_value.__enter__ = Mock(return_value=mock_row_instance)
@@ -331,7 +337,7 @@ class TestSendFunction:
 
         question = "Hello"
         if not question.strip():
-            assert False  # Should not return early
+            raise AssertionError()  # Should not return early
         else:
             assert True
 
@@ -389,7 +395,7 @@ class TestSendFunction:
             return
 
         # Should not reach here
-        assert False
+        raise AssertionError()
 
     def test_send_function_with_valid_message(self):
         """Test send function with valid message - should process."""
@@ -402,7 +408,7 @@ class TestSendFunction:
         text.value = ""
         if not question.strip():
             # Should not return early
-            assert False
+            raise AssertionError()
 
         # Should process the message
         assert question == "Hello world"
@@ -423,7 +429,7 @@ class TestSendFunction:
         question = text.value
         text.value = ""
         if not question.strip():
-            assert False  # Should not be empty
+            raise AssertionError()  # Should not be empty
 
         # Should disable UI elements
         text.disable()
@@ -975,22 +981,16 @@ class TestEdgeCases:
         mock_chat_service = Mock(spec=ChatService)
 
         # Mock all the UI components that setup_ui creates
-        with patch("src.ui.main_ui.ui.dark_mode") as mock_dark_mode, patch(
-            "src.ui.main_ui.ui.run_javascript"
-        ) as mock_run_js, patch(
-            "src.ui.main_ui.setup_colors"
-        ) as mock_setup_colors, patch(
-            "src.ui.main_ui.setup_head_html"
-        ) as mock_setup_head, patch(
-            "src.ui.main_ui.create_header"
-        ) as mock_create_header, patch(
-            "src.ui.main_ui.create_chat_area"
-        ) as mock_create_chat_area, patch(
-            "src.ui.main_ui.create_footer"
-        ) as mock_create_footer, patch(
-            "src.ui.main_ui.ConversationState"
-        ) as mock_conversation_state:
-
+        with (
+            patch("src.ui.main_ui.ui.dark_mode") as mock_dark_mode,
+            patch("src.ui.main_ui.ui.run_javascript") as mock_run_js,
+            patch("src.ui.main_ui.setup_colors") as mock_setup_colors,
+            patch("src.ui.main_ui.setup_head_html") as mock_setup_head,
+            patch("src.ui.main_ui.create_header") as mock_create_header,
+            patch("src.ui.main_ui.create_chat_area") as mock_create_chat_area,
+            patch("src.ui.main_ui.create_footer") as mock_create_footer,
+            patch("src.ui.main_ui.ConversationState") as mock_conversation_state,
+        ):
             mock_dark = Mock()
             mock_dark.value = False
             mock_dark_mode.return_value = mock_dark
@@ -1025,10 +1025,11 @@ class TestEdgeCases:
     def test_send_function_complete_flow(self):
         """Test the complete send function flow to cover more lines."""
         # Mock all the components that the send function uses
-        with patch("src.ui.main_ui.config") as mock_config, patch(
-            "src.ui.main_ui.strip_markdown"
-        ), patch("src.ui.main_ui.ui"):
-
+        with (
+            patch("src.ui.main_ui.config") as mock_config,
+            patch("src.ui.main_ui.strip_markdown"),
+            patch("src.ui.main_ui.ui"),
+        ):
             # Set up config mock
             mock_scene = {
                 "chat": {
@@ -1102,7 +1103,6 @@ class TestEdgeCases:
     def test_new_conversation_complete_flow(self):
         """Test the complete new conversation flow."""
         with patch("src.ui.main_ui.config") as mock_config, patch("src.ui.main_ui.ui"):
-
             # Set up config mock
             mock_scene = {
                 "chat": {
@@ -1131,9 +1131,10 @@ class TestEdgeCases:
 
     def test_theme_toggle_javascript_calls(self):
         """Test that theme toggle calls the correct JavaScript."""
-        with patch("src.ui.main_ui.ui.run_javascript") as mock_run_js, patch(
-            "src.ui.main_ui.ui"
-        ) as mock_ui:
+        with (
+            patch("src.ui.main_ui.ui.run_javascript") as mock_run_js,
+            patch("src.ui.main_ui.ui") as mock_ui,
+        ):
             # Mock dark mode
             dark = Mock()
             dark.value = False
@@ -1171,10 +1172,10 @@ class TestEdgeCases:
 
     def test_response_display_refreshable_component(self):
         """Test the response_display refreshable component."""
-        with patch("src.ui.main_ui.ui") as mock_ui, patch(
-            "src.ui.main_ui.strip_markdown"
-        ) as mock_strip_markdown:
-
+        with (
+            patch("src.ui.main_ui.ui") as mock_ui,
+            patch("src.ui.main_ui.strip_markdown") as mock_strip_markdown,
+        ):
             # Test error state
             response_state = {"error": "Test error", "content": ""}
             mock_ui.label = Mock()
@@ -1201,9 +1202,7 @@ class TestEdgeCases:
             response_state = {"error": None, "content": "Hello world"}
             mock_strip_markdown.return_value = "Stripped content"
 
-            if response_state["error"]:
-                pass
-            elif not response_state["content"]:
+            if response_state["error"] or not response_state["content"]:
                 pass
             else:
                 mock_ui.label(mock_strip_markdown(response_state["content"])).classes(
@@ -1254,10 +1253,10 @@ class TestEdgeCases:
 
     def test_scroll_to_bottom_after_message(self):
         """Test scrolling to bottom after message is added."""
-        with patch("src.ui.main_ui.asyncio.sleep") as mock_sleep, patch(
-            "src.ui.main_ui.ui"
+        with (
+            patch("src.ui.main_ui.asyncio.sleep") as mock_sleep,
+            patch("src.ui.main_ui.ui"),
         ):
-
             mock_scroll_area = Mock()
             mock_scroll_area.scroll_to = Mock()
 
@@ -1275,10 +1274,11 @@ class TestEdgeCases:
 
     def test_ui_initialization_javascript(self):
         """Test the JavaScript initialization code."""
-        with patch("src.ui.main_ui.ui.run_javascript") as mock_run_js, patch(
-            "src.ui.main_ui.ui.dark_mode"
-        ) as mock_dark_mode, patch("src.ui.main_ui.ui") as mock_ui:
-
+        with (
+            patch("src.ui.main_ui.ui.run_javascript") as mock_run_js,
+            patch("src.ui.main_ui.ui.dark_mode") as mock_dark_mode,
+            patch("src.ui.main_ui.ui") as mock_ui,
+        ):
             # Mock dark mode
             mock_dark = Mock()
             mock_dark.value = False

@@ -1,8 +1,14 @@
 """Unit tests for chat models."""
 
-from src.models.chat import (ChatEventType, ChatMessage, ChatStreamEvent,
-                             ConversationState, ConversationStatus,
-                             ExecutionStep, MessageRole)
+from src.models.chat import (
+    ChatEventType,
+    ChatMessage,
+    ChatStreamEvent,
+    ConversationState,
+    ConversationStatus,
+    ExecutionStep,
+    MessageRole,
+)
 from src.models.memory import MemoryEpisode, MemorySearchResult, MemorySpace
 
 

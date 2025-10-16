@@ -8,6 +8,11 @@ from ..models.memory import MemoryEpisode, MemorySearchResult, MemorySpace
 from ..utils.exceptions import AuthenticationError
 from .auth_service import AuthService
 
+try:
+    from heysol import HeySolClient  # type: ignore
+except ImportError:
+    HeySolClient = None
+
 
 class MemoryService:
     """Service for managing HeySol memory operations."""
@@ -28,7 +33,8 @@ class MemoryService:
             raise AuthenticationError("Authentication required for memory search")
 
         try:
-            from heysol import HeySolClient
+            if HeySolClient is None:
+                raise ImportError("HeySolClient not available")
 
             space_list = list(space_ids) if space_ids else None
             client = HeySolClient(
@@ -46,9 +52,9 @@ class MemoryService:
             if isinstance(result, dict):
                 result_dict = result
             elif hasattr(result, "__dict__"):
-                result_dict = result.__dict__
+                result_dict = result.__dict__  # type: ignore
             else:
-                result_dict = dict(result)
+                result_dict = dict(result)  # type: ignore
 
             return MemorySearchResult.from_api(result_dict)
         except ImportError:
@@ -68,7 +74,8 @@ class MemoryService:
             raise AuthenticationError("Authentication required for memory operations")
 
         try:
-            from heysol import HeySolClient
+            if HeySolClient is None:
+                raise ImportError("HeySolClient not available")
 
             client = HeySolClient(
                 api_key=self._auth_service.api_key,
@@ -93,7 +100,8 @@ class MemoryService:
             raise AuthenticationError("Authentication required for memory operations")
 
         try:
-            from heysol import HeySolClient
+            if HeySolClient is None:
+                raise ImportError("HeySolClient not available")
 
             client = HeySolClient(
                 api_key=self._auth_service.api_key,

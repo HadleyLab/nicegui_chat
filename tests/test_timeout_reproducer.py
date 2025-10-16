@@ -202,7 +202,7 @@ class TestTimeoutReproducer:
         # Verify file was created and contains expected data
         import json
 
-        with open(filename, "r") as f:
+        with open(filename) as f:
             data = json.load(f)
 
         assert "results" in data
@@ -284,10 +284,11 @@ class TestTimeoutReproducer:
     @pytest.mark.asyncio
     async def test_main_function_runs_scenarios(self):
         """Test that main function runs all scenarios."""
-        with patch(
-            "src.utils.timeout_reproducer.TimeoutReproducer"
-        ) as mock_class, patch("asyncio.sleep"), patch("builtins.print"):
-
+        with (
+            patch("src.utils.timeout_reproducer.TimeoutReproducer") as mock_class,
+            patch("asyncio.sleep"),
+            patch("builtins.print"),
+        ):
             mock_instance = MagicMock()
             mock_class.return_value = mock_instance
 
@@ -318,10 +319,10 @@ class TestTimeoutReproducer:
     @pytest.mark.asyncio
     async def test_main_function_handles_scenario_errors(self):
         """Test that main function handles scenario errors gracefully."""
-        with patch(
-            "src.utils.timeout_reproducer.TimeoutReproducer"
-        ) as mock_class, patch("builtins.print") as mock_print:
-
+        with (
+            patch("src.utils.timeout_reproducer.TimeoutReproducer") as mock_class,
+            patch("builtins.print") as mock_print,
+        ):
             mock_instance = MagicMock()
             mock_class.return_value = mock_instance
 

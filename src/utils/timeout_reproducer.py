@@ -14,9 +14,12 @@ import json
 import random
 import statistics
 import time
-from typing import Dict, List, Optional
+from pathlib import Path
+from typing import Any
 
-import structlog
+import httpx  # type: ignore
+import psutil  # type: ignore[import-untyped]
+import structlog  # type: ignore
 
 logger = structlog.get_logger()
 
@@ -24,12 +27,12 @@ logger = structlog.get_logger()
 class TimeoutReproducer:
     """Reproduces timeout scenarios for debugging."""
 
-    def __init__(self):
-        self.results = []
+    def __init__(self) -> None:
+        self.results: list[dict] = []
 
     async def api_stress_test(
         self, num_requests: int = 50, concurrent: int = 10
-    ) -> Dict:
+    ) -> dict:
         """Stress test API endpoints to reproduce timeout issues."""
         logger.info(
             "starting_api_stress_test", requests=num_requests, concurrent=concurrent
@@ -49,7 +52,7 @@ class TimeoutReproducer:
             # Add timeout simulation
             if random.random() < 0.05:  # 5% timeouts
                 await asyncio.sleep(base_delay)
-                raise asyncio.TimeoutError(f"Request {request_id} timed out")
+                raise TimeoutError(f"Request {request_id} timed out")
 
             await asyncio.sleep(base_delay)
             return base_delay
@@ -57,11 +60,11 @@ class TimeoutReproducer:
         # Run concurrent requests
         semaphore = asyncio.Semaphore(concurrent)
 
-        async def limited_request(request_id: int) -> Optional[float]:
+        async def limited_request(request_id: int) -> float | None:
             async with semaphore:
                 try:
                     return await mock_api_call(request_id)
-                except asyncio.TimeoutError as e:
+                except TimeoutError as e:
                     logger.warning(
                         "request_timeout", request_id=request_id, error=str(e)
                     )
@@ -97,7 +100,7 @@ class TimeoutReproducer:
         logger.info("api_stress_test_completed", **result)
         return result
 
-    async def memory_pressure_test(self, duration_seconds: int = 60) -> Dict:
+    async def memory_pressure_test(self, duration_seconds: int = 60) -> dict:
         """Test application behavior under memory pressure."""
         logger.info("starting_memory_pressure_test", duration=duration_seconds)
 
@@ -105,9 +108,7 @@ class TimeoutReproducer:
         memory_samples = []
         start_time = time.time()
 
-        async def memory_monitor():
-            import psutil
-
+        async def memory_monitor() -> None:
             while time.time() - start_time < duration_seconds:
                 try:
                     process = psutil.Process()
@@ -124,7 +125,7 @@ class TimeoutReproducer:
                     logger.error("memory_monitor_error", error=str(e))
 
         # Simulate memory-intensive operations
-        async def memory_stresser():
+        async def memory_stresser() -> None:
             large_objects = []
 
             while time.time() - start_time < duration_seconds:
@@ -163,7 +164,7 @@ class TimeoutReproducer:
         logger.info("memory_pressure_test_completed", **result)
         return result
 
-    def _calculate_growth_rate(self, samples: List[Dict]) -> float:
+    def _calculate_growth_rate(self, samples: list[dict]) -> float:
         """Calculate memory growth rate in MB/second."""
         if len(samples) < 2:
             return 0.0
@@ -176,11 +177,11 @@ class TimeoutReproducer:
             return 0.0
 
         memory_diff = last_sample["rss_mb"] - first_sample["rss_mb"]
-        return memory_diff / time_diff
+        return float(memory_diff / time_diff)
 
     async def concurrent_requests_test(
         self, num_users: int = 20, messages_per_user: int = 5
-    ) -> Dict:
+    ) -> dict:
         """Test concurrent user requests to reproduce race conditions."""
         logger.info(
             "starting_concurrent_requests_test",
@@ -191,10 +192,10 @@ class TimeoutReproducer:
         start_time = time.time()
 
         # Simulate multiple users sending messages concurrently
-        async def simulate_user(user_id: int) -> List[float]:
+        async def simulate_user(user_id: int) -> list[float]:
             response_times = []
 
-            for msg_id in range(messages_per_user):
+            for _msg_id in range(messages_per_user):
                 request_start = time.time()
 
                 # Simulate message processing time
@@ -239,11 +240,9 @@ class TimeoutReproducer:
 
     async def network_latency_test(
         self, target_url: str = "https://api.deepseek.com"
-    ) -> Dict:
+    ) -> dict:
         """Test network latency and connectivity issues."""
         logger.info("starting_network_latency_test", target_url=target_url)
-
-        import httpx
 
         response_times = []
         errors = []
@@ -291,7 +290,7 @@ class TimeoutReproducer:
         logger.info("network_latency_test_completed", **result)
         return result
 
-    async def run_scenario(self, scenario: str, **kwargs) -> Dict:
+    async def run_scenario(self, scenario: str, **kwargs: Any) -> dict:
         """Run a specific timeout reproduction scenario."""
         logger.info("running_timeout_scenario", scenario=scenario, kwargs=kwargs)
 
@@ -306,13 +305,13 @@ class TimeoutReproducer:
         else:
             raise ValueError(f"Unknown scenario: {scenario}")
 
-    def save_results(self, filename: Optional[str] = None) -> str:
+    def save_results(self, filename: str | None = None) -> str:
         """Save test results to JSON file."""
         if not filename:
             timestamp = int(time.time())
             filename = f"timeout_reproduction_{timestamp}.json"
 
-        with open(filename, "w") as f:
+        with Path(filename).open("w") as f:
             json.dump(
                 {
                     "results": self.results,
@@ -359,7 +358,8 @@ class TimeoutReproducer:
             elif result["scenario"] == "network_latency_test":
                 print(f"  Target: {result['target_url']}")
                 print(
-                    f"  Successful: {result['successful_requests']}/{result['total_requests']}"
+                    f"  Successful: {result['successful_requests']}/"
+                    f"{result['total_requests']}"
                 )
                 print(f"  Avg Response Time: {result['avg_response_time_ms']:.1f}ms")
                 print(f"  Max Response Time: {result['max_response_time_ms']:.1f}ms")
@@ -368,7 +368,7 @@ class TimeoutReproducer:
         print("=" * 80)
 
 
-async def main():
+async def main() -> None:
     """Main function to run timeout reproduction tests."""
     reproducer = TimeoutReproducer()
 
@@ -386,7 +386,7 @@ async def main():
     for scenario_name, kwargs in scenarios:
         try:
             print(f"🧪 Running {scenario_name} test...")
-            await reproducer.run_scenario(scenario_name, **kwargs)
+            await reproducer.run_scenario(scenario_name, **kwargs)  # type: ignore[arg-type]
             print(f"✅ {scenario_name} test completed\n")
             await asyncio.sleep(2)  # Brief pause between tests
         except Exception as e:

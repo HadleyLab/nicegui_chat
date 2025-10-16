@@ -51,6 +51,13 @@ coverage:
 lint:
 	ruff check src tests
 	ruff format --check src tests
+	black --check src tests
+	isort --check-only --diff src tests
+
+format:
+	ruff format src tests
+	black src tests
+	isort src tests
 
 typecheck:
 	mypy src tests
@@ -93,7 +100,7 @@ ci: clean install
 	pytest --cov=src --cov-report=term-missing --cov-report=xml --cov-fail-under=70 --junitxml=junit.xml
 
 # Development workflow
-dev: test-fast lint typecheck
+dev: test-fast format lint typecheck
 
 # Pre-commit style checks
-pre-commit: lint typecheck test-fast
+pre-commit: format lint typecheck test-fast

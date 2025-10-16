@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from uuid import uuid4
@@ -56,7 +56,7 @@ class ChatMessage(BaseModel):
     role: MessageRole = Field(description="Role of the message sender")
     content: str = Field(description="Message content text")
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="Message creation timestamp",
     )
     metadata: dict[str, Any] = Field(
@@ -69,7 +69,8 @@ class ChatMessage(BaseModel):
 
 
 class ExecutionStep(BaseModel):
-    """Execution step model for tracking agent actions with performance optimizations."""
+    """Execution step model for tracking agent actions with performance
+    optimizations."""
 
     model_config = ConfigDict(
         validate_assignment=True,

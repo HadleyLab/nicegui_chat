@@ -16,16 +16,15 @@ performance optimizations while preserving system stability.
 import asyncio
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 from unittest.mock import MagicMock
 from uuid import uuid4
 
 import pytest
 import structlog
-
 from config import config
-from src.models.chat import (ChatEventType, ConversationState,
-                             ConversationStatus)
+
+from src.models.chat import ChatEventType, ConversationState, ConversationStatus
 from src.services.auth_service import AuthService
 from src.services.chat_service import ChatService
 from src.services.memory_service import MemoryService
@@ -52,7 +51,7 @@ class AsyncIntegrationMetrics:
     cpu_peak_percent: float = 0.0
 
     # Error tracking
-    errors: List[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
     timeouts: int = 0
     deadlocks_detected: bool = False
 
@@ -65,15 +64,15 @@ class AsyncOperationResult:
     success: bool
     execution_time_ms: float
     memory_used_mb: float
-    error_message: Optional[str] = None
-    artifacts: Dict[str, Any] = field(default_factory=dict)
+    error_message: str | None = None
+    artifacts: dict[str, Any] = field(default_factory=dict)
 
 
 class AsyncIntegrationTester:
     """Comprehensive async integration testing framework."""
 
     def __init__(self):
-        self.results: Dict[str, AsyncOperationResult] = {}
+        self.results: dict[str, AsyncOperationResult] = {}
         self.metrics = AsyncIntegrationMetrics()
 
     async def setup_test_services(self) -> tuple:
@@ -226,7 +225,7 @@ class AsyncIntegrationTester:
 
         try:
             # Create multiple service instances
-            for i in range(num_services):
+            for _i in range(num_services):
                 chat_service, _, _ = await self.setup_test_services()
                 services.append(chat_service)
 
@@ -377,7 +376,9 @@ class AsyncIntegrationTester:
                     error_msg = (error_msg or "") + "; "
                 else:
                     success = False
-                    error_msg = f"Slow service cleanup: {avg_cleanup_time:.2f}ms average"
+                    error_msg = (
+                        f"Slow service cleanup: {avg_cleanup_time:.2f}ms average"
+                    )
 
             result = AsyncOperationResult(
                 operation_name=test_name,
@@ -411,7 +412,7 @@ class AsyncIntegrationTester:
     async def test_error_propagation_and_recovery(
         self,
         test_name: str,
-        error_scenarios: List[str],
+        error_scenarios: list[str],
     ) -> AsyncOperationResult:
         """Test error propagation and recovery mechanisms."""
         logger.info(
@@ -424,7 +425,7 @@ class AsyncIntegrationTester:
         chat_service, _, memory_service = await self.setup_test_services()
 
         try:
-            results: Dict[str, Dict[str, Any]] = {}
+            results: dict[str, dict[str, Any]] = {}
 
             for scenario in error_scenarios:
                 scenario_start = time.time()
@@ -516,7 +517,7 @@ class AsyncIntegrationTester:
                         "error_handled": False,
                     }
 
-                scenario_execution_time_ms = (time.time() - scenario_start) * 1000
+                (time.time() - scenario_start) * 1000
 
             execution_time_ms = (time.time() - start_time) * 1000
 
@@ -570,12 +571,12 @@ class AsyncIntegrationTester:
 
     async def run_comprehensive_async_integration_test(
         self,
-    ) -> Dict[str, AsyncOperationResult]:
+    ) -> dict[str, AsyncOperationResult]:
         """Run comprehensive async integration tests."""
         logger.info("Starting comprehensive async integration tests")
 
         # Define test scenarios
-        test_scenarios: List[Dict[str, Any]] = [
+        test_scenarios: list[dict[str, Any]] = [
             {
                 "name": "background_task_processing",
                 "concurrent_chats": 5,
@@ -669,7 +670,7 @@ async def run_async_integration_tests():
     print(f"Total Tests: {total_tests}")
     print(f"Passed: {passed_tests}")
     print(f"Failed: {failed_tests}")
-    print(f"Success Rate: {passed_tests/total_tests*100:.1f}%")
+    print(f"Success Rate: {passed_tests / total_tests * 100:.1f}%")
 
     # Detailed results
     for name, result in results.items():

@@ -17,8 +17,9 @@ service operations, enabling easy testing and maintenance.
 """
 
 import asyncio
+from typing import Any
 
-from nicegui import ui
+from nicegui import ui  # type: ignore
 
 from config import config
 from src.models.chat import ConversationState
@@ -26,7 +27,7 @@ from src.services.chat_service import ChatService
 from src.utils.text_processing import strip_markdown
 
 
-def setup_colors(scene):
+def setup_colors(scene: Any) -> None:
     ui.colors(
         primary=scene["palette"]["primary"],
         secondary=scene["palette"]["secondary"],
@@ -38,19 +39,21 @@ def setup_colors(scene):
     )
 
 
-def setup_head_html(scene):
+def setup_head_html(scene: Any) -> None:
     """Set up PWA meta tags and fonts without custom CSS generation."""
     ui.add_head_html(
         f"""
-        <meta name="theme-color" content="{scene['palette']['primary']}">
+        <meta name="theme-color" content="{scene["palette"]["primary"]}">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <link rel="apple-touch-icon" href="/branding/apple-touch-icon.png">
         <link rel="manifest" href="/public/manifest.json">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, "
+              "maximum-scale=1.0, user-scalable=no">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+              rel="stylesheet">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -85,83 +88,80 @@ def setup_head_html(scene):
     )
 
 
-def create_header(scene, dark):
+def create_header(scene: Any, dark: Any) -> Any:
     """Build the MammoChat header."""
     header_classes = scene.get("header_styles", {}).get(
         "classes",
-        "w-full p-6 bg-gradient-to-br from-rose-200 to-pink-300 shadow-lg transition-all duration-300 items-center justify-between",
+        "w-full p-6 bg-gradient-to-br from-rose-200 to-pink-300 shadow-lg "
+        "transition-all duration-300 items-center justify-between",
     )
     header = ui.header().classes(header_classes)
-    with header:
-        # Main header row with responsive layout
+    with (
+        header,
+        ui.row().classes("w-full items-center justify-between gap-4 py-2 flex-nowrap"),
+    ):
+        # Left side: Logo and tagline
         with ui.row().classes(
-            "w-full items-center justify-between gap-4 py-2 flex-nowrap"
+            "items-center gap-3 md:gap-6 flex-shrink-0 min-w-0 flex-1"
         ):
-            # Left side: Logo and tagline
-            with ui.row().classes(
-                "items-center gap-3 md:gap-6 flex-shrink-0 min-w-0 flex-1"
-            ):
-                # Use HTML img tag for reliable logo display
-                logo_src = scene.get("logo", {}).get(
-                    "src", "/branding/logo-full-white.svg"
-                )
-                logo_alt = scene.get("logo", {}).get("alt", "MammoChat Logo")
-                logo_classes = scene.get("header_logo", {}).get(
-                    "classes",
-                    "h-8 sm:h-10 md:h-12 lg:h-16 w-auto max-w-[120px] sm:max-w-[150px] md:max-w-[200px] lg:max-w-[250px] object-contain flex-shrink-0",
-                )
-                ui.html(
-                    f'<img src="{logo_src}" alt="{logo_alt}" class="{logo_classes}">',
-                    sanitize=False,
-                )
+            # Use HTML img tag for reliable logo display
+            logo_src = scene.get("logo", {}).get("src", "/branding/logo-full-white.svg")
+            logo_alt = scene.get("logo", {}).get("alt", "MammoChat Logo")
+            logo_classes = scene.get("header_logo", {}).get(
+                "classes",
+                "h-8 sm:h-10 md:h-12 lg:h-16 w-auto max-w-[120px] "
+                "sm:max-w-[150px] md:max-w-[200px] lg:max-w-[250px] "
+                "object-contain flex-shrink-0",
+            )
+            ui.html(
+                f'<img src="{logo_src}" alt="{logo_alt}" class="{logo_classes}">',
+                sanitize=False,
+            )
 
-                # Tagline with proper responsive styling - ensure visibility
-                tagline = scene.get("header", {}).get(
-                    "tagline", "Your journey, together"
-                )
-                tagline_classes = scene.get("header", {}).get(
-                    "tagline_classes",
-                    "text-sm md:text-base text-white leading-tight drop-shadow-lg flex-shrink-0",
-                )
-                ui.label(tagline).classes(tagline_classes)
+            # Tagline with proper responsive styling - ensure visibility
+            tagline = scene.get("header", {}).get("tagline", "Your journey, together")
+            tagline_classes = scene.get("header", {}).get(
+                "tagline_classes",
+                "text-sm md:text-base text-white leading-tight "
+                "drop-shadow-lg flex-shrink-0",
+            )
+            ui.label(tagline).classes(tagline_classes)
 
-            # Right side: Theme toggle button
-            with ui.row().classes("gap-2 flex-shrink-0"):
+        # Right side: Theme toggle button
+        with ui.row().classes("gap-2 flex-shrink-0"):
 
-                def toggle_theme():
-                    dark.toggle()
-                    theme_btn.icon = "dark_mode" if dark.value else "light_mode"
-                    # Update document class for CSS targeting
-                    if dark.value:
-                        ui.run_javascript("document.body.classList.add('dark-theme')")
-                        ui.run_javascript(
-                            "document.documentElement.setAttribute('data-theme', 'dark')"
-                        )
-                    else:
-                        ui.run_javascript(
-                            "document.body.classList.remove('dark-theme')"
-                        )
-                        ui.run_javascript(
-                            "document.documentElement.setAttribute('data-theme', 'light')"
-                        )
-
-                theme_btn_props = scene.get("header", {}).get(
-                    "theme_btn_props", "flat dense color=white"
-                )
-                theme_btn_classes = scene.get("header", {}).get(
-                    "theme_btn_classes", "flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10"
-                )
-                theme_btn = (
-                    ui.button(on_click=toggle_theme)
-                    .props(theme_btn_props)
-                    .classes(theme_btn_classes)
-                )
+            def toggle_theme() -> None:
+                dark.toggle()
                 theme_btn.icon = "dark_mode" if dark.value else "light_mode"
+                # Update document class for CSS targeting
+                if dark.value:
+                    ui.run_javascript("document.body.classList.add('dark-theme')")
+                    ui.run_javascript(
+                        "document.documentElement.setAttribute('data-theme', 'dark')"
+                    )
+                else:
+                    ui.run_javascript("document.body.classList.remove('dark-theme')")
+                    ui.run_javascript(
+                        "document.documentElement.setAttribute('data-theme', 'light')"
+                    )
+
+            theme_btn_props = scene.get("header", {}).get(
+                "theme_btn_props", "flat dense color=white"
+            )
+            theme_btn_classes = scene.get("header", {}).get(
+                "theme_btn_classes", "flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10"
+            )
+            theme_btn = (
+                ui.button(on_click=toggle_theme)
+                .props(theme_btn_props)
+                .classes(theme_btn_classes)
+            )
+            theme_btn.icon = "dark_mode" if dark.value else "light_mode"
 
     return header
 
 
-def create_chat_area(scene, conversation):
+def create_chat_area(scene: Any, conversation: Any) -> tuple[Any, Any]:
     """Build the main chat interface."""
     with ui.column().classes("w-full h-screen"):
         scroll_classes = scene.get("chat", {}).get(
@@ -184,7 +184,9 @@ def create_chat_area(scene, conversation):
                 )
                 welcome_classes = scene.get("chat", {}).get(
                     "welcome_message_classes",
-                    "bg-white border border-slate-200 text-slate-700 shadow-md rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] leading-relaxed transition-all duration-300",
+                    "bg-white border border-slate-200 text-slate-700 shadow-md "
+                    "rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] "
+                    "leading-relaxed transition-all duration-300",
                 )
                 with ui.row().classes(assistant_row_classes):
                     ui.chat_message(
@@ -193,72 +195,75 @@ def create_chat_area(scene, conversation):
     return scroll_area, chat_container
 
 
-def create_footer(scene, send, new_conversation):
+def create_footer(scene: Any, send: Any, new_conversation: Any) -> tuple[Any, Any]:
     footer_classes = scene.get("footer", {}).get(
         "classes",
-        "w-full items-center backdrop-blur-md bg-white/25 border-t border-white/20 transition-all duration-300",
+        "w-full items-center backdrop-blur-md bg-white/25 border-t "
+        "border-white/20 transition-all duration-300",
     )
-    with ui.footer().classes(footer_classes):
-        # Main footer row with responsive layout matching header
+    with (
+        ui.footer().classes(footer_classes),
+        ui.row().classes(
+            "w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 "
+            "items-center justify-between gap-4 flex-nowrap"
+        ),
+    ):
+        # Left side: New conversation button
+        with ui.row().classes("gap-2 flex-shrink-0"):
+            new_btn_props = scene.get("footer", {}).get("new_btn_props", "flat round")
+            new_btn_classes = scene.get("footer", {}).get(
+                "new_btn_classes",
+                "w-8 h-8 sm:w-10 sm:h-10 hover:scale-105 transition-all "
+                "duration-300 backdrop-blur-sm flex-shrink-0",
+            )
+            new_btn_tooltip = scene.get("footer", {}).get(
+                "new_btn_tooltip", "New conversation"
+            )
+            ui.button(icon="add", on_click=new_conversation, color="primary").props(
+                new_btn_props
+            ).classes(new_btn_classes).tooltip(new_btn_tooltip)
+
+        # Center: Input field with flexible growth
         with ui.row().classes(
-            "w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 items-center justify-between gap-4 flex-nowrap"
+            "items-center gap-3 md:gap-6 flex-shrink-0 min-w-0 flex-1"
         ):
-            # Left side: New conversation button
-            with ui.row().classes("gap-2 flex-shrink-0"):
-                new_btn_props = scene.get("footer", {}).get(
-                    "new_btn_props", "flat round"
-                )
-                new_btn_classes = scene.get("footer", {}).get(
-                    "new_btn_classes",
-                    "w-8 h-8 sm:w-10 sm:h-10 hover:scale-105 transition-all duration-300 backdrop-blur-sm flex-shrink-0",
-                )
-                new_btn_tooltip = scene.get("footer", {}).get(
-                    "new_btn_tooltip", "New conversation"
-                )
-                ui.button(icon="add", on_click=new_conversation, color="primary").props(
-                    new_btn_props
-                ).classes(new_btn_classes).tooltip(new_btn_tooltip)
+            input_classes = scene.get("footer", {}).get(
+                "input_classes", "flex-grow backdrop-blur-sm min-w-0"
+            )
+            input_props = scene.get("footer", {}).get("input_props", "filled dense")
+            input_placeholder = scene.get("footer", {}).get(
+                "input_placeholder", "Share what's on your mind..."
+            )
+            input_tooltip = scene.get("footer", {}).get(
+                "input_tooltip", "Type your message here"
+            )
+            text = (
+                ui.input(placeholder=input_placeholder)
+                .classes(input_classes)
+                .props(input_props)
+                .on("keydown.enter", send)
+                .tooltip(input_tooltip)
+            )
 
-            # Center: Input field with flexible growth
-            with ui.row().classes(
-                "items-center gap-3 md:gap-6 flex-shrink-0 min-w-0 flex-1"
-            ):
-                input_classes = scene.get("footer", {}).get(
-                    "input_classes", "flex-grow backdrop-blur-sm min-w-0"
-                )
-                input_props = scene.get("footer", {}).get("input_props", "filled dense")
-                input_placeholder = scene.get("footer", {}).get(
-                    "input_placeholder", "Share what's on your mind..."
-                )
-                input_tooltip = scene.get("footer", {}).get(
-                    "input_tooltip", "Type your message here"
-                )
-                text = (
-                    ui.input(placeholder=input_placeholder)
-                    .classes(input_classes)
-                    .props(input_props)
-                    .on("keydown.enter", send)
-                    .tooltip(input_tooltip)
-                )
-
-            # Right side: Send button
-            with ui.row().classes("gap-2 flex-shrink-0"):
-                send_btn_props = scene.get("footer", {}).get(
-                    "send_btn_props", "flat round color=primary"
-                )
-                send_btn_classes = scene.get("footer", {}).get(
-                    "send_btn_classes",
-                    "w-8 h-8 sm:w-10 sm:h-10 hover:scale-105 transition-all duration-300 backdrop-blur-sm flex-shrink-0",
-                )
-                send_btn_tooltip = scene.get("footer", {}).get(
-                    "send_btn_tooltip", "Send message"
-                )
-                send_btn = (
-                    ui.button(icon="send", on_click=send)
-                    .props(send_btn_props)
-                    .classes(send_btn_classes)
-                    .tooltip(send_btn_tooltip)
-                )
+        # Right side: Send button
+        with ui.row().classes("gap-2 flex-shrink-0"):
+            send_btn_props = scene.get("footer", {}).get(
+                "send_btn_props", "flat round color=primary"
+            )
+            send_btn_classes = scene.get("footer", {}).get(
+                "send_btn_classes",
+                "w-8 h-8 sm:w-10 sm:h-10 hover:scale-105 transition-all "
+                "duration-300 backdrop-blur-sm flex-shrink-0",
+            )
+            send_btn_tooltip = scene.get("footer", {}).get(
+                "send_btn_tooltip", "Send message"
+            )
+            send_btn = (
+                ui.button(icon="send", on_click=send)
+                .props(send_btn_props)
+                .classes(send_btn_classes)
+                .tooltip(send_btn_tooltip)
+            )
     return text, send_btn
 
 
@@ -323,7 +328,10 @@ def setup_ui(chat_service: ChatService) -> None:
             )
             user_classes = scene.get("chat", {}).get(
                 "user_message_classes",
-                "bg-gradient-to-br from-rose-200 to-pink-300 ml-auto text-white border-none shadow-md rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] leading-relaxed transition-all duration-300",
+                "bg-gradient-to-br from-rose-200 to-pink-300 ml-auto text-white "
+                "border-none shadow-md rounded-2xl p-5 max-w-[70%] "
+                "animate-[slideIn_0.3s_ease-out] leading-relaxed "
+                "transition-all duration-300",
             )
             with ui.row().classes(user_row_classes):
                 ui.chat_message(text=question, sent=True).props(user_props).classes(
@@ -338,7 +346,9 @@ def setup_ui(chat_service: ChatService) -> None:
             )
             assistant_classes = scene.get("chat", {}).get(
                 "assistant_message_classes",
-                "bg-white border border-slate-200 text-slate-700 shadow-md rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] leading-relaxed transition-all duration-300",
+                "bg-white border border-slate-200 text-slate-700 shadow-md "
+                "rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] "
+                "leading-relaxed transition-all duration-300",
             )
             with ui.row().classes(assistant_row_classes):
                 response_message = (
@@ -353,8 +363,8 @@ def setup_ui(chat_service: ChatService) -> None:
         # Use NiceGUI's native task processing with refreshable UI
         response_state = {"content": "", "error": None}
 
-        @ui.refreshable
-        def response_display():
+        @ui.refreshable  # type: ignore[misc]
+        def response_display() -> None:
             """Refreshable UI component for streaming response."""
             if response_state["error"]:
                 ui.label(f"Error: {response_state['error']}").classes("text-left")
@@ -368,7 +378,7 @@ def setup_ui(chat_service: ChatService) -> None:
         with response_message:
             response_display()
 
-        async def stream_worker():
+        async def stream_worker() -> None:
             """NiceGUI native worker for streaming chat responses."""
             try:
                 async for event in chat_service.stream_chat(conversation, question):
@@ -408,7 +418,9 @@ def setup_ui(chat_service: ChatService) -> None:
             )
             welcome_classes = scene.get("chat", {}).get(
                 "welcome_message_classes",
-                "bg-white border border-slate-200 text-slate-700 shadow-md rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] leading-relaxed transition-all duration-300",
+                "bg-white border border-slate-200 text-slate-700 shadow-md "
+                "rounded-2xl p-5 max-w-[70%] animate-[slideIn_0.3s_ease-out] "
+                "leading-relaxed transition-all duration-300",
             )
             with ui.row().classes(assistant_row_classes):
                 ui.chat_message(

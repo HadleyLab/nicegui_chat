@@ -22,9 +22,15 @@ from uuid import uuid4
 
 from config import Config
 
-from ..models.chat import (ChatEventType, ChatMessage, ChatStreamEvent,
-                           ConversationState, ConversationStatus,
-                           ExecutionStep, MessageRole)
+from ..models.chat import (
+    ChatEventType,
+    ChatMessage,
+    ChatStreamEvent,
+    ConversationState,
+    ConversationStatus,
+    ExecutionStep,
+    MessageRole,
+)
 from ..services.agent_service import ChatAgent
 from ..services.auth_service import AuthService
 from ..services.memory_service import MemoryService

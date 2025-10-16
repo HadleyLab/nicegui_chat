@@ -9,12 +9,14 @@ and performance optimization.
 """
 
 from pathlib import Path
+from typing import Any
 
-import structlog
-from nicegui import app as nicegui_app
+import structlog  # type: ignore
+from fastapi.staticfiles import StaticFiles  # type: ignore
+from nicegui import app as nicegui_app  # type: ignore
 
 
-def get_logger(name: str = "mammochat") -> structlog.WriteLogger:
+def get_logger(name: str = "mammochat") -> structlog.WriteLogger:  # type: ignore
     """Get a structured logger instance."""
     return structlog.get_logger(name)
 
@@ -25,7 +27,7 @@ def handle_error(error: Exception, logger: structlog.WriteLogger) -> None:
     raise error
 
 
-def setup_static_files(app) -> None:
+def setup_static_files(app: Any) -> None:
     """Configure static file serving for the application.
 
     Sets up NiceGUI static file serving for branding assets.
@@ -37,14 +39,12 @@ def setup_static_files(app) -> None:
     # Mount branding directory
     branding_path = Path("branding")
     if branding_path.exists():
-        from fastapi.staticfiles import StaticFiles
         nicegui_app.mount(
             "/branding", StaticFiles(directory="branding"), name="branding"
         )
 
     # Mount static directory for backward compatibility
     if branding_path.exists():
-        from fastapi.staticfiles import StaticFiles
         nicegui_app.mount(
             "/static",
             StaticFiles(directory="branding"),

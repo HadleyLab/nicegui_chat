@@ -2,7 +2,7 @@
 
 import re
 
-from html_sanitizer import Sanitizer
+from html_sanitizer import Sanitizer  # type: ignore[import-untyped]
 
 sanitizer = Sanitizer()
 

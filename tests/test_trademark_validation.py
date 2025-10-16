@@ -30,7 +30,7 @@ class TestTrademarkValidation:
         """Test that app.json contains proper trademark symbol."""
         app_json_path = self.config_dir / "app.json"
 
-        with open(app_json_path, "r", encoding="utf-8") as f:
+        with open(app_json_path, encoding="utf-8") as f:
             app_config = json.load(f)
 
         # Check main app name
@@ -47,7 +47,7 @@ class TestTrademarkValidation:
         """Test that scene.json contains proper trademark symbol."""
         scene_json_path = self.config_dir / "scene.json"
 
-        with open(scene_json_path, "r", encoding="utf-8") as f:
+        with open(scene_json_path, encoding="utf-8") as f:
             scene_config = json.load(f)
 
         # Check logo alt text
@@ -65,7 +65,7 @@ class TestTrademarkValidation:
         """Test that manifest.json contains proper trademark symbols."""
         manifest_path = self.public_dir / "manifest.json"
 
-        with open(manifest_path, "r", encoding="utf-8") as f:
+        with open(manifest_path, encoding="utf-8") as f:
             manifest = json.load(f)
 
         # Check name field
@@ -90,7 +90,7 @@ class TestTrademarkValidation:
         """Test that user-facing strings contain proper trademark symbols."""
         # Test main.py title
         main_py_path = self.project_root / "main.py"
-        with open(main_py_path, "r", encoding="utf-8") as f:
+        with open(main_py_path, encoding="utf-8") as f:
             main_content = f.read()
 
         # Check UI title in main.py
@@ -107,7 +107,7 @@ class TestTrademarkValidation:
         """Test that welcome message contains proper trademark symbol."""
         scene_json_path = self.config_dir / "scene.json"
 
-        with open(scene_json_path, "r", encoding="utf-8") as f:
+        with open(scene_json_path, encoding="utf-8") as f:
             scene_config = json.load(f)
 
         welcome_message = scene_config.get("chat", {}).get("welcome_message", "")
@@ -135,7 +135,7 @@ class TestTrademarkValidation:
         for file_path in source_files:
             full_path = self.project_root / file_path
             if full_path.exists():
-                with open(full_path, "r", encoding="utf-8") as f:
+                with open(full_path, encoding="utf-8") as f:
                     content = f.read()
 
                 # Check for proper trademark symbol in docstrings and comments
@@ -156,7 +156,7 @@ class TestTrademarkValidation:
         for file_path in doc_files:
             full_path = self.project_root / file_path
             if full_path.exists():
-                with open(full_path, "r", encoding="utf-8") as f:
+                with open(full_path, encoding="utf-8") as f:
                     content = f.read()
 
                 # Check for proper trademark symbol
@@ -182,7 +182,7 @@ class TestTrademarkValidation:
         for file_path in branding_files:
             full_path = self.project_root / file_path
             if full_path.exists():
-                with open(full_path, "r", encoding="utf-8") as f:
+                with open(full_path, encoding="utf-8") as f:
                     content = f.read()
 
                 # Check for proper trademark symbol
@@ -221,7 +221,7 @@ class TestTrademarkValidation:
                         continue
 
                     try:
-                        with open(file_path, "r", encoding="utf-8") as f:
+                        with open(file_path, encoding="utf-8") as f:
                             content = f.read()
 
                         # Check for incorrect format
@@ -246,7 +246,7 @@ class TestTrademarkValidation:
         for file_path in critical_files:
             full_path = self.project_root / file_path
             if full_path.exists():
-                with open(full_path, "r", encoding="utf-8") as f:
+                with open(full_path, encoding="utf-8") as f:
                     content = f.read()
 
                 assert (

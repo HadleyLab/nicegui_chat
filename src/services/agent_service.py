@@ -5,10 +5,10 @@ from __future__ import annotations
 from collections.abc import AsyncIterator
 from typing import Any
 
-from pydantic import BaseModel, Field
-from pydantic_ai import Agent, RunContext
-from pydantic_ai.models.openai import OpenAIChatModel
-from pydantic_ai.providers.deepseek import DeepSeekProvider
+from pydantic import BaseModel, Field  # type: ignore
+from pydantic_ai import Agent, RunContext  # type: ignore
+from pydantic_ai.models.openai import OpenAIChatModel  # type: ignore
+from pydantic_ai.providers.deepseek import DeepSeekProvider  # type: ignore
 
 from config import DeepSeekConfig
 
@@ -16,13 +16,13 @@ from ..models.chat import ConversationState
 from ..services.memory_service import MemoryService
 
 
-class AgentDependencies(BaseModel):  # type: ignore[misc]
+class AgentDependencies(BaseModel):
     """Dependencies provided to tool callbacks during agent execution."""
 
     selected_space_ids: list[str] = Field(default_factory=list)
 
 
-class AgentOutput(BaseModel):  # type: ignore[misc]
+class AgentOutput(BaseModel):
     """Structured response returned by the agent."""
 
     reply: str = Field(description="Assistant reply to present to the user")
@@ -36,7 +36,7 @@ class AgentOutput(BaseModel):  # type: ignore[misc]
     )
 
 
-class AgentResult(BaseModel):  # type: ignore[misc]
+class AgentResult(BaseModel):
     """Aggregated result returned to the chat service."""
 
     reply: str
@@ -77,7 +77,8 @@ class ChatAgent:
             query: str,
             limit: int = 5,
         ) -> list[str]:
-            """Search the user's HeySol memory store for episodes related to the query."""
+            """Search the user's HeySol memory store for episodes related to
+            the query."""
             deps = ctx.deps
             result = await self._memory_service.search(
                 query,
@@ -89,7 +90,7 @@ class ChatAgent:
                 episodes = result.episodes
             else:
                 # If result is already a list, use it directly
-                episodes = result if isinstance(result, list) else []
+                episodes = result if isinstance(result, list) else []  # type: ignore
             return [episode.body for episode in episodes]
 
         # Register memory ingest tool
@@ -110,8 +111,10 @@ class ChatAgent:
     def _build_system_prompt(self) -> str:
         """Build the system prompt with tool descriptions."""
         tools_desc = """
-- `memory_search(query: str, limit: int = 5)`: Search memory for relevant episodes
-- `memory_ingest(note: str, space_id: Optional[str] = None)`: Store new information in memory
+- `memory_search(query: str, limit: int = 5)`: Search memory for relevant
+  episodes
+- `memory_ingest(note: str, space_id: Optional[str] = None)`: Store new
+  information in memory
 """
         return self._config.system_prompt.replace("{tools}", tools_desc)
 
@@ -175,7 +178,10 @@ class ChatAgent:
                 previous_reply = output.reply
 
             # Yield the final result
-            yield "final", AgentResult(
-                reply=output.reply,
-                referenced_memories=output.referenced_memories,
+            yield (
+                "final",
+                AgentResult(
+                    reply=output.reply,
+                    referenced_memories=output.referenced_memories,
+                ),
             )
