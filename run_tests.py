@@ -27,7 +27,7 @@ def run_command(cmd, description):
     print("-" * 50)
 
     try:
-        result = subprocess.run(cmd, cwd=Path(__file__).parent)
+        result = subprocess.run(cmd, check=False, cwd=Path(__file__).parent)
         return result.returncode == 0
     except KeyboardInterrupt:
         print("\n⏹️  Test run interrupted by user")

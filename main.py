@@ -18,7 +18,8 @@ The application follows a layered architecture where:
 This design enables maintainability, testability, and scalability.
 """
 
-import os
+import sys
+from pathlib import Path
 
 from nicegui import app, ui
 
@@ -30,25 +31,25 @@ from src.ui.main_ui import setup_ui
 
 # Set up static file serving for branding assets
 try:
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+    current_dir = Path(__file__).parent.resolve()
 except NameError:
     # Fallback when __file__ is not defined (e.g., in certain container contexts)
-    current_dir = os.getcwd()
+    current_dir = Path.cwd()
 
-branding_dir = os.path.join(current_dir, "branding")
-if os.path.exists(branding_dir):
-    app.add_static_files("/branding", branding_dir)
+branding_dir = current_dir / "branding"
+if branding_dir.exists():
+    app.add_static_files("/branding", str(branding_dir))
 
-public_dir = os.path.join(current_dir, "public")
-if os.path.exists(public_dir):
-    app.add_static_files("/public", public_dir)
+public_dir = current_dir / "public"
+if public_dir.exists():
+    app.add_static_files("/public", str(public_dir))
 
 try:
     validate_config(config)
 except ValueError as e:
     print(f"❌ Configuration Error: {e}")
     print("Please create a .env file with your DEEPSEEK_API_KEY")
-    exit(1)
+    sys.exit(1)
 
 auth_service = AuthService(config.memory)
 memory_service = MemoryService(auth_service)

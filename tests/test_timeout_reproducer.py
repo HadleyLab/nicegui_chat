@@ -201,8 +201,9 @@ class TestTimeoutReproducer:
 
         # Verify file was created and contains expected data
         import json
+        from pathlib import Path
 
-        with open(filename) as f:
+        with Path(filename).open() as f:
             data = json.load(f)
 
         assert "results" in data

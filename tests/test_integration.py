@@ -1,8 +1,8 @@
 """Integration tests for external APIs (only run with real API keys)."""
 
 import pytest
-from config import config
 
+from config import config
 from src.services.agent_service import ChatAgent
 from src.services.auth_service import AuthService
 from src.services.memory_service import MemoryService

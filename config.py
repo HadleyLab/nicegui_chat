@@ -67,12 +67,12 @@ CONFIG_DIR = BASE_DIR / "config"
 
 
 def _load_json(path: Path) -> dict[str, Any]:
-    with open(path, encoding="utf-8") as f:
+    with path.open(encoding="utf-8") as f:
         return cast(dict[str, Any], json.load(f))
 
 
 def _load_text(path: Path) -> str:
-    with open(path, encoding="utf-8") as f:
+    with path.open(encoding="utf-8") as f:
         return f.read().strip()
 
 

@@ -9,8 +9,8 @@ import asyncio
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from config import config
 
+from config import config
 from src.models.chat import ConversationState, ConversationStatus
 from src.services.chat_service import ChatService
 from src.ui.main_ui import (

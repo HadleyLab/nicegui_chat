@@ -22,8 +22,8 @@ from uuid import uuid4
 
 import pytest
 import structlog
-from config import config
 
+from config import config
 from src.models.chat import ChatEventType, ConversationState, ConversationStatus
 from src.services.auth_service import AuthService
 from src.services.chat_service import ChatService
@@ -238,7 +238,7 @@ class AsyncIntegrationTester:
                         status=ConversationStatus.RUNNING,
                     )
 
-                    async def service_operation(svc, conv):
+                    async def service_operation(svc, conv, service_idx=service_idx, op_idx=op_idx):
                         events = []
                         async for event in svc.stream_chat(
                             conversation=conv,
@@ -491,7 +491,7 @@ class AsyncIntegrationTester:
                         # Create a very slow response simulation
                         original_search = memory_service.search
 
-                        async def slow_search(*args, **kwargs):
+                        async def slow_search(original_search=original_search, *args, **kwargs):
                             await asyncio.sleep(2.0)  # Longer than typical timeout
                             return await original_search(*args, **kwargs)
 

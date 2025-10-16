@@ -1,22 +1,29 @@
 #!/usr/bin/env python3
 """Test script to verify AI response sanitization on deployed MammoChat™."""
 
+import inspect
+import sys
+from pathlib import Path
+
 import requests
+
+# Type ignore for imports that may not be available in test environment
+try:
+    from src.services.ai_service import AIService  # type: ignore
+
+    from src.utils.text_processing import strip_markdown  # type: ignore
+except ImportError:
+    AIService = None
+    strip_markdown = None
 
 
 def test_text_sanitization():
     """Test the text processing sanitization functions."""
     print("🧪 Testing text sanitization functions...")
 
-    # Import the text processing function
-    import sys
-    import os
-
     # Add current directory to path first to prioritize local modules
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    sys.path.insert(0, current_dir)
-
-    from utils.text_processing import strip_markdown
+    current_dir = Path(__file__).parent.resolve()
+    sys.path.insert(0, str(current_dir))
 
     # Test cases for markdown stripping
     test_cases = [
@@ -83,20 +90,13 @@ def simulate_chat_test():
     # Since direct testing is complex, we'll verify that the sanitization
     # functions are properly integrated by checking the code
     try:
-        import os
-        import sys
-
         # Add current directory and src to path
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        sys.path.insert(0, current_dir)
-        sys.path.insert(0, os.path.join(current_dir, "src"))
+        current_dir = Path(__file__).parent.resolve()
+        sys.path.insert(0, str(current_dir))
+        sys.path.insert(0, str(current_dir / "src"))
 
         # Test that the AI service imports and uses strip_markdown
         # Check that AIService has the strip_markdown function available
-        import inspect
-
-        from src.services.ai_service import AIService
-        from src.utils.text_processing import strip_markdown
 
         source = inspect.getsource(AIService.stream_chat)
 
