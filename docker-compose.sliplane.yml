@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  nicegui-chat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: nicegui-chat-app
+    restart: unless-stopped
+
+    # Environment variables
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONOPTIMIZE=1
+      - PORT=8080
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+
+    # Secrets (will be injected by sliplane)
+    secrets:
+      - deepseek_api_key
+      - heysol_api_key
+
+    # Resource limits for sliplane
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+    # Logging configuration for sliplane
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Network configuration
+    networks:
+      - sliplane-network
+
+# Secrets (to be configured in sliplane dashboard)
+secrets:
+  deepseek_api_key:
+    external: true
+    name: deepseek_api_key
+  heysol_api_key:
+    external: true
+    name: heysol_api_key
+
+# Networks
+networks:
+  sliplane-network:
+    driver: bridge
+    name: sliplane-chat-network
+
+# Volumes for persistent data (if needed)
+volumes:
+  chat-data:
+    driver: local
+  chat-logs:
+    driver: local

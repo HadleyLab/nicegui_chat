@@ -1,0 +1,130 @@
+name: nicegui-chat-app
+version: 1.0.0
+
+# Application configuration
+app:
+  name: "NiceGUI Chat Application"
+  description: "A modern chat application built with NiceGUI and Python"
+  port: 8080
+  health_check_path: "/health"
+  health_check_interval: 30
+
+# Deployment configuration
+deployment:
+  strategy: "rolling"
+  replicas: 2
+  memory: "512Mi"
+  cpu: "250m"
+  max_surge: 1
+  max_unavailable: 0
+
+# Environment variables
+environment:
+  - name: PYTHONUNBUFFERED
+    value: "1"
+  - name: PYTHONDONTWRITEBYTECODE
+    value: "1"
+  - name: PYTHONOPTIMIZE
+    value: "1"
+  - name: PIP_NO_CACHE_DIR
+    value: "1"
+  - name: PIP_DISABLE_PIP_VERSION_CHECK
+    value: "1"
+
+# Secrets (to be configured in sliplane dashboard)
+secrets:
+  - DEEPSEEK_API_KEY
+  - HEYSOL_API_KEY
+
+# Resource limits
+resources:
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+
+# Health checks
+health_checks:
+  liveness:
+    path: "/health"
+    port: 8080
+    initial_delay_seconds: 30
+    period_seconds: 10
+    timeout_seconds: 5
+    failure_threshold: 3
+    success_threshold: 1
+
+  readiness:
+    path: "/health"
+    port: 8080
+    initial_delay_seconds: 10
+    period_seconds: 5
+    timeout_seconds: 3
+    failure_threshold: 3
+    success_threshold: 1
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "json"
+  output: "stdout"
+
+# Monitoring
+monitoring:
+  enabled: true
+  metrics_path: "/metrics"
+  metrics_port: 9090
+
+# Backup configuration (if supported by platform)
+backup:
+  enabled: false
+  schedule: "0 2 * * *"
+  retention_days: 7
+
+# Domain configuration (to be configured in sliplane dashboard)
+domains:
+  - your-app-name.sliplane.io
+
+# Build configuration
+build:
+  dockerfile: "Dockerfile"
+  context: "."
+  target: "production"
+  args:
+    - BUILD_ENV=production
+
+# Network policies
+network_policies:
+  - name: "allow-health-checks"
+    pod_selector:
+      match_labels:
+        app: nicegui-chat-app
+    policy_types:
+      - Ingress
+    ingress:
+      - from:
+          - pod_selector:
+              match_labels:
+                app: health-checker
+        ports:
+          - protocol: TCP
+            port: 8080
+
+# Security context
+security_context:
+  run_as_non_root: true
+  run_as_user: 1000
+  run_as_group: 1000
+  fs_group: 1000
+  read_only_root_filesystem: true
+
+# Volume mounts (if needed)
+volumes: []
+
+# Init containers (if needed)
+init_containers: []
+
+# Sidecar containers (if needed)
+sidecars: []

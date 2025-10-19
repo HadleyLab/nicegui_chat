@@ -1,0 +1,26 @@
+{
+  "name": "mammo-chat-app",
+  "version": "1.0.0",
+  "description": "NiceGUI Chat Application",
+  "image": "mammo-chat-app:latest",
+  "port": 8080,
+  "healthCheckPath": "/health",
+  "environment": {
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONOPTIMIZE": "1",
+    "LOG_LEVEL": "INFO",
+    "ENVIRONMENT": "production",
+    "DEBUG": "false"
+  },
+  "secrets": [
+    "DEEPSEEK_API_KEY",
+    "HEYSOL_API_KEY"
+  ],
+  "resources": {
+    "memory": "512Mi",
+    "cpu": "250m"
+  },
+  "replicas": 2,
+  "created_at": "2025-10-19T03:02:08Z"
+}
