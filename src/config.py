@@ -74,10 +74,9 @@ class DeepSeekConfig:
     system_prompt: str
 
     def ensure_valid(self) -> None:
+        # API key is now optional for demo/UI testing mode
         if not self.api_key:
-            raise ConfigurationError(
-                "DEEPSEEK_API_KEY environment variable is required to run the chat agent"
-            )
+            print("Warning: DEEPSEEK_API_KEY not set - running in demo mode (AI responses disabled)")
         if not self.system_prompt:
             raise ConfigurationError(
                 "System prompt could not be loaded from configuration"

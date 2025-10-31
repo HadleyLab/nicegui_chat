@@ -52,7 +52,10 @@ class ChatService:
         store_user_message: bool = True,
     ) -> AsyncIterator[ChatStreamEvent]:
         """Stream chat responses from the agent."""
-        if not self._auth_service.is_authenticated:
+        # Allow demo mode without authentication
+        demo_mode = not self._app_config.llm.api_key
+
+        if not demo_mode and not self._auth_service.is_authenticated:
             raise AuthenticationError("Authentication is required")
         if not user_message.strip():
             raise ChatServiceError("Cannot send an empty message")
@@ -67,14 +70,44 @@ class ChatService:
             )
             conversation.append_message(user_chat_message)
 
-        # Generate response using the agent
-        agent_result = await self._agent.generate(
-            conversation,
-            user_message,
-            selected_space_ids=selected_space_ids,
-            metadata=metadata,
-            prefetch_memory=self._chat_config.enable_memory_enrichment,
-        )
+        # Generate response using the agent or demo response
+        if demo_mode:
+            # Demo mode: return variable-length demo responses for UI testing
+            import random
+            from dataclasses import dataclass
+
+            demo_responses = [
+                "**Demo Mode Active** 🎨\n\nThis is a short demo response to test the UI.",
+
+                "**Demo Mode Active** 🎨\n\nThis is a medium-length demo response. It includes multiple sentences to help you test how the chat bubbles look with different amounts of content.\n\nYou can see how the gradient background appears with paragraphs and line breaks. The streaming effect should also be visible as this text appears character by character.",
+
+                "**Demo Mode Active** 🎨\n\nThis is a longer demo response designed to test the UI with more substantial content. When you're building a chat interface, it's important to see how it handles various message lengths.\n\n### Key Features Being Tested:\n\n- **Gradient Background**: The pink-to-rose gradient should be clearly visible\n- **Text Readability**: White text on gradient background\n- **Message Bubbles**: Rounded corners and proper spacing\n- **Streaming Effect**: Watch as text appears gradually\n\nThe MammoChat interface uses a beautiful design with glassmorphism effects, custom gradients, and smooth animations. This demo mode lets you test all these features without needing API credentials.\n\n### To Enable Full Functionality:\n\nAdd your `DEEPSEEK_API_KEY` to the `.env` file to connect to the AI service and get real responses!",
+
+                "**Demo Response** ✨\n\nHere's another example with **markdown formatting**:\n\n1. First item\n2. Second item\n3. Third item\n\nThis helps test how lists appear in the chat bubbles with the gradient background.",
+
+                "**Short test** 👋\n\nJust a quick message to verify the UI handles brief responses elegantly.",
+            ]
+
+            @dataclass
+            class DemoResult:
+                reply: str
+                referenced_memories: list = None
+
+                def __post_init__(self):
+                    if self.referenced_memories is None:
+                        self.referenced_memories = []
+
+            # Pick a random response for variety
+            agent_result = DemoResult(reply=random.choice(demo_responses))
+        else:
+            # Generate response using the agent
+            agent_result = await self._agent.generate(
+                conversation,
+                user_message,
+                selected_space_ids=selected_space_ids,
+                metadata=metadata,
+                prefetch_memory=self._chat_config.enable_memory_enrichment,
+            )
 
         assistant_message = ChatMessage(
             message_id=str(uuid4()),
@@ -88,12 +121,21 @@ class ChatService:
             payload={"role": MessageRole.ASSISTANT.value},
         )
 
+        # In demo mode, add a delay before streaming to show the thinking indicator
+        if demo_mode:
+            import asyncio
+            await asyncio.sleep(2.0)  # 2 second delay to see the thinking indicator
+
         # Stream the response in chunks
         for chunk in self._chunk_reply(agent_result.reply):
             assistant_message.content += chunk
             yield ChatStreamEvent(
                 event_type=ChatEventType.MESSAGE_CHUNK, payload={"content": chunk}
             )
+            # In demo mode, add small delays between chunks for realistic streaming effect
+            if demo_mode:
+                import asyncio
+                await asyncio.sleep(0.03)  # 30ms delay between chunks
 
         yield ChatStreamEvent(
             event_type=ChatEventType.MESSAGE_END,
