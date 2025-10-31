@@ -542,10 +542,10 @@ class ChatUI:
         logger.debug("Displaying user message in chat")
         with self.chat_container, ui.row().classes("w-full justify-end message-enter"):
             with ui.card().props("flat").style(
-                "background: white; border: 1px solid #FBCFE8; border-radius: 0.25rem 1.5rem 1.5rem 1.5rem; "
-                "padding: 1.25rem 1.75rem; box-shadow: 0 4px 12px rgba(233, 30, 99, 0.1); max-width: 75%;"
+                "background: linear-gradient(to right, lab(56.9303 76.8162 -8.07021) 0%, lab(56.101 79.4328 31.4532) 100%); border: 1px solid #FBCFE8; border-radius: 1.5rem 0.25rem 1.5rem 1.5rem; "
+                "padding: 1.25rem 1.75rem; box-shadow: 0 4px 12px rgba(233, 30, 99, 0.1); max-width: 75%; "
             ):
-                ui.label(message).style("color: #212121; font-weight: 300; line-height: 1.7; font-size: 1rem;")
+                ui.label(message).style("color: #ffffff; font-weight: 300; line-height: 1.7; font-size: 1rem;")
 
         # Save user message to localStorage
         ui.run_javascript(f'saveChatMessage({repr(message)}, true);')
@@ -558,33 +558,33 @@ class ChatUI:
         # Show typing indicator
         logger.debug("Displaying typing indicator")
         with self.chat_container:
-            typing_row = ui.row().classes("w-full items-start gap-2 message-enter")
-            # Bot avatar
-            ui.html('''
-                <div style="width: 2rem; height: 2rem; border-radius: 9999px;
-                            background: linear-gradient(to bottom right, #ec4899, #f43f5e);
-                            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-                            margin-top: 1.25rem;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round" style="color: white;">
-                        <path d="M12 8V4H8"></path>
-                        <rect width="16" height="12" x="4" y="8" rx="2"></rect>
-                        <path d="M2 14h2"></path>
-                        <path d="M20 14h2"></path>
-                        <path d="M15 13v2"></path>
-                        <path d="M9 13v2"></path>
-                    </svg>
-                </div>
-            ''', sanitize=False)
-            with typing_row, ui.card().props("flat").style(
-                "background: linear-gradient(to right, lab(56.9303 76.8162 -8.07021) 0%, lab(56.101 79.4328 31.4532) 100%); "
-                "border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 1.5rem 0.25rem 1.5rem 1.5rem; "
-                "padding: 1.25rem 1.75rem; max-width: 75%;"
-            ):
-                with ui.row().classes("gap-2 items-center"):
-                    ui.spinner("dots", size="sm").style("color: white;")
-                    ui.label(self.config.ui.thinking_text).style("color: white; font-weight: 300; font-size: 1rem;")
+            typing_row = ui.row().classes("w-full items-start message-enter").style("gap: 8px;")
+            with typing_row:
+                # Bot avatar
+                ui.html('''
+                    <div style="width: 2rem; height: 2rem; border-radius: 9999px;
+                                background: linear-gradient(to bottom right, #ec4899, #f43f5e);
+                                display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" style="color: white;">
+                            <path d="M12 8V4H8"></path>
+                            <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+                            <path d="M2 14h2"></path>
+                            <path d="M20 14h2"></path>
+                            <path d="M15 13v2"></path>
+                            <path d="M9 13v2"></path>
+                        </svg>
+                    </div>
+                ''', sanitize=False)
+                with ui.card().props("flat").style(
+                    "background: white; "
+                    "border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.25rem 1.5rem 1.5rem 1.5rem; "
+                    "padding: 1.25rem 1.75rem; max-width: 75%;"
+                ):
+                    with ui.row().classes("gap-2 items-center"):
+                        ui.spinner("dots", size="sm").style("color: white;")
+                        ui.label(self.config.ui.thinking_text).style("color: white; font-weight: 300; font-size: 1rem;")
 
         # Stream response
         assistant_content = ""
@@ -605,31 +605,32 @@ class ChatUI:
                     typing_row.delete()
 
                     # Create assistant message bubble with gradient background
-                    with self.chat_container, ui.row().classes("w-full items-start gap-2 message-enter"):
-                        # Bot avatar
-                        ui.html('''
-                            <div style="width: 2rem; height: 2rem; border-radius: 9999px;
-                                        background: linear-gradient(to bottom right, #ec4899, #f43f5e);
-                                        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-                                        margin-right: 4px; margin-top: 1.25rem;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round" style="color: white;">
-                                    <path d="M12 8V4H8"></path>
-                                    <rect width="16" height="12" x="4" y="8" rx="2"></rect>
-                                    <path d="M2 14h2"></path>
-                                    <path d="M20 14h2"></path>
-                                    <path d="M15 13v2"></path>
-                                    <path d="M9 13v2"></path>
-                                </svg>
-                            </div>
-                        ''', sanitize=False)
-                        with ui.card().props("flat").style(
-                            "background: linear-gradient(to right, lab(56.9303 76.8162 -8.07021) 0%, lab(56.101 79.4328 31.4532) 100%); "
-                            "border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 1.5rem 0.25rem 1.5rem 1.5rem; "
-                            "padding: 1.25rem 1.75rem; box-shadow: 0 4px 12px rgba(233, 30, 99, 0.2); max-width: 75%;"
-                        ):
-                            assistant_label = ui.markdown("").style("color: white; font-weight: 300; line-height: 1.7; font-size: 1rem;")
+                    with self.chat_container:
+                        message_row = ui.row().classes("w-full items-start message-enter").style("gap: 4px;")
+                        with message_row:
+                            # Bot avatar
+                            ui.html('''
+                                <div style="width: 2rem; height: 2rem; border-radius: 9999px;
+                                            background: linear-gradient(to bottom right, #ec4899, #f43f5e);
+                                            display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" style="color: white;">
+                                        <path d="M12 8V4H8"></path>
+                                        <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+                                        <path d="M2 14h2"></path>
+                                        <path d="M20 14h2"></path>
+                                        <path d="M15 13v2"></path>
+                                        <path d="M9 13v2"></path>
+                                    </svg>
+                                </div>
+                            ''', sanitize=False)
+                            with ui.card().props("flat").style(
+                                "background: linear-gradient(to right, lab(56.9303 76.8162 -8.07021) 0%, lab(56.101 79.4328 31.4532) 100%); "
+                                "border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 1.5rem 0.25rem 1.5rem 1.5rem; "
+                                "padding: 1.25rem 1.75rem; box-shadow: 0 4px 12px rgba(233, 30, 99, 0.2); max-width: 75%;"
+                            ):
+                                assistant_label = ui.markdown("").style("color: white; font-weight: 300; line-height: 1.7; font-size: 1rem;")
 
                 elif event.event_type == ChatEventType.MESSAGE_CHUNK:
                     chunk = event.payload.get("content", "")
