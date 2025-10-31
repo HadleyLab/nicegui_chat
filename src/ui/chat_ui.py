@@ -312,13 +312,36 @@ class ChatUI:
     def _add_welcome_message(self) -> None:
         """Add the welcome message to the chat."""
         logger.debug("Adding welcome message to chat container")
+
+        # State for accordion
+        is_expanded = {'value': True}
+
+        def toggle_content():
+            is_expanded['value'] = not is_expanded['value']
+            if is_expanded['value']:
+                content_container.set_visibility(True)
+                chevron_icon.content = '''
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #EC4899; transition: transform 0.3s ease;">
+                        <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg>
+                '''
+            else:
+                content_container.set_visibility(False)
+                chevron_icon.content = '''
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #EC4899; transition: transform 0.3s ease;">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                '''
+
         with self.chat_container:
             with ui.card().classes("message-enter").style(
                 "background: white; "
                 "border-radius: 1.5rem; padding: 2.5rem; border: 1px solid #FBCFE8; "
-                "box-shadow: 0 4px 12px rgba(233, 30, 99, 0.08);"
+                "box-shadow: 0 4px 12px rgba(233, 30, 99, 0.08); "
+                "width: 100%;"
             ):
-                with ui.row().classes("items-center gap-3").style("margin-bottom: 1.5rem;"):
+                # Header row with toggle button
+                with ui.row().classes("items-center gap-3 w-full").style("margin-bottom: 1.5rem; position: relative;"):
                     # Chat bubble with heart icon only
                     ui.html('''
                         <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56" fill="none">
@@ -340,9 +363,26 @@ class ChatUI:
                         sanitize=False
                     )
 
-                ui.markdown(self.config.ui.welcome_message).style(
-                    "color: #212121; font-weight: 300; line-height: 1.8; font-size: 1rem;"
-                )
+                    # Spacer to push button to the right
+                    ui.space()
+
+                    # Toggle button with chevron SVG
+                    with ui.button(on_click=toggle_content).props("flat round").style(
+                        "background: transparent; transition: transform 0.2s ease; padding: 0.5rem; min-width: 2.5rem; min-height: 2.5rem;"
+                    ):
+                        chevron_icon = ui.html('''
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #EC4899; transition: transform 0.3s ease;">
+                                <polyline points="18 15 12 9 6 15"></polyline>
+                            </svg>
+                        ''', sanitize=False)
+
+                # Content container (collapsible) - set min-height to maintain card height
+                content_container = ui.column().classes("w-full")
+                with content_container:
+                    ui.markdown(self.config.ui.welcome_message).style(
+                        "color: #212121; font-weight: 300; line-height: 1.8; font-size: 1rem;"
+                    )
+
         logger.debug("Welcome message added successfully")
 
     def _build_header(self) -> None:
